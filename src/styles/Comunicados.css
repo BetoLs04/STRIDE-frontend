@@ -1,0 +1,559 @@
+/* ===== ESTILOS PARA COMUNICADOS ===== */
+
+.comunicados-publicos {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.comunicados-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.comunicados-header h2 {
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.comunicados-subtitle {
+  color: var(--medium-gray);
+  font-size: 1.1rem;
+}
+
+/* Grid de comunicados */
+.comunicados-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Tarjeta de comunicado */
+.comunicado-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  border-left: 4px solid var(--secondary-blue);
+  transition: all 0.3s ease;
+}
+
+.comunicado-card:hover {
+  box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.comunicado-card.expanded {
+  border-left-color: var(--accent-gold);
+}
+
+/* Header del comunicado */
+.comunicado-header {
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f8f9fa;
+  transition: background 0.3s ease;
+}
+
+.comunicado-header:hover {
+  background: #e9ecef;
+}
+
+.comunicado-title {
+  flex: 1;
+}
+
+.comunicado-title h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-blue);
+  font-size: 1.2rem;
+}
+
+.comunicado-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.comunicado-fecha,
+.comunicado-autor {
+  font-size: 0.9rem;
+  color: var(--medium-gray);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.comunicado-toggle {
+  font-size: 1.2rem;
+  color: var(--primary-blue);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  margin-left: 1rem;
+}
+
+/* Contenido del comunicado */
+.comunicado-content {
+  padding: 1.5rem;
+  border-top: 1px solid #e9ecef;
+  animation: slideDown 0.3s ease-out;
+}
+
+.comunicado-contenido {
+  line-height: 1.8;
+  color: var(--dark-gray);
+  margin-bottom: 1.5rem;
+}
+
+.comunicado-contenido p {
+  margin-bottom: 1rem;
+}
+
+.comunicado-contenido p:last-child {
+  margin-bottom: 0;
+}
+
+.comunicado-link {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #e8f4fd;
+  border-radius: 8px;
+  border-left: 4px solid var(--secondary-blue);
+}
+
+.link-externo {
+  color: var(--secondary-blue);
+  text-decoration: none;
+  word-break: break-all;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.link-externo:hover {
+  text-decoration: underline;
+  color: var(--primary-blue);
+}
+
+/* Footer del comunicado */
+.comunicado-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed #dee2e6;
+  font-size: 0.9rem;
+}
+
+.comunicado-estado {
+  background: #d4edda;
+  color: #155724;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-weight: 500;
+}
+
+.comunicado-id {
+  color: var(--medium-gray);
+  background: #f8f9fa;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+}
+
+/* Controles */
+.comunicados-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+  padding-top: 2rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.comunicados-info {
+  text-align: center;
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Estados vacío y loading */
+.no-comunicados {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.no-comunicados-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.no-comunicados h3 {
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.comunicados-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.comunicados-loading .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--secondary-blue);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* Animaciones */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .comunicados-publicos {
+    padding: 1rem;
+  }
+  
+  .comunicado-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .comunicado-toggle {
+    align-self: flex-end;
+  }
+  
+  .comunicado-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .comunicado-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .comunicados-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.panel-comunicados-admin {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.panel-header {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.header-content h2 {
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.header-content p {
+  color: var(--medium-gray);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Formulario de comunicados */
+.comunicados-form-container {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.comunicados-form .form-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.comunicados-form .form-header h3 {
+  color: var(--primary-blue);
+  margin: 0;
+}
+
+.comunicados-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.comunicados-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--dark-gray);
+}
+
+.comunicados-form input[type="text"],
+.comunicados-form input[type="url"],
+.comunicados-form textarea,
+.comunicados-form select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.comunicados-form input:focus,
+.comunicados-form textarea:focus,
+.comunicados-form select:focus {
+  outline: none;
+  border-color: var(--secondary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.1);
+}
+
+.comunicados-form textarea {
+  min-height: 200px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Tabla de comunicados admin */
+.comunicados-list-admin {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.table-summary {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--dark-gray);
+}
+
+.table-summary span strong {
+  color: var(--primary-blue);
+}
+
+.comunicados-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comunicados-table th {
+  background: var(--primary-blue);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comunicados-table th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.comunicados-table th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.comunicados-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.comunicados-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* Columnas específicas */
+.comunicado-id {
+  font-weight: 600;
+  color: var(--primary-blue);
+  text-align: center;
+}
+
+.comunicado-titulo {
+  max-width: 300px;
+}
+
+.link-indicator {
+  margin-left: 8px;
+  color: var(--secondary-blue);
+  font-size: 0.9rem;
+}
+
+.comunicado-fecha {
+  white-space: nowrap;
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+}
+
+.comunicado-creador {
+  font-weight: 500;
+}
+
+/* Estados */
+.estado-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.estado-badge.publicado {
+  background: #d4edda;
+  color: #155724;
+}
+
+.estado-badge.borrador {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.estado-badge.archivado {
+  background: #e9ecef;
+  color: #495057;
+}
+
+/* Acciones */
+.comunicado-actions {
+  display: flex;
+  gap: 0.5rem;
+  min-width: 100px;
+}
+
+.btn-action {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.btn-action.edit {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.btn-action.edit:hover {
+  background: #1565c0;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-action.delete {
+  background: #fdecea;
+  color: #d32f2f;
+}
+
+.btn-action.delete:hover {
+  background: #d32f2f;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Responsive para tabla */
+@media (max-width: 1024px) {
+  .comunicados-table-container {
+    overflow-x: auto;
+  }
+  
+  .comunicados-table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .table-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}
