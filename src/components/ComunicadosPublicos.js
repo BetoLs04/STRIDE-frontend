@@ -17,7 +17,7 @@ const fetchComunicados = async () => {
   try {
     setLoading(true);
     // Usa la ruta sin query string (usa la ruta con parámetro por defecto)
-    const response = await axios.get('/api/university/comunicados-recientes/10');
+    const response = await axios.get('https://api.strideutmat.com/api/university/comunicados-recientes/10');
     
     if (response.data.success) {
       setComunicados(response.data.data || []);

@@ -42,7 +42,7 @@ const Header = ({ user, onLogout }) => {
 
   const cargarTareasPendientes = async () => {
     try {
-      const response = await axios.get(`/api/university/tareas/personal/${user.id}/conteo`);
+      const response = await axios.get(`https://api.strideutmat.com/api/university/tareas/personal/${user.id}/conteo`);
       if (response.data.success) {
         setTareasPendientes(response.data.data.pendientes);
       }
@@ -112,7 +112,7 @@ const Header = ({ user, onLogout }) => {
 
     try {
       if (user.tipo === 'personal') {
-        const response = await axios.get('/api/university/personal');
+        const response = await axios.get('https://api.strideutmat.com/api/university/personal');
         
         if (response.data.success) {
           const allPersonal = response.data.data || [];
@@ -150,9 +150,9 @@ const Header = ({ user, onLogout }) => {
     console.log('📸 Cargando foto:', fotoPerfil);
     
     const urlsToTry = [
-      `/api/university/personal/foto/${fotoPerfil}`,
+      `https://api.strideutmat.com/api/university/personal/foto/${fotoPerfil}`,
       `/uploads/personal/${fotoPerfil}`,
-      `/api/university/personal/foto/default-avatar.png`
+      `https://api.strideutmat.com/api/university/personal/foto/default-avatar.png`
     ];
 
     const tryLoadImage = (index) => {
@@ -194,7 +194,7 @@ const Header = ({ user, onLogout }) => {
       formData.append('uploaded_by', user?.username || 'system');
       formData.append('user_type', user?.tipo || 'system');
 
-      const response = await axios.post('/api/university/upload-logo', formData, {
+      const response = await axios.post('https://api.strideutmat.com/api/university/upload-logo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -223,7 +223,7 @@ const Header = ({ user, onLogout }) => {
     }
 
     try {
-      const response = await axios.delete('/api/university/delete-logo');
+      const response = await axios.delete('https://api.strideutmat.com/api/university/delete-logo');
       
       if (response.data.success) {
         toast.success('Logo eliminado correctamente');

@@ -62,7 +62,7 @@ const SuperAdminActividades = ({ admin }) => {
 
   const fetchDirecciones = async () => {
     try {
-      const response = await axios.get('/api/university/direcciones');
+      const response = await axios.get('https://api.strideutmat.com/api/university/direcciones');
       setDirecciones(response.data.data || []);
     } catch (error) {
       console.error('Error cargando direcciones:', error);
@@ -77,7 +77,7 @@ const SuperAdminActividades = ({ admin }) => {
       
       let todasActividades = [];
       
-      const direccionesRes = await axios.get('/api/university/direcciones');
+      const direccionesRes = await axios.get('https://api.strideutmat.com/api/university/direcciones');
       const direccionesList = direccionesRes.data.data || [];
       
       if (direccionesList.length === 0) {
@@ -92,7 +92,7 @@ const SuperAdminActividades = ({ admin }) => {
       for (const direccion of direccionesList) {
         try {
           console.log(`   📂 Obteniendo actividades de: ${direccion.nombre} (ID: ${direccion.id})`);
-          const response = await axios.get(`/api/university/actividades/direccion/${direccion.id}`);
+          const response = await axios.get(`https://api.strideutmat.com/api/university/actividades/direccion/${direccion.id}`);
           
           if (response.data.data && response.data.data.length > 0) {
             console.log(`   ✅ ${response.data.data.length} actividades encontradas`);
@@ -272,7 +272,7 @@ const SuperAdminActividades = ({ admin }) => {
     try {
       const response = await axios({
         method: 'DELETE',
-        url: `/api/university/actividades/${actividadId}`,
+        url: `https://api.strideutmat.com/api/university/actividades/${actividadId}`,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'

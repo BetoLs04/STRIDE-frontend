@@ -83,7 +83,7 @@ const PersonalDashboard = ({ user }) => {
         return;
       }
       
-      const response = await axios.get(`/api/university/actividades/direccion/${user.direccion_id}`);
+      const response = await axios.get(`https://api.strideutmat.com/api/university/actividades/direccion/${user.direccion_id}`);
       setActividades(response.data.data || []);
     } catch (error) {
       console.error('Error fetching actividades:', error);
@@ -398,7 +398,7 @@ const PersonalDashboard = ({ user }) => {
       console.log('Enviando actividad con', formData.imagenes.length, 'imágenes');
       console.log('Tipo de actividad:', formData.tipo_actividad);
       
-      const response = await axios.post('/api/university/actividades', formDataToSend, {
+      const response = await axios.post('https://api.strideutmat.com/api/university/actividades', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -476,7 +476,7 @@ const PersonalDashboard = ({ user }) => {
 
   const updateEstadoActividad = async (actividadId, nuevoEstado) => {
     try {
-      await axios.put(`/api/university/actividades/${actividadId}/estado`, {
+      await axios.put(`https://api.strideutmat.com/api/university/actividades/${actividadId}/estado`, {
         estado: nuevoEstado
       });
       
@@ -494,7 +494,7 @@ const PersonalDashboard = ({ user }) => {
     }
     
     try {
-      const response = await axios.delete(`/api/university/actividades/${actividadId}`);
+      const response = await axios.delete(`https://api.strideutmat.com/api/university/actividades/${actividadId}`);
       
       if (response.data.success) {
         toast.success('Actividad eliminada exitosamente');

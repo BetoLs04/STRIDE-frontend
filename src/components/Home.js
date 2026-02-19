@@ -39,7 +39,7 @@ const Home = () => {
 
   const checkSuperAdminExistence = async () => {
     try {
-      const response = await axios.get('/api/university/superusers');
+      const response = await axios.get('https://api.strideutmat.com/api/university/superusers');
       const hasSuperAdmin = response.data.data && response.data.data.length > 0;
       setSuperAdminExists(hasSuperAdmin);
     } catch (error) {
@@ -53,7 +53,7 @@ const Home = () => {
   const fetchComunicadosRecientes = async () => {
     try {
       setComunicadosLoading(true);
-      const response = await axios.get('/api/university/comunicados-recientes?limit=10');
+      const response = await axios.get('https://api.strideutmat.com/api/university/comunicados-recientes?limit=10');
       
       if (response.data.success) {
         setComunicados(response.data.data || []);

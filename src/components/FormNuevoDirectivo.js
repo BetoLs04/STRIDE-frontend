@@ -22,7 +22,7 @@ const FormNuevoDirectivo = ({ admin, onClose, onSuccess }) => {
 
   const fetchDirecciones = async () => {
     try {
-      const response = await axios.get('/api/university/direcciones');
+      const response = await axios.get('https://api.strideutmat.com/api/university/direcciones');
       setDirecciones(response.data.data || []);
     } catch (error) {
       toast.error('Error al cargar direcciones');
@@ -60,7 +60,7 @@ const FormNuevoDirectivo = ({ admin, onClose, onSuccess }) => {
     setLoading(true);
     
     try {
-      await axios.post('/api/university/directivos', {
+      await axios.post('https://api.strideutmat.com/api/university/directivos', {
         nombre_completo: formData.nombre_completo,
         cargo: formData.cargo,
         direccion_id: formData.direccion_id,

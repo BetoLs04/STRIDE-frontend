@@ -20,7 +20,7 @@ const CreateSuperAdmin = ({ onLogin }) => {
 
   const checkSuperAdminExistence = async () => {
     try {
-      const response = await axios.get('/api/university/superusers');
+      const response = await axios.get('https://api.strideutmat.com/api/university/superusers');
       const hasSuperAdmin = response.data.data && response.data.data.length > 0;
       setSuperAdminExists(hasSuperAdmin);
       
@@ -66,7 +66,7 @@ const CreateSuperAdmin = ({ onLogin }) => {
     
     try {
       console.log('Creando primer Super Admin con datos:', formData);
-      const createRes = await axios.post('/api/university/create-superuser', {
+      const createRes = await axios.post('https://api.strideutmat.com/api/university/create-superuser', {
         username: formData.username,
         email: formData.email,
         password: formData.password
@@ -77,7 +77,7 @@ const CreateSuperAdmin = ({ onLogin }) => {
       toast.info('Ahora podrás configurar el sistema completo.');
 
       // Hacer login automático con el nuevo usuario
-      const loginRes = await axios.post('/api/university/login', {
+      const loginRes = await axios.post('https://api.strideutmat.com/api/university/login', {
         email: formData.email,
         password: formData.password
       });

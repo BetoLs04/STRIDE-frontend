@@ -37,7 +37,7 @@ const SuperAdminTareas = ({ admin }) => {
   const cargarTareas = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/university/tareas');
+      const response = await axios.get('https://api.strideutmat.com/api/university/tareas');
       
       if (response.data.success) {
         setTareas(response.data.data);
@@ -53,7 +53,7 @@ const SuperAdminTareas = ({ admin }) => {
   const cargarPersonal = async () => {
     try {
       setLoadingPersonal(true);
-      const response = await axios.get('/api/university/tareas/usuarios-disponibles');
+      const response = await axios.get('https://api.strideutmat.com/api/university/tareas/usuarios-disponibles');
       
       if (response.data.success) {
         setPersonal(response.data.data);
@@ -100,7 +100,7 @@ const SuperAdminTareas = ({ admin }) => {
     if (!window.confirm('¿Eliminar este archivo?')) return;
     
     try {
-      await axios.delete(`/api/university/tareas/archivo/${archivoId}`);
+      await axios.delete(`https://api.strideutmat.com/api/university/tareas/archivo/${archivoId}`);
       setArchivosEliminar(prev => [...prev, archivoId]);
       toast.success('Archivo eliminado');
     } catch (error) {
@@ -201,7 +201,7 @@ const SuperAdminTareas = ({ admin }) => {
       });
       
       const response = await axios.post(
-        '/api/university/tareas',
+        'https://api.strideutmat.com/api/university/tareas',
         formDataToSend,
         {
           headers: {
@@ -301,7 +301,7 @@ const SuperAdminTareas = ({ admin }) => {
       });
       
       const response = await axios.put(
-        `/api/university/tareas/${tareaAEditar.id}`,
+        `https://api.strideutmat.com/api/university/tareas/${tareaAEditar.id}`,
         formDataToSend,
         {
           headers: {
@@ -333,7 +333,7 @@ const SuperAdminTareas = ({ admin }) => {
     }
     
     try {
-      const response = await axios.delete(`/api/university/tareas/${tareaId}`);
+      const response = await axios.delete(`https://api.strideutmat.com/api/university/tareas/${tareaId}`);
       
       if (response.data.success) {
         toast.success('Tarea eliminada correctamente');

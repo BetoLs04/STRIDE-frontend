@@ -27,7 +27,7 @@ const FormNuevaDireccion = ({ onClose, onSuccess }) => {
     setLoading(true);
     
     try {
-      await axios.post('/api/university/direcciones', formData);
+      await axios.post('https://api.strideutmat.com/api/university/direcciones', formData);
       
       toast.success('Dirección creada exitosamente!');
       setFormData({ nombre: '' });

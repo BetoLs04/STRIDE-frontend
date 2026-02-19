@@ -26,7 +26,7 @@ const FormNuevoPersonal = ({ admin, onClose, onSuccess }) => {
 
   const fetchDirecciones = async () => {
     try {
-      const response = await axios.get('/api/university/direcciones');
+      const response = await axios.get('https://api.strideutmat.com/api/university/direcciones');
       setDirecciones(response.data.data || []);
     } catch (error) {
       toast.error('Error al cargar direcciones');
@@ -110,7 +110,7 @@ const FormNuevoPersonal = ({ admin, onClose, onSuccess }) => {
         formDataToSend.append('foto', foto);
       }
       
-      await axios.post('/api/university/personal', formDataToSend, {
+      await axios.post('https://api.strideutmat.com/api/university/personal', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
