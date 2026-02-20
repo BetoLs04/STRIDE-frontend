@@ -3,6 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../styles/PersonalTareas.css';
 
+const API_URL = 'https://api.strideutmat.com';
+
 const PersonalTareas = ({ user }) => {
   const [tareas, setTareas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ const PersonalTareas = ({ user }) => {
       setLoading(true);
       console.log('🔍 ID del usuario desde props:', user.id);
       
-      const response = await axios.get(`https://api.strideutmat.com/api/university/tareas/personal/${user.id}`);
+      const response = await axios.get(`${API_URL}/api/university/tareas/personal/${user.id}`);
       
       console.log('📦 Respuesta completa:', response.data);
       
@@ -134,7 +136,7 @@ const PersonalTareas = ({ user }) => {
       });
       
       const response = await axios.post(
-        `https://api.strideutmat.com/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
+        `${API_URL}/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
         formData,
         {
           headers: {
@@ -314,48 +316,48 @@ const PersonalTareas = ({ user }) => {
                   
                   {tarea.archivos?.length > 0 && (
                     <div className="tarea-archivos">
-                        <span className="archivos-label">Archivos adjuntos:</span>
-                        <div className="archivos-lista-completa">
+                      <span className="archivos-label">Archivos adjuntos:</span>
+                      <div className="archivos-lista-completa">
                         {tarea.archivos.map(arch => (
-                            <a 
+                          <a 
                             key={arch.id}
-                            href={arch.url}
+                            href={`${API_URL}${arch.url}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="archivo-link-completo"
                             title={`Haz clic para descargar ${arch.nombre_original}`}
-                            >
+                          >
                             <span className="archivo-icono">
-                                {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
+                              {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
                             </span>
                             <span className="archivo-nombre-completo">{arch.nombre_original}</span>
                             <span className="archivo-tamano">
-                                {(arch.tamano / 1024).toFixed(1)} KB
+                              {(arch.tamano / 1024).toFixed(1)} KB
                             </span>
-                            </a>
+                          </a>
                         ))}
-                        </div>
+                      </div>
                     </div>
-                    )}
+                  )}
                   
                   {puedeResponder ? (
                     <button 
-                        className="btn-responder"
-                        onClick={() => handleResponderClick(tarea)}
+                      className="btn-responder"
+                      onClick={() => handleResponderClick(tarea)}
                     >
-                        <span className="btn-icon">📝</span>
-                        Enviar Respuesta
+                      <span className="btn-icon">📝</span>
+                      Enviar Respuesta
                     </button>
-                    ) : (
+                  ) : (
                     <button 
-                        className="btn-editar-respuesta"
-                        onClick={() => handleEditarRespuesta(tarea)}
-                        title="Editar respuesta"
+                      className="btn-editar-respuesta"
+                      onClick={() => handleEditarRespuesta(tarea)}
+                      title="Editar respuesta"
                     >
-                        <span className="btn-icon">✏️</span>
-                        Editar
+                      <span className="btn-icon">✏️</span>
+                      Editar
                     </button>
-                    )}
+                  )}
                 </div>
               );
             })
