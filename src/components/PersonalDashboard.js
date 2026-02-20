@@ -7,6 +7,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../styles/PersonalDashboard.css';
 
+const API_URL = 'https://api.strideutmat.com';
+
 const PersonalDashboard = ({ user }) => {
   const navigate = useNavigate();
   const [actividades, setActividades] = useState([]);
@@ -879,11 +881,11 @@ const PersonalDashboard = ({ user }) => {
                       <div key={index} className="modal-slide">
                         <div className="modal-slide-content">
                           <img 
-                            src={img.url} 
+                            src={`${API_URL}${img.url}`}
                             alt={`Evidencia ${index + 1} - ${actividadSeleccionada.titulo}`}
                             className="modal-image"
                             onError={(e) => {
-                              e.target.src = '/placeholder.jpg';
+                              e.target.style.display = 'none';
                               e.target.alt = 'Imagen no disponible';
                             }}
                           />
