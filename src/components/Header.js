@@ -52,7 +52,7 @@ const Header = ({ user, onLogout }) => {
   };
 
   const loadLogo = () => {
-    const baseUrl = '/uploads/logos/institution-logo';
+    const baseUrl = 'https://api.strideutmat.com/uploads/logos/institution-logo';
     const extensions = ['.webp', '.png', '.jpg', '.jpeg', '.gif', '.svg'];
     
     const imagePromises = extensions.map(ext => {
@@ -79,7 +79,7 @@ const Header = ({ user, onLogout }) => {
   };
 
   const loadStrideLogo = () => {
-    const logoPath = '/uploads/logo_app/STRIDE%20WITHE%20LETTERS.png';
+    const logoPath = 'https://api.strideutmat.com/uploads/logo_app/STRIDE%20WITHE%20LETTERS.png';
     
     const img = new Image();
     img.onload = () => {
@@ -88,7 +88,7 @@ const Header = ({ user, onLogout }) => {
     };
     img.onerror = () => {
       console.log('❌ Error al cargar el logo de STRIDE, usando alternativo');
-      const alternativePath = '/uploads/logo_app/stride-logo.png';
+      const alternativePath = 'https://api.strideutmat.com/uploads/logo_app/stride-logo.png';
       const img2 = new Image();
       img2.onload = () => {
         setStrideLogoUrl(alternativePath);
@@ -151,7 +151,7 @@ const Header = ({ user, onLogout }) => {
     
     const urlsToTry = [
       `https://api.strideutmat.com/api/university/personal/foto/${fotoPerfil}`,
-      `/uploads/personal/${fotoPerfil}`,
+      `https://api.strideutmat.com//uploads/personal/${fotoPerfil}`,
       `https://api.strideutmat.com/api/university/personal/foto/default-avatar.png`
     ];
 
