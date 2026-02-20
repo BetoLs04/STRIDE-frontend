@@ -14,6 +14,7 @@ const Header = ({ user, onLogout }) => {
   const [userPhoto, setUserPhoto] = useState(null);
   const [userFullData, setUserFullData] = useState(null);
   const [tareasPendientes, setTareasPendientes] = useState(0);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const userMenuRef = useRef(null);
 
   useEffect(() => {
@@ -252,6 +253,9 @@ const Header = ({ user, onLogout }) => {
       return;
     }
 
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+
     const img = new Image();
     img.onload = function() {
       const width = this.width;
@@ -265,7 +269,7 @@ const Header = ({ user, onLogout }) => {
       file.height = height;
       setLogoFile(file);
     };
-    img.src = URL.createObjectURL(file);
+    img.src = objectUrl;
   };
 
   const handleLogout = () => {
@@ -377,85 +381,135 @@ const Header = ({ user, onLogout }) => {
         {/* Modal para subir/cambiar logo */}
         {showLogoUpload && (
           <div 
-            className="modal-overlay" 
-            onClick={() => setShowLogoUpload(false)}
+            onClick={() => { setShowLogoUpload(false); setLogoFile(null); setPreviewUrl(null); }}
             style={{
               position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
+              backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex',
               alignItems: 'center', justifyContent: 'center', zIndex: 9999
             }}
           >
             <div 
-              className="modal-content"
               onClick={e => e.stopPropagation()}
               style={{
-                background: 'white', padding: '30px', borderRadius: '10px',
-                minWidth: '350px', maxWidth: '500px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                background: 'white', borderRadius: '14px',
+                width: '100%', maxWidth: '460px', boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+                overflow: 'hidden'
               }}
             >
-              <h3 style={{ marginTop: 0, marginBottom: '20px' }}>
-                {logoUrl ? '🔄 Cambiar Logo de la Institución' : '➕ Agregar Logo de la Institución'}
-              </h3>
-
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  Seleccionar imagen:
-                </label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{ width: '100%' }}
-                />
-                <small style={{ color: '#666', display: 'block', marginTop: '5px' }}>
-                  Máximo 2MB. Formatos: PNG, JPG, GIF, SVG, WebP
-                </small>
+              {/* Header del modal */}
+              <div style={{
+                background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
+                padding: '20px 25px', color: 'white', display: 'flex',
+                justifyContent: 'space-between', alignItems: 'center'
+              }}>
+                <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
+                  {logoUrl ? '🔄 Cambiar Logo' : '➕ Agregar Logo'}
+                </h3>
+                <button
+                  onClick={() => { setShowLogoUpload(false); setLogoFile(null); setPreviewUrl(null); }}
+                  style={{
+                    background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white',
+                    width: '30px', height: '30px', borderRadius: '50%', cursor: 'pointer',
+                    fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}
+                >✕</button>
               </div>
 
-              {logoFile && (
-                <div style={{ 
-                  background: '#f0f9ff', padding: '10px', borderRadius: '6px', 
-                  marginBottom: '15px', fontSize: '0.9rem' 
+              {/* Cuerpo del modal */}
+              <div style={{ padding: '25px' }}>
+
+                {/* Preview de imagen actual o nueva */}
+                <div style={{
+                  background: '#f8fafc', border: '2px dashed #cbd5e1', borderRadius: '10px',
+                  padding: '20px', textAlign: 'center', marginBottom: '20px', minHeight: '130px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                  ✅ Archivo seleccionado: <strong>{logoFile.name}</strong>
+                  {previewUrl ? (
+                    <div>
+                      <img 
+                        src={previewUrl} 
+                        alt="Preview nuevo logo"
+                        style={{ maxHeight: '100px', maxWidth: '100%', borderRadius: '6px', objectFit: 'contain' }}
+                      />
+                      <p style={{ margin: '8px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                        Vista previa del nuevo logo
+                      </p>
+                    </div>
+                  ) : logoUrl ? (
+                    <div>
+                      <img 
+                        src={logoUrl} 
+                        alt="Logo actual"
+                        style={{ maxHeight: '100px', maxWidth: '100%', borderRadius: '6px', objectFit: 'contain' }}
+                      />
+                      <p style={{ margin: '8px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                        Logo actual
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ color: '#94a3b8' }}>
+                      <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🏫</div>
+                      <p style={{ margin: 0, fontSize: '0.9rem' }}>Sin logo actualmente</p>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <button 
-                  onClick={handleLogoUpload}
-                  disabled={uploadingLogo || !logoFile}
-                  style={{
-                    background: uploadingLogo || !logoFile ? '#ccc' : '#2563eb',
-                    color: 'white', border: 'none', padding: '10px 20px',
-                    borderRadius: '6px', cursor: uploadingLogo || !logoFile ? 'not-allowed' : 'pointer',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  {uploadingLogo ? '⏳ Subiendo...' : '📤 Subir Logo'}
-                </button>
+                {/* Input de archivo */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                    Seleccionar nueva imagen:
+                  </label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ 
+                      width: '100%', padding: '8px', border: '1px solid #d1d5db',
+                      borderRadius: '6px', fontSize: '0.9rem', boxSizing: 'border-box'
+                    }}
+                  />
+                  <small style={{ color: '#6b7280', display: 'block', marginTop: '5px' }}>
+                    Máximo 2MB · PNG, JPG, GIF, SVG, WebP · Se recomienda formato horizontal
+                  </small>
+                </div>
 
-                {logoUrl && (
+                {/* Botones */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <button 
-                    onClick={handleLogoDelete}
+                    onClick={handleLogoUpload}
+                    disabled={uploadingLogo || !logoFile}
                     style={{
-                      background: '#dc2626', color: 'white', border: 'none',
-                      padding: '10px 20px', borderRadius: '6px', cursor: 'pointer'
+                      flex: 1, background: uploadingLogo || !logoFile ? '#94a3b8' : '#2563eb',
+                      color: 'white', border: 'none', padding: '11px 16px',
+                      borderRadius: '8px', cursor: uploadingLogo || !logoFile ? 'not-allowed' : 'pointer',
+                      fontWeight: '600', fontSize: '0.95rem'
                     }}
                   >
-                    🗑️ Eliminar Logo
+                    {uploadingLogo ? '⏳ Subiendo...' : '📤 Subir Logo'}
                   </button>
-                )}
 
-                <button 
-                  onClick={() => { setShowLogoUpload(false); setLogoFile(null); }}
-                  style={{
-                    background: '#6b7280', color: 'white', border: 'none',
-                    padding: '10px 20px', borderRadius: '6px', cursor: 'pointer'
-                  }}
-                >
-                  Cancelar
-                </button>
+                  {logoUrl && (
+                    <button 
+                      onClick={handleLogoDelete}
+                      style={{
+                        background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5',
+                        padding: '11px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600'
+                      }}
+                    >
+                      🗑️ Eliminar
+                    </button>
+                  )}
+
+                  <button 
+                    onClick={() => { setShowLogoUpload(false); setLogoFile(null); setPreviewUrl(null); }}
+                    style={{
+                      background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0',
+                      padding: '11px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600'
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
