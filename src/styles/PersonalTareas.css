@@ -917,3 +917,70 @@
     order: 3;
   }
 }
+/* Estilos para la sección de archivos dividida */
+.tarea-archivos-container {
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.archivos-seccion {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+}
+
+.archivos-seccion.respuesta {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.archivos-seccion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.archivos-seccion.respuesta .archivos-seccion-header {
+  border-bottom-color: #7dd3fc;
+}
+
+.archivos-titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.archivos-seccion.respuesta .archivos-titulo {
+  color: #0369a1;
+}
+
+.archivos-seccion .archivos-badge {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.archivos-seccion.respuesta .archivos-badge {
+  background: #bae6fd;
+  color: #0369a1;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+  .tarea-archivos-container {
+    gap: 10px;
+  }
+  
+  .archivos-seccion {
+    padding: 12px;
+  }
+}
