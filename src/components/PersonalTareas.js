@@ -178,6 +178,10 @@ const PersonalTareas = ({ user }) => {
     return 'normal';
   };
 
+  const tieneArchivosRespuesta = (tarea) => {
+    return tarea.archivos_respuesta && tarea.archivos_respuesta.length > 0;
+  };
+
   const tareasFiltradas = tareas.filter(t => {
     if (filtro === 'pendientes') {
       return t.asignacion_estado === 'pendiente' || t.asignacion_estado === 'en_progreso';
@@ -269,9 +273,9 @@ const PersonalTareas = ({ user }) => {
                   <div className="tarea-item-header">
                     <div className="tarea-titulo">
                       <h3>{tarea.titulo}</h3>
-                      {tarea.archivos?.length > 0 && (
+                      {(tarea.archivos?.length > 0 || tarea.archivos_respuesta?.length > 0) && (
                         <span className="archivos-badge" title="Archivos adjuntos">
-                          📎 {tarea.archivos.length}
+                          📎 {tarea.archivos?.length || 0} / {tarea.archivos_respuesta?.length || 0}
                         </span>
                       )}
                     </div>
@@ -314,29 +318,68 @@ const PersonalTareas = ({ user }) => {
                     </div>
                   )}
                   
-                  {tarea.archivos?.length > 0 && (
-                    <div className="tarea-archivos">
-                      <span className="archivos-label">Archivos adjuntos:</span>
-                      <div className="archivos-lista-completa">
-                        {tarea.archivos.map(arch => (
-                          <a 
-                            key={arch.id}
-                            href={`${API_URL}${arch.url}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="archivo-link-completo"
-                            title={`Haz clic para descargar ${arch.nombre_original}`}
-                          >
-                            <span className="archivo-icono">
-                              {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
-                            </span>
-                            <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                            <span className="archivo-tamano">
-                              {(arch.tamano / 1024).toFixed(1)} KB
-                            </span>
-                          </a>
-                        ))}
-                      </div>
+                  {/* SECCIÓN DE ARCHIVOS - ORIGINALES Y RESPUESTA */}
+                  {(tarea.archivos?.length > 0 || tarea.archivos_respuesta?.length > 0) && (
+                    <div className="tarea-archivos-container">
+                      {/* Archivos originales de la tarea */}
+                      {tarea.archivos?.length > 0 && (
+                        <div className="archivos-seccion">
+                          <div className="archivos-seccion-header">
+                            <span className="archivos-titulo">📎 Adjuntados</span>
+                            <span className="archivos-badge">{tarea.archivos.length}</span>
+                          </div>
+                          <div className="archivos-lista-completa">
+                            {tarea.archivos.map(arch => (
+                              <a 
+                                key={arch.id}
+                                href={`${API_URL}${arch.url}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="archivo-link-completo"
+                                title={`Haz clic para descargar ${arch.nombre_original}`}
+                              >
+                                <span className="archivo-icono">
+                                  {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
+                                </span>
+                                <span className="archivo-nombre-completo">{arch.nombre_original}</span>
+                                <span className="archivo-tamano">
+                                  {(arch.tamano / 1024).toFixed(1)} KB
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Archivos de respuesta enviados por el usuario */}
+                      {tarea.archivos_respuesta?.length > 0 && (
+                        <div className="archivos-seccion respuesta">
+                          <div className="archivos-seccion-header">
+                            <span className="archivos-titulo">📤 Enviados</span>
+                            <span className="archivos-badge">{tarea.archivos_respuesta.length}</span>
+                          </div>
+                          <div className="archivos-lista-completa">
+                            {tarea.archivos_respuesta.map(arch => (
+                              <a 
+                                key={arch.id}
+                                href={`${API_URL}${arch.url}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="archivo-link-completo"
+                                title={`Haz clic para descargar ${arch.nombre_original}`}
+                              >
+                                <span className="archivo-icono">
+                                  {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
+                                </span>
+                                <span className="archivo-nombre-completo">{arch.nombre_original}</span>
+                                <span className="archivo-tamano">
+                                  {(arch.tamano / 1024).toFixed(1)} KB
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   
@@ -346,7 +389,7 @@ const PersonalTareas = ({ user }) => {
                       onClick={() => handleResponderClick(tarea)}
                     >
                       <span className="btn-icon">📝</span>
-                      Enviar Respuesta
+                      {tarea.asignacion_estado === 'pendiente' ? 'Enviar Respuesta' : 'Actualizar Respuesta'}
                     </button>
                   ) : (
                     <button 
@@ -355,7 +398,7 @@ const PersonalTareas = ({ user }) => {
                       title="Editar respuesta"
                     >
                       <span className="btn-icon">✏️</span>
-                      Editar
+                      Editar Respuesta
                     </button>
                   )}
                 </div>
