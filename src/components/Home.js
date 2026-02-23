@@ -177,24 +177,24 @@ const Home = () => {
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
-                          padding: '0rem 2.5rem 1.5rem 2.5rem', // Reducido padding vertical
+                          padding: '0rem 2.5rem 1.5rem 2.5rem',
                           minHeight: 'auto',
                           display: 'flex',
                           flexDirection: 'column'
                         }}>
                           {/* Título y metadatos - COMPACTADO */}
                           <div style={{
-                            marginBottom: '0.2rem',           // Reducido de 1.5rem
-                            paddingBottom: '0.4rem',        // Reducido de 1.5rem
+                            marginBottom: '0.2rem',
+                            paddingBottom: '0.4rem',
                             borderBottom: '2px solid #e9ecef'
                           }}>
                             <h3 style={{
-                              margin: '0 0 0.3rem -2px',    // Margen inferior reducido y leve margen negativo izquierdo
+                              margin: '0 0 0.3rem -2px',
                               color: 'var(--primary-blue)',
                               fontSize: '1.8rem',
-                              lineHeight: '1.2',            // Reducido de 1.3
+                              lineHeight: '1.2',
                               fontWeight: '700',
-                              paddingLeft: '2px'            // Compensa el margen negativo
+                              paddingLeft: '2px'
                             }}>
                               {comunicado.titulo}
                             </h3>
@@ -202,22 +202,22 @@ const Home = () => {
                             <div style={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.8rem',                // Reducido de 1.5rem
+                              gap: '0.8rem',
                               flexWrap: 'wrap'
                             }}>
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'               // Reducido de 0.5rem
+                                gap: '0.3rem'
                               }}>
                                 <span style={{
                                   color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'        // Reducido de 1.2rem
+                                  fontSize: '0.9rem'
                                 }}>
                                   👤
                                 </span>
                                 <span style={{
-                                  fontSize: '0.85rem',      // Reducido de 1rem
+                                  fontSize: '0.85rem',
                                   color: 'var(--medium-gray)',
                                   fontWeight: '500'
                                 }}>
@@ -228,23 +228,22 @@ const Home = () => {
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'               // Reducido de 0.5rem
+                                gap: '0.3rem'
                               }}>
                                 <span style={{
                                   color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'        // Reducido de 1.2rem
+                                  fontSize: '0.9rem'
                                 }}>
                                   📅
                                 </span>
                                 <span style={{
-                                  fontSize: '0.85rem',      // Reducido de 1rem
+                                  fontSize: '0.85rem',
                                   color: 'var(--medium-gray)',
                                   fontWeight: '500'
                                 }}>
                                   {formatDate(comunicado.fecha_publicacion)}
                                 </span>
                               </div>
-                              
                             </div>
                           </div>
 
@@ -285,35 +284,45 @@ const Home = () => {
                                 }}>
                                   💡 El comunicado continúa. Ve al panel de administración para más detalles.
                                 </span>
+                              </div>
+                            )}
+
+                            {/* ===== ENLACE EXTERNO ===== */}
                             {comunicado.link_externo && (
-                                    <div style={{
-                                      marginTop: '1rem',
-                                      paddingTop: '1rem',
-                                      borderTop: '1px dashed #dee2e6'
-                                    }}>
-                                      <a 
-                                        href={comunicado.link_externo}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                          display: 'inline-flex',
-                                          alignItems: 'center',
-                                          gap: '8px',
-                                          color: 'var(--primary-blue)',
-                                          fontWeight: '600',
-                                          fontSize: '0.95rem',
-                                          textDecoration: 'none',
-                                          padding: '8px 16px',
-                                          background: '#f0f4ff',
-                                          borderRadius: '8px',
-                                          border: '1px solid #dbeafe',
-                                          transition: 'all 0.2s ease'
-                                        }}
-                                      >
-                                        🔗 Ver enlace relacionado
-                                      </a>
-                                    </div>
-                                  )}
+                              <div style={{
+                                marginTop: '1rem',
+                                paddingTop: '1rem',
+                                borderTop: '1px dashed #dee2e6'
+                              }}>
+                                <a 
+                                  href={comunicado.link_externo}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: 'var(--primary-blue)',
+                                    fontWeight: '600',
+                                    fontSize: '0.95rem',
+                                    textDecoration: 'none',
+                                    padding: '8px 16px',
+                                    background: '#f0f4ff',
+                                    borderRadius: '8px',
+                                    border: '1px solid #dbeafe',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={e => {
+                                    e.target.style.background = '#dbeafe';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                  }}
+                                  onMouseLeave={e => {
+                                    e.target.style.background = '#f0f4ff';
+                                    e.target.style.transform = 'translateY(0)';
+                                  }}
+                                >
+                                  🔗 Ver enlace relacionado
+                                </a>
                               </div>
                             )}
                           </div>
