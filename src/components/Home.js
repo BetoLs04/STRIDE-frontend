@@ -292,8 +292,13 @@ const Home = () => {
                               <div style={{
                                 marginTop: '1rem',
                                 paddingTop: '1rem',
-                                borderTop: '1px dashed #dee2e6'
+                                borderTop: '1px dashed #dee2e6',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                flexWrap: 'wrap'
                               }}>
+                                {/* Enlace clickeable */}
                                 <a 
                                   href={comunicado.link_externo}
                                   target="_blank"
@@ -304,25 +309,52 @@ const Home = () => {
                                     gap: '8px',
                                     color: 'var(--primary-blue)',
                                     fontWeight: '600',
-                                    fontSize: '0.95rem',
+                                    fontSize: '0.9rem',
                                     textDecoration: 'none',
-                                    padding: '8px 16px',
+                                    padding: '8px 14px',
                                     background: '#f0f4ff',
                                     borderRadius: '8px',
                                     border: '1px solid #dbeafe',
-                                    transition: 'all 0.2s ease'
-                                  }}
-                                  onMouseEnter={e => {
-                                    e.target.style.background = '#dbeafe';
-                                    e.target.style.transform = 'translateY(-1px)';
-                                  }}
-                                  onMouseLeave={e => {
-                                    e.target.style.background = '#f0f4ff';
-                                    e.target.style.transform = 'translateY(0)';
+                                    maxWidth: '350px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
                                   }}
                                 >
-                                  🔗 Ver enlace relacionado
+                                  🔗 {comunicado.link_externo}
                                 </a>
+
+                                {/* Botón copiar */}
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(comunicado.link_externo)
+                                      .then(() => {
+                                        const btn = document.getElementById(`copy-btn-${comunicado.id}`);
+                                        if (btn) {
+                                          btn.textContent = '✅ Copiado';
+                                          setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
+                                        }
+                                      })
+                                      .catch(() => alert('No se pudo copiar: ' + comunicado.link_externo));
+                                  }}
+                                  id={`copy-btn-${comunicado.id}`}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '8px 14px',
+                                    background: '#f8fafc',
+                                    border: '1px solid #e2e8f0',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.85rem',
+                                    color: '#475569',
+                                    fontWeight: '500',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  📋 Copiar
+                                </button>
                               </div>
                             )}
                           </div>
