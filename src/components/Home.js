@@ -17,7 +17,7 @@ const Home = () => {
 
   // Configuración del carrusel SIMPLIFICADA
   const carouselSettings = {
-    dots: false, // Desactivamos los dots nativos
+    dots: false,
     infinite: true,
     speed: 500,
     slidesToShow: 1,
@@ -112,6 +112,13 @@ const Home = () => {
     return tempDiv.textContent || tempDiv.innerText || '';
   };
 
+  // Función para manejar clic en enlace externo
+  const handleExternalLink = (url) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener noreferrer');
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -177,24 +184,24 @@ const Home = () => {
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
-                          padding: '0rem 2.5rem 1.5rem 2.5rem', // Reducido padding vertical
+                          padding: '0rem 2.5rem 1.5rem 2.5rem',
                           minHeight: 'auto',
                           display: 'flex',
                           flexDirection: 'column'
                         }}>
-                          {/* Título y metadatos - COMPACTADO */}
+                          {/* Título y metadatos */}
                           <div style={{
-                            marginBottom: '0.2rem',           // Reducido de 1.5rem
-                            paddingBottom: '0.4rem',        // Reducido de 1.5rem
+                            marginBottom: '0.2rem',
+                            paddingBottom: '0.4rem',
                             borderBottom: '2px solid #e9ecef'
                           }}>
                             <h3 style={{
-                              margin: '0 0 0.3rem -2px',    // Margen inferior reducido y leve margen negativo izquierdo
+                              margin: '0 0 0.3rem -2px',
                               color: 'var(--primary-blue)',
                               fontSize: '1.8rem',
-                              lineHeight: '1.2',            // Reducido de 1.3
+                              lineHeight: '1.2',
                               fontWeight: '700',
-                              paddingLeft: '2px'            // Compensa el margen negativo
+                              paddingLeft: '2px'
                             }}>
                               {comunicado.titulo}
                             </h3>
@@ -202,22 +209,22 @@ const Home = () => {
                             <div style={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.8rem',                // Reducido de 1.5rem
+                              gap: '0.8rem',
                               flexWrap: 'wrap'
                             }}>
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'               // Reducido de 0.5rem
+                                gap: '0.3rem'
                               }}>
                                 <span style={{
                                   color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'        // Reducido de 1.2rem
+                                  fontSize: '0.9rem'
                                 }}>
                                   👤
                                 </span>
                                 <span style={{
-                                  fontSize: '0.85rem',      // Reducido de 1rem
+                                  fontSize: '0.85rem',
                                   color: 'var(--medium-gray)',
                                   fontWeight: '500'
                                 }}>
@@ -228,23 +235,45 @@ const Home = () => {
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'               // Reducido de 0.5rem
+                                gap: '0.3rem'
                               }}>
                                 <span style={{
                                   color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'        // Reducido de 1.2rem
+                                  fontSize: '0.9rem'
                                 }}>
                                   📅
                                 </span>
                                 <span style={{
-                                  fontSize: '0.85rem',      // Reducido de 1rem
+                                  fontSize: '0.85rem',
                                   color: 'var(--medium-gray)',
                                   fontWeight: '500'
                                 }}>
                                   {formatDate(comunicado.fecha_publicacion)}
                                 </span>
                               </div>
-                              
+
+                              {/* Indicador de enlace externo si existe */}
+                              {comunicado.link_externo && (
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem'
+                                }}>
+                                  <span style={{
+                                    color: 'var(--secondary-blue)',
+                                    fontSize: '0.9rem'
+                                  }}>
+                                    🔗
+                                  </span>
+                                  <span style={{
+                                    fontSize: '0.85rem',
+                                    color: '#28a745',
+                                    fontWeight: '500'
+                                  }}>
+                                    Enlace disponible
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -283,11 +312,98 @@ const Home = () => {
                                   fontSize: '0.9rem',
                                   fontStyle: 'italic'
                                 }}>
-                                  💡 El comunicado continúa. Ve al panel de administración para más detalles.
+                                  💡 El comunicado continúa...
                                 </span>
                               </div>
                             )}
                           </div>
+
+                          {/* SECCIÓN DE ENLACE EXTERNO - AHORA SÍ SE MUESTRA */}
+                          {comunicado.link_externo && (
+                            <div style={{
+                              marginTop: '1.2rem',
+                              padding: '1rem 1.5rem',
+                              background: 'linear-gradient(135deg, #e8f4f8 0%, #d1e7f5 100%)',
+                              borderRadius: '10px',
+                              border: '1px solid #b8d9e5',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              flexWrap: 'wrap',
+                              gap: '1rem'
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                flexWrap: 'wrap'
+                              }}>
+                                <span style={{
+                                  fontSize: '2rem',
+                                  background: 'white',
+                                  width: '40px',
+                                  height: '40px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: '50%',
+                                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                }}>
+                                  🔗
+                                </span>
+                                <div>
+                                  <div style={{
+                                    fontWeight: '600',
+                                    color: 'var(--primary-blue)',
+                                    fontSize: '1rem',
+                                    marginBottom: '0.2rem'
+                                  }}>
+                                    Enlace relacionado
+                                  </div>
+                                  <div style={{
+                                    color: '#2c3e50',
+                                    fontSize: '0.95rem',
+                                    wordBreak: 'break-all'
+                                  }}>
+                                    {comunicado.link_externo.length > 60 
+                                      ? comunicado.link_externo.substring(0, 60) + '...' 
+                                      : comunicado.link_externo}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <button
+                                onClick={() => handleExternalLink(comunicado.link_externo)}
+                                className="btn btn-primary"
+                                style={{
+                                  padding: '0.8rem 1.5rem',
+                                  fontSize: '0.95rem',
+                                  borderRadius: '8px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.5rem',
+                                  background: 'var(--primary-blue)',
+                                  color: 'white',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s',
+                                  boxShadow: '0 2px 8px rgba(0, 123, 255, 0.3)'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.transform = 'translateY(-2px)';
+                                  e.target.style.boxShadow = '0 4px 12px rgba(0, 123, 255, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.transform = 'translateY(0)';
+                                  e.target.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.3)';
+                                }}
+                              >
+                                <span>🔗</span>
+                                Visitar enlace
+                                <span>→</span>
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -306,7 +422,7 @@ const Home = () => {
                     flexWrap: 'wrap',
                     gap: '1rem'
                   }}>
-                    {/* Puntos de navegación MEJORADOS */}
+                    {/* Puntos de navegación */}
                     <div style={{
                       display: 'flex',
                       gap: '8px',
