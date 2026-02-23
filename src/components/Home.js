@@ -15,9 +15,9 @@ const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderRef = useRef(null);
 
-  // Configuración del carrusel
+  // Configuración del carrusel SIMPLIFICADA
   const carouselSettings = {
-    dots: false,
+    dots: false, // Desactivamos los dots nativos
     infinite: true,
     speed: 500,
     slidesToShow: 1,
@@ -53,38 +53,13 @@ const Home = () => {
   const fetchComunicadosRecientes = async () => {
     try {
       setComunicadosLoading(true);
-      console.log('🔍 Solicitando comunicados...');
       const response = await axios.get('https://api.strideutmat.com/api/university/comunicados-recientes?limit=10');
       
-      console.log('✅ Respuesta completa:', response.data);
-      
       if (response.data.success) {
-        const data = response.data.data || [];
-        console.log('📊 Datos recibidos:', data);
-        
-        // Verificar cada comunicado para ver si tiene link_externo
-        data.forEach((com, index) => {
-          console.log(`📝 Comunicado ${index + 1}:`, {
-            id: com.id,
-            titulo: com.titulo,
-            link_externo: com.link_externo,
-            tipo: typeof com.link_externo,
-            tiene_link: !!com.link_externo
-          });
-        });
-        
-        setComunicados(data);
-      } else {
-        console.warn('⚠️ La API respondió pero success = false');
+        setComunicados(response.data.data || []);
       }
     } catch (error) {
-      console.error('❌ Error cargando comunicados:', error);
-      if (error.response) {
-        console.error('Detalles del error:', {
-          status: error.response.status,
-          data: error.response.data
-        });
-      }
+      console.error('Error cargando comunicados:', error);
     } finally {
       setComunicadosLoading(false);
     }
@@ -124,23 +99,17 @@ const Home = () => {
     }
   };
 
+  // Función para renderizar HTML con estilos
   const renderHtmlContent = (html) => {
     return { __html: html || '' };
   };
 
+  // Función para extraer texto plano para vista previa
   const extractPlainText = (html) => {
     if (!html) return '';
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
     return tempDiv.textContent || tempDiv.innerText || '';
-  };
-
-  const handleExternalLink = (url, e) => {
-    if (e) e.preventDefault();
-    if (url) {
-      console.log('🔗 Abriendo enlace:', url);
-      window.open(url, '_blank', 'noopener noreferrer');
-    }
   };
 
   if (loading) {
@@ -156,8 +125,8 @@ const Home = () => {
     <div className="home-container">
       {/* Hero Section */}
       
-      {/* Carrusel de Comunicados */}
-      {comunicados.length > 0 ? (
+      {/* Carrusel de Comunicados - CON ESTILOS IGUALES AL PANEL */}
+      {comunicados.length > 0 && (
         <div className="comunicados-carousel-section" style={{ 
           margin: '4rem 0',
           background: 'white',
@@ -167,6 +136,7 @@ const Home = () => {
           border: '1px solid #e9ecef'
         }}>
           
+          {/* Contenido del carrusel */}
           <div style={{ padding: '0', position: 'relative' }}>
             {comunicadosLoading ? (
               <div className="loading-container" style={{ minHeight: '300px', padding: '3rem' }}>
@@ -175,6 +145,7 @@ const Home = () => {
               </div>
             ) : (
               <>
+                {/* Controles de navegación - Flechas MEJORADAS */}
                 {comunicados.length > 1 && (
                   <>
                     <button 
@@ -195,32 +166,35 @@ const Home = () => {
                   </>
                 )}
 
-                <Slider {...carouselSettings} ref={sliderRef}>
+                {/* Carrusel principal */}
+                <Slider 
+                  {...carouselSettings} 
+                  ref={sliderRef}
+                >
                   {comunicados.map((comunicado) => {
                     const plainText = extractPlainText(comunicado.contenido);
-                    const tieneEnlace = !!comunicado.link_externo && comunicado.link_externo.trim() !== '';
                     
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
-                          padding: '0rem 2.5rem 1.5rem 2.5rem',
+                          padding: '0rem 2.5rem 1.5rem 2.5rem', // Reducido padding vertical
                           minHeight: 'auto',
                           display: 'flex',
                           flexDirection: 'column'
                         }}>
-                          {/* Título y metadatos */}
+                          {/* Título y metadatos - COMPACTADO */}
                           <div style={{
-                            marginBottom: '0.2rem',
-                            paddingBottom: '0.4rem',
+                            marginBottom: '0.2rem',           // Reducido de 1.5rem
+                            paddingBottom: '0.4rem',        // Reducido de 1.5rem
                             borderBottom: '2px solid #e9ecef'
                           }}>
                             <h3 style={{
-                              margin: '0 0 0.3rem -2px',
+                              margin: '0 0 0.3rem -2px',    // Margen inferior reducido y leve margen negativo izquierdo
                               color: 'var(--primary-blue)',
                               fontSize: '1.8rem',
-                              lineHeight: '1.2',
+                              lineHeight: '1.2',            // Reducido de 1.3
                               fontWeight: '700',
-                              paddingLeft: '2px'
+                              paddingLeft: '2px'            // Compensa el margen negativo
                             }}>
                               {comunicado.titulo}
                             </h3>
@@ -228,22 +202,22 @@ const Home = () => {
                             <div style={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.8rem',
+                              gap: '0.8rem',                // Reducido de 1.5rem
                               flexWrap: 'wrap'
                             }}>
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'
+                                gap: '0.3rem'               // Reducido de 0.5rem
                               }}>
                                 <span style={{
                                   color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'
+                                  fontSize: '0.9rem'        // Reducido de 1.2rem
                                 }}>
                                   👤
                                 </span>
                                 <span style={{
-                                  fontSize: '0.85rem',
+                                  fontSize: '0.85rem',      // Reducido de 1rem
                                   color: 'var(--medium-gray)',
                                   fontWeight: '500'
                                 }}>
@@ -254,52 +228,27 @@ const Home = () => {
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'
+                                gap: '0.3rem'               // Reducido de 0.5rem
                               }}>
                                 <span style={{
                                   color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'
+                                  fontSize: '0.9rem'        // Reducido de 1.2rem
                                 }}>
                                   📅
                                 </span>
                                 <span style={{
-                                  fontSize: '0.85rem',
+                                  fontSize: '0.85rem',      // Reducido de 1rem
                                   color: 'var(--medium-gray)',
                                   fontWeight: '500'
                                 }}>
                                   {formatDate(comunicado.fecha_publicacion)}
                                 </span>
                               </div>
-
-                              {/* SOLUCIÓN: Mostrar indicador de enlace si existe */}
-                              {tieneEnlace && (
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.3rem',
-                                  backgroundColor: '#e8f4fd',
-                                  padding: '0.2rem 0.6rem',
-                                  borderRadius: '20px'
-                                }}>
-                                  <span style={{
-                                    color: '#0066cc',
-                                    fontSize: '0.9rem'
-                                  }}>
-                                    🔗
-                                  </span>
-                                  <span style={{
-                                    fontSize: '0.8rem',
-                                    color: '#0066cc',
-                                    fontWeight: '600'
-                                  }}>
-                                    Enlace disponible
-                                  </span>
-                                </div>
-                              )}
+                              
                             </div>
                           </div>
 
-                          {/* Contenido con formato HTML */}
+                          {/* Contenido CON FORMATO HTML */}
                           <div 
                             className="comunicado-content-html"
                             style={{
@@ -334,124 +283,18 @@ const Home = () => {
                                   fontSize: '0.9rem',
                                   fontStyle: 'italic'
                                 }}>
-                                  💡 El comunicado continúa...
+                                  💡 El comunicado continúa. Ve al panel de administración para más detalles.
                                 </span>
                               </div>
                             )}
                           </div>
-
-                          {/* SOLUCIÓN: Mostrar enlace externo si existe */}
-                          {tieneEnlace && (
-                            <div style={{
-                              marginTop: '1.2rem',
-                              padding: '1rem 1.5rem',
-                              background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
-                              borderRadius: '12px',
-                              border: '1px solid #90caf9',
-                              boxShadow: '0 2px 8px rgba(25, 118, 210, 0.1)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              flexWrap: 'wrap',
-                              gap: '1rem'
-                            }}>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem',
-                                flex: '1',
-                                minWidth: '200px'
-                              }}>
-                                <div style={{
-                                  fontSize: '2.2rem',
-                                  lineHeight: '1'
-                                }}>
-                                  🔗
-                                </div>
-                                <div style={{
-                                  flex: 1
-                                }}>
-                                  <div style={{
-                                    fontWeight: '600',
-                                    color: '#0d47a1',
-                                    fontSize: '1rem',
-                                    marginBottom: '0.3rem'
-                                  }}>
-                                    Enlace relacionado
-                                  </div>
-                                  <div style={{
-                                    color: '#1565c0',
-                                    fontSize: '0.9rem',
-                                    wordBreak: 'break-all',
-                                    background: 'rgba(255,255,255,0.7)',
-                                    padding: '0.3rem 0.6rem',
-                                    borderRadius: '6px',
-                                    border: '1px solid #90caf9'
-                                  }}>
-                                    {comunicado.link_externo.length > 70 
-                                      ? comunicado.link_externo.substring(0, 70) + '...' 
-                                      : comunicado.link_externo}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <button
-                                onClick={(e) => handleExternalLink(comunicado.link_externo, e)}
-                                className="btn-link-externo"
-                                style={{
-                                  padding: '0.8rem 1.8rem',
-                                  fontSize: '1rem',
-                                  fontWeight: '600',
-                                  borderRadius: '30px',
-                                  background: '#1976d2',
-                                  color: 'white',
-                                  border: 'none',
-                                  cursor: 'pointer',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '0.5rem',
-                                  transition: 'all 0.2s ease',
-                                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                                  whiteSpace: 'nowrap'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.background = '#1565c0';
-                                  e.target.style.transform = 'translateY(-2px)';
-                                  e.target.style.boxShadow = '0 6px 16px rgba(25, 118, 210, 0.4)';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.background = '#1976d2';
-                                  e.target.style.transform = 'translateY(0)';
-                                  e.target.style.boxShadow = '0 4px 12px rgba(25, 118, 210, 0.3)';
-                                }}
-                              >
-                                <span>🔗</span>
-                                Ver enlace
-                                <span>→</span>
-                              </button>
-                            </div>
-                          )}
-
-                          {/* SOLUCIÓN: Mensaje de depuración (solo desarrollo) */}
-                          {process.env.NODE_ENV === 'development' && !tieneEnlace && (
-                            <div style={{
-                              marginTop: '0.5rem',
-                              padding: '0.3rem',
-                              background: '#fff3cd',
-                              border: '1px solid #ffeeba',
-                              borderRadius: '4px',
-                              fontSize: '0.8rem',
-                              color: '#856404'
-                            }}>
-                              Debug: Sin enlace externo
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
                   })}
                 </Slider>
 
+                {/* Navegación inferior */}
                 {comunicados.length > 1 && (
                   <div style={{
                     padding: '1.5rem 2rem',
@@ -463,6 +306,7 @@ const Home = () => {
                     flexWrap: 'wrap',
                     gap: '1rem'
                   }}>
+                    {/* Puntos de navegación MEJORADOS */}
                     <div style={{
                       display: 'flex',
                       gap: '8px',
@@ -479,6 +323,7 @@ const Home = () => {
                       ))}
                     </div>
                     
+                    {/* Información y controles */}
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -501,28 +346,29 @@ const Home = () => {
             )}
           </div>
         </div>
-      ) : (
-        !comunicadosLoading && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '4rem', 
-            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-            borderRadius: '15px',
-            margin: '3rem 0',
-            border: '2px dashed #ced4da'
-          }}>
-            <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: '0.5' }}>📢</div>
-            <h3 style={{ color: 'var(--primary-blue)', marginBottom: '0.5rem', fontSize: '1.8rem' }}>
-              No hay comunicados publicados
-            </h3>
-            <p style={{ color: 'var(--medium-gray)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-              No se han publicado comunicados oficiales todavía.
-            </p>
-            <p style={{ fontSize: '0.95rem', color: '#6c757d', fontStyle: 'italic' }}>
-              Los comunicados aparecerán aquí cuando sean publicados por la administración.
-            </p>
-          </div>
-        )
+      )}
+
+      {/* Si no hay comunicados */}
+      {!comunicadosLoading && comunicados.length === 0 && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '4rem', 
+          background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+          borderRadius: '15px',
+          margin: '3rem 0',
+          border: '2px dashed #ced4da'
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: '0.5' }}>📢</div>
+          <h3 style={{ color: 'var(--primary-blue)', marginBottom: '0.5rem', fontSize: '1.8rem' }}>
+            No hay comunicados publicados
+          </h3>
+          <p style={{ color: 'var(--medium-gray)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+            No se han publicado comunicados oficiales todavía.
+          </p>
+          <p style={{ fontSize: '0.95rem', color: '#6c757d', fontStyle: 'italic' }}>
+            Los comunicados aparecerán aquí cuando sean publicados por la administración.
+          </p>
+        </div>
       )}
 
       {/* Features Grid */}
