@@ -7,16 +7,15 @@ import FormNuevoDirectivo from './FormNuevoDirectivo';
 import FormNuevoPersonal from './FormNuevoPersonal';
 import PanelComunicadosAdmin from './PanelComunicadosAdmin';
 
-const API_URL = 'https://api.strideutmat.com';
+const API_URL = 'https://api1.strideutmat.com';
 
 const SuperAdminDashboard = ({ admin }) => {
   const navigate = useNavigate();
-  
+
   const [showFormDireccion, setShowFormDireccion] = useState(false);
   const [showFormDirectivo, setShowFormDirectivo] = useState(false);
   const [showFormPersonal, setShowFormPersonal] = useState(false);
 
-  // Estados para edición
   const [showEditDirectivo, setShowEditDirectivo] = useState(false);
   const [showEditPersonal, setShowEditPersonal] = useState(false);
   const [editingDirectivo, setEditingDirectivo] = useState(null);
@@ -49,93 +48,27 @@ const SuperAdminDashboard = ({ admin }) => {
       } catch (e) { console.warn('Error estadísticas:', e.message); }
 
       try {
-<<<<<<< HEAD
-        const persRes = await axios.get('https://api1.strideutmat.com/api/university/personal');
-        const personalData = persRes.data.data || [];
-        
-        console.log('👤 DEBUG - Datos de personal recibidos:', {
-          total: personalData.length,
-          primerRegistro: personalData[0] ? {
-            nombre: personalData[0].nombre_completo,
-            tieneFotoPerfil: !!personalData[0].foto_perfil,
-            fotoPerfil: personalData[0].foto_perfil,
-            tieneFotoUrl: !!personalData[0].foto_url,
-            fotoUrl: personalData[0].foto_url,
-            todosLosCampos: Object.keys(personalData[0])
-          } : 'No hay datos'
-        });
-        
-        setPersonal(personalData);
-        console.log('👤 Personal:', personalData.length);
-      } catch (error) {
-        console.warn('⚠️ Error cargando personal:', error.message);
-      }
-      
-      // 1. Obtener estadísticas
-      try {
-        const statsRes = await axios.get('https://api1.strideutmat.com/api/university/estadisticas');
-        console.log('📊 Estadísticas:', statsRes.data);
-        setEstadisticas(statsRes.data.data || { 
-          usuarios: 0, 
-          direcciones: 0, 
-          directivos: 0, 
-          personal: 0,
-          comunicados: 0
-        });
-      } catch (error) {
-        console.warn('⚠️ Error cargando estadísticas:', error.message);
-      }
-
-      // 2. Obtener super usuarios
-      try {
-        const usersRes = await axios.get('https://api1.strideutmat.com/api/university/superusers');
-        console.log('👥 Usuarios:', usersRes.data.data?.length || 0);
-=======
         const usersRes = await axios.get(`${API_URL}/api/university/superusers`);
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
         setUsuarios(usersRes.data.data || []);
       } catch (e) { console.warn('Error usuarios:', e.message); }
 
       try {
-<<<<<<< HEAD
-        const dirRes = await axios.get('https://api1.strideutmat.com/api/university/direcciones');
-        console.log('🏛️ Direcciones:', dirRes.data.data?.length || 0);
-=======
         const dirRes = await axios.get(`${API_URL}/api/university/direcciones`);
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
         setDirecciones(dirRes.data.data || []);
       } catch (e) { console.warn('Error direcciones:', e.message); }
 
       try {
-<<<<<<< HEAD
-        const dirivosRes = await axios.get('https://api1.strideutmat.com/api/university/directivos');
-        console.log('👔 Directivos:', dirivosRes.data.data?.length || 0);
-        setDirectivos(dirivosRes.data.data || []);
-      } catch (error) {
-        console.warn('⚠️ Error cargando directivos:', error.message);
-      }
-=======
         const divRes = await axios.get(`${API_URL}/api/university/directivos`);
         setDirectivos(divRes.data.data || []);
       } catch (e) { console.warn('Error directivos:', e.message); }
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
 
       try {
-<<<<<<< HEAD
-        const persRes = await axios.get('https://api1.strideutmat.com/api/university/personal');
-        console.log('👤 Personal:', persRes.data.data?.length || 0);
-=======
         const persRes = await axios.get(`${API_URL}/api/university/personal`);
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
         setPersonal(persRes.data.data || []);
       } catch (e) { console.warn('Error personal:', e.message); }
 
       try {
-<<<<<<< HEAD
-        const comRes = await axios.get('https://api1.strideutmat.com/api/university/comunicados-admin');
-=======
         const comRes = await axios.get(`${API_URL}/api/university/comunicados-admin`);
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
         const comunicados = comRes.data.data || [];
         setEstadisticas(prev => ({ ...prev, comunicados: comunicados.length }));
       } catch (e) { console.warn('Error comunicados:', e.message); }
@@ -147,7 +80,6 @@ const SuperAdminDashboard = ({ admin }) => {
     }
   };
 
-  // ========== FUNCIONES EDITAR DIRECTIVO ==========
   const handleOpenEditDirectivo = (directivo) => {
     setEditingDirectivo(directivo);
     setEditFormDirectivo({
@@ -187,7 +119,6 @@ const SuperAdminDashboard = ({ admin }) => {
     }
   };
 
-  // ========== FUNCIONES EDITAR PERSONAL ==========
   const handleOpenEditPersonal = (persona) => {
     setEditingPersonal(persona);
     setEditFormPersonal({
@@ -221,7 +152,6 @@ const SuperAdminDashboard = ({ admin }) => {
       formData.append('email', editFormPersonal.email);
       if (editFormPersonal.password) formData.append('password', editFormPersonal.password);
       if (editPersonalFoto) formData.append('foto', editPersonalFoto);
-
       await axios.put(`${API_URL}/api/university/personal/${editingPersonal.id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -248,14 +178,12 @@ const SuperAdminDashboard = ({ admin }) => {
     }
   };
 
-  // ========== RENDER DASHBOARD ==========
   const renderDashboard = () => (
     <div className="dashboard-content">
       <div className="welcome-section">
         <h2>Panel de Super Administración</h2>
         <p>Bienvenido, <strong>{admin?.username || 'Administrador'}</strong>. Gestiona todo el sistema universitario.</p>
       </div>
-
       <div className="stats-grid">
         <div className="stat-card" onClick={() => setActiveTab('usuarios')}>
           <span className="stat-number">{estadisticas.usuarios || 0}</span>
@@ -283,7 +211,6 @@ const SuperAdminDashboard = ({ admin }) => {
           <div className="stat-icon">📢</div>
         </div>
       </div>
-
       <div className="quick-actions">
         <h2>Acciones Rápidas</h2>
         <div className="actions-grid">
@@ -392,7 +319,6 @@ const SuperAdminDashboard = ({ admin }) => {
     </div>
   );
 
-  // ========== RENDER DIRECTIVOS CON EDITAR/ELIMINAR ==========
   const renderDirectivos = () => (
     <div className="tab-content">
       <div className="tab-header">
@@ -413,12 +339,7 @@ const SuperAdminDashboard = ({ admin }) => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Cargo</th>
-                  <th>Dirección</th>
-                  <th>Email</th>
-                  <th>Fecha de Registro</th>
-                  <th>Acciones</th>
+                  <th>Nombre</th><th>Cargo</th><th>Dirección</th><th>Email</th><th>Fecha de Registro</th><th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -431,20 +352,8 @@ const SuperAdminDashboard = ({ admin }) => {
                     <td>{new Date(dir.created_at).toLocaleDateString('es-ES')}</td>
                     <td>
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          className="btn btn-primary btn-small"
-                          onClick={() => handleOpenEditDirectivo(dir)}
-                          title="Editar directivo"
-                        >
-                          ✏️ Editar
-                        </button>
-                        <button
-                          className="btn btn-danger btn-small"
-                          onClick={() => handleDeleteDirectivo(dir)}
-                          title="Eliminar directivo"
-                        >
-                          🗑️ Eliminar
-                        </button>
+                        <button className="btn btn-primary btn-small" onClick={() => handleOpenEditDirectivo(dir)}>✏️ Editar</button>
+                        <button className="btn btn-danger btn-small" onClick={() => handleDeleteDirectivo(dir)}>🗑️ Eliminar</button>
                       </div>
                     </td>
                   </tr>
@@ -457,103 +366,13 @@ const SuperAdminDashboard = ({ admin }) => {
     </div>
   );
 
-  // ========== RENDER PERSONAL CON EDITAR/ELIMINAR ==========
   const renderPersonal = () => (
-<<<<<<< HEAD
-  <div className="tab-content">
-    <div className="tab-header">
-      <h2>👥 Personal Administrativo</h2>
-      <div className="tab-actions">
-        <button className="btn btn-secondary" onClick={() => setActiveTab('dashboard')}>
-          ← Volver al Dashboard
-        </button>
-        <button className="btn btn-primary" onClick={() => setShowFormPersonal(true)}>
-          + Nuevo Personal
-        </button>
-      </div>
-    </div>
-    
-    {loading ? (
-      <div className="loading">Cargando personal...</div>
-    ) : personal.length === 0 ? (
-      <div className="no-data">
-        <p>No hay personal registrado</p>
-        <button className="btn btn-primary" onClick={() => setShowFormPersonal(true)}>
-          Crear Primer Personal
-        </button>
-      </div>
-    ) : (
-      <div className="table-responsive">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Foto</th>
-              <th>Nombre</th>
-              <th>Puesto</th>
-              <th>Dirección</th>
-              <th>Email</th>
-              <th>Fecha de Registro</th>
-            </tr>
-          </thead>
-          <tbody>
-            {personal.map(pers => {
-              // Construir URL de la foto manualmente
-              const fotoUrl = pers.foto_perfil 
-                ? `https://api1.strideutmat.com/api/university/personal/foto/${pers.foto_perfil}`
-                : `https://api1.strideutmat.com/api/university/personal/foto/default-avatar.png`;
-              
-              return (
-                <tr key={pers.id}>
-                  <td>
-                    <div className="personal-foto-cell">
-                      <img 
-                        src={fotoUrl}
-                        alt={pers.nombre_completo}
-                        className="personal-foto"
-                        onError={(e) => {
-                          console.error(`Error cargando foto para ${pers.nombre_completo}:`, pers.foto_perfil);
-                          e.target.src = 'https://api1.strideutmat.com/api/university/personal/foto/default-avatar.png';
-                        }}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <strong>{pers.nombre_completo}</strong>
-                    {pers.foto_perfil && (
-                      <span style={{ 
-                        fontSize: '0.7rem', 
-                        color: 'green',
-                        marginLeft: '5px'
-                      }}>
-                        (con foto)
-                      </span>
-                    )}
-                  </td>
-                  <td>{pers.puesto}</td>
-                  <td>{pers.direccion_nombre || 'Sin asignar'}</td>
-                  <td>{pers.email}</td>
-                  <td>{new Date(pers.created_at).toLocaleDateString('es-ES')}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        
-        {/* Estadísticas */}
-        <div className="stats-footer">
-          <small>
-            Total: {personal.length} | 
-            Con foto: {personal.filter(p => p.foto_perfil).length} | 
-            Sin foto: {personal.filter(p => !p.foto_perfil).length}
-          </small>
-=======
     <div className="tab-content">
       <div className="tab-header">
         <h2>👥 Personal Administrativo</h2>
         <div className="tab-actions">
           <button className="btn btn-secondary" onClick={() => setActiveTab('dashboard')}>← Volver al Dashboard</button>
           <button className="btn btn-primary" onClick={() => setShowFormPersonal(true)}>+ Nuevo Personal</button>
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
         </div>
       </div>
       {loading ? <div className="loading">Cargando personal...</div> :
@@ -567,13 +386,7 @@ const SuperAdminDashboard = ({ admin }) => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Foto</th>
-                  <th>Nombre</th>
-                  <th>Puesto</th>
-                  <th>Dirección</th>
-                  <th>Email</th>
-                  <th>Fecha de Registro</th>
-                  <th>Acciones</th>
+                  <th>Foto</th><th>Nombre</th><th>Puesto</th><th>Dirección</th><th>Email</th><th>Fecha de Registro</th><th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -600,20 +413,8 @@ const SuperAdminDashboard = ({ admin }) => {
                       <td>{new Date(pers.created_at).toLocaleDateString('es-ES')}</td>
                       <td>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                          <button
-                            className="btn btn-primary btn-small"
-                            onClick={() => handleOpenEditPersonal(pers)}
-                            title="Editar personal"
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button
-                            className="btn btn-danger btn-small"
-                            onClick={() => handleDeletePersonal(pers)}
-                            title="Eliminar personal"
-                          >
-                            🗑️ Eliminar
-                          </button>
+                          <button className="btn btn-primary btn-small" onClick={() => handleOpenEditPersonal(pers)}>✏️ Editar</button>
+                          <button className="btn btn-danger btn-small" onClick={() => handleDeletePersonal(pers)}>🗑️ Eliminar</button>
                         </div>
                       </td>
                     </tr>
@@ -622,9 +423,7 @@ const SuperAdminDashboard = ({ admin }) => {
               </tbody>
             </table>
             <div className="stats-footer">
-              <small>
-                Total: {personal.length} | Con foto: {personal.filter(p => p.foto_perfil).length} | Sin foto: {personal.filter(p => !p.foto_perfil).length}
-              </small>
+              <small>Total: {personal.length} | Con foto: {personal.filter(p => p.foto_perfil).length} | Sin foto: {personal.filter(p => !p.foto_perfil).length}</small>
             </div>
           </div>
         )
@@ -632,7 +431,6 @@ const SuperAdminDashboard = ({ admin }) => {
     </div>
   );
 
-  // ========== MODAL EDITAR DIRECTIVO ==========
   const renderModalEditDirectivo = () => {
     if (!showEditDirectivo || !editingDirectivo) return null;
     return (
@@ -646,58 +444,30 @@ const SuperAdminDashboard = ({ admin }) => {
           <form onSubmit={handleSaveEditDirectivo} style={{ padding: '20px 30px 30px' }}>
             <div className="form-group">
               <label>Nombre Completo *</label>
-              <input
-                type="text"
-                value={editFormDirectivo.nombre_completo}
-                onChange={e => setEditFormDirectivo({ ...editFormDirectivo, nombre_completo: e.target.value })}
-                required
-              />
+              <input type="text" value={editFormDirectivo.nombre_completo} onChange={e => setEditFormDirectivo({ ...editFormDirectivo, nombre_completo: e.target.value })} required />
             </div>
             <div className="form-group">
               <label>Cargo *</label>
-              <input
-                type="text"
-                value={editFormDirectivo.cargo}
-                onChange={e => setEditFormDirectivo({ ...editFormDirectivo, cargo: e.target.value })}
-                required
-              />
+              <input type="text" value={editFormDirectivo.cargo} onChange={e => setEditFormDirectivo({ ...editFormDirectivo, cargo: e.target.value })} required />
             </div>
             <div className="form-group">
               <label>Dirección *</label>
-              <select
-                value={editFormDirectivo.direccion_id}
-                onChange={e => setEditFormDirectivo({ ...editFormDirectivo, direccion_id: e.target.value })}
-                required
-              >
+              <select value={editFormDirectivo.direccion_id} onChange={e => setEditFormDirectivo({ ...editFormDirectivo, direccion_id: e.target.value })} required>
                 <option value="">Seleccionar dirección...</option>
-                {direcciones.map(d => (
-                  <option key={d.id} value={d.id}>{d.nombre}</option>
-                ))}
+                {direcciones.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
               </select>
             </div>
             <div className="form-group">
               <label>Email *</label>
-              <input
-                type="email"
-                value={editFormDirectivo.email}
-                onChange={e => setEditFormDirectivo({ ...editFormDirectivo, email: e.target.value })}
-                required
-              />
+              <input type="email" value={editFormDirectivo.email} onChange={e => setEditFormDirectivo({ ...editFormDirectivo, email: e.target.value })} required />
             </div>
             <div className="form-group">
               <label>Nueva Contraseña <small style={{ color: '#9ca3af', fontWeight: 400 }}>(dejar vacío para no cambiar)</small></label>
-              <input
-                type="password"
-                value={editFormDirectivo.password}
-                onChange={e => setEditFormDirectivo({ ...editFormDirectivo, password: e.target.value })}
-                placeholder="Nueva contraseña (opcional)"
-              />
+              <input type="password" value={editFormDirectivo.password} onChange={e => setEditFormDirectivo({ ...editFormDirectivo, password: e.target.value })} placeholder="Nueva contraseña (opcional)" />
             </div>
             <div className="form-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setShowEditDirectivo(false)}>Cancelar</button>
-              <button type="submit" className="btn btn-primary" disabled={savingEdit}>
-                {savingEdit ? 'Guardando...' : '💾 Guardar Cambios'}
-              </button>
+              <button type="submit" className="btn btn-primary" disabled={savingEdit}>{savingEdit ? 'Guardando...' : '💾 Guardar Cambios'}</button>
             </div>
           </form>
         </div>
@@ -705,12 +475,9 @@ const SuperAdminDashboard = ({ admin }) => {
     );
   };
 
-  // ========== MODAL EDITAR PERSONAL ==========
   const renderModalEditPersonal = () => {
     if (!showEditPersonal || !editingPersonal) return null;
-    const fotoActual = editingPersonal.foto_perfil
-      ? `${API_URL}/api/university/personal/foto/${editingPersonal.foto_perfil}`
-      : null;
+    const fotoActual = editingPersonal.foto_perfil ? `${API_URL}/api/university/personal/foto/${editingPersonal.foto_perfil}` : null;
     return (
       <div className="form-modal">
         <div className="form-modal-content" style={{ maxWidth: '550px' }}>
@@ -722,56 +489,29 @@ const SuperAdminDashboard = ({ admin }) => {
           <form onSubmit={handleSaveEditPersonal} style={{ padding: '20px 30px 30px' }}>
             <div className="form-group">
               <label>Nombre Completo *</label>
-              <input
-                type="text"
-                value={editFormPersonal.nombre_completo}
-                onChange={e => setEditFormPersonal({ ...editFormPersonal, nombre_completo: e.target.value })}
-                required
-              />
+              <input type="text" value={editFormPersonal.nombre_completo} onChange={e => setEditFormPersonal({ ...editFormPersonal, nombre_completo: e.target.value })} required />
             </div>
             <div className="form-group">
               <label>Puesto *</label>
-              <input
-                type="text"
-                value={editFormPersonal.puesto}
-                onChange={e => setEditFormPersonal({ ...editFormPersonal, puesto: e.target.value })}
-                required
-              />
+              <input type="text" value={editFormPersonal.puesto} onChange={e => setEditFormPersonal({ ...editFormPersonal, puesto: e.target.value })} required />
             </div>
             <div className="form-group">
               <label>Dirección *</label>
-              <select
-                value={editFormPersonal.direccion_id}
-                onChange={e => setEditFormPersonal({ ...editFormPersonal, direccion_id: e.target.value })}
-                required
-              >
+              <select value={editFormPersonal.direccion_id} onChange={e => setEditFormPersonal({ ...editFormPersonal, direccion_id: e.target.value })} required>
                 <option value="">Seleccionar dirección...</option>
-                {direcciones.map(d => (
-                  <option key={d.id} value={d.id}>{d.nombre}</option>
-                ))}
+                {direcciones.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
               </select>
             </div>
             <div className="form-group">
               <label>Email *</label>
-              <input
-                type="email"
-                value={editFormPersonal.email}
-                onChange={e => setEditFormPersonal({ ...editFormPersonal, email: e.target.value })}
-                required
-              />
+              <input type="email" value={editFormPersonal.email} onChange={e => setEditFormPersonal({ ...editFormPersonal, email: e.target.value })} required />
             </div>
             <div className="form-group">
               <label>Nueva Contraseña <small style={{ color: '#9ca3af', fontWeight: 400 }}>(dejar vacío para no cambiar)</small></label>
-              <input
-                type="password"
-                value={editFormPersonal.password}
-                onChange={e => setEditFormPersonal({ ...editFormPersonal, password: e.target.value })}
-                placeholder="Nueva contraseña (opcional)"
-              />
+              <input type="password" value={editFormPersonal.password} onChange={e => setEditFormPersonal({ ...editFormPersonal, password: e.target.value })} placeholder="Nueva contraseña (opcional)" />
             </div>
             <div className="form-group">
               <label>Foto de Perfil</label>
-              {/* Preview */}
               <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <img
                   src={editPersonalFotoPreview || fotoActual || ''}
@@ -779,28 +519,18 @@ const SuperAdminDashboard = ({ admin }) => {
                   style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb', display: (editPersonalFotoPreview || fotoActual) ? 'block' : 'none' }}
                 />
                 <div>
-                  <input
-                    type="file"
-                    id="edit-foto-input"
-                    accept="image/*"
-                    onChange={handleEditPersonalFoto}
-                    style={{ display: 'none' }}
-                  />
+                  <input type="file" id="edit-foto-input" accept="image/*" onChange={handleEditPersonalFoto} style={{ display: 'none' }} />
                   <label htmlFor="edit-foto-input" style={{ cursor: 'pointer', padding: '8px 14px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '0.85rem', color: '#475569' }}>
                     📷 {editingPersonal.foto_perfil ? 'Cambiar foto' : 'Subir foto'}
                   </label>
-                  {editPersonalFoto && (
-                    <span style={{ marginLeft: '10px', fontSize: '0.8rem', color: '#10b981' }}>✅ {editPersonalFoto.name}</span>
-                  )}
+                  {editPersonalFoto && <span style={{ marginLeft: '10px', fontSize: '0.8rem', color: '#10b981' }}>✅ {editPersonalFoto.name}</span>}
                 </div>
               </div>
               <small style={{ color: '#9ca3af' }}>Máximo 2MB • JPG, PNG, GIF</small>
             </div>
             <div className="form-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setShowEditPersonal(false)}>Cancelar</button>
-              <button type="submit" className="btn btn-primary" disabled={savingEdit}>
-                {savingEdit ? 'Guardando...' : '💾 Guardar Cambios'}
-              </button>
+              <button type="submit" className="btn btn-primary" disabled={savingEdit}>{savingEdit ? 'Guardando...' : '💾 Guardar Cambios'}</button>
             </div>
           </form>
         </div>
@@ -838,12 +568,10 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'comunicados' && <PanelComunicadosAdmin admin={admin} onClose={() => setActiveTab('dashboard')} />}
       </div>
 
-      {/* Modales crear */}
       {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}
       {showFormDirectivo && <FormNuevoDirectivo admin={admin} onClose={() => setShowFormDirectivo(false)} onSuccess={fetchData} />}
       {showFormPersonal && <FormNuevoPersonal admin={admin} onClose={() => setShowFormPersonal(false)} onSuccess={fetchData} />}
 
-      {/* Modales editar */}
       {renderModalEditDirectivo()}
       {renderModalEditPersonal()}
     </div>

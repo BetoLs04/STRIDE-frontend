@@ -13,9 +13,7 @@ const PersonalTareas = ({ user }) => {
   const [editandoRespuesta, setEditandoRespuesta] = useState(null);
   const [showResponderModal, setShowResponderModal] = useState(false);
   const [tareaAResponder, setTareaAResponder] = useState(null);
-  const [responderForm, setResponderForm] = useState({
-    comentarios: ''
-  });
+  const [responderForm, setResponderForm] = useState({ comentarios: '' });
   const [archivos, setArchivos] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
   const [stats, setStats] = useState({
@@ -32,23 +30,13 @@ const PersonalTareas = ({ user }) => {
   const cargarTareas = async () => {
     try {
       setLoading(true);
-      console.log('🔍 ID del usuario desde props:', user.id);
-      
-<<<<<<< HEAD
-      const response = await axios.get(`https://api1.strideutmat.com/api/university/tareas/personal/${user.id}`);
-=======
       const response = await axios.get(`${API_URL}/api/university/tareas/personal/${user.id}`);
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
-      
-      console.log('📦 Respuesta completa:', response.data);
-      
       if (response.data.success) {
-        console.log('✅ Tareas encontradas:', response.data.data.length);
         setTareas(response.data.data);
         calcularStats(response.data.data);
       }
     } catch (error) {
-      console.error('❌ Error cargando tareas:', error);
+      console.error('Error cargando tareas:', error);
       toast.error('Error al cargar tus tareas');
     } finally {
       setLoading(false);
@@ -58,7 +46,7 @@ const PersonalTareas = ({ user }) => {
   const handleEditarRespuesta = (tarea) => {
     setTareaAResponder(tarea);
     setResponderForm({ comentarios: tarea.asignacion_comentarios || '' });
-    setArchivos([]); // No puedes editar archivos, solo agregar nuevos
+    setArchivos([]);
     setEditandoRespuesta(true);
     setShowResponderModal(true);
   };
@@ -66,29 +54,19 @@ const PersonalTareas = ({ user }) => {
   const calcularStats = (tareasList) => {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    
-    const nuevasStats = {
-      pendientes: 0,
-      en_progreso: 0,
-      completadas: 0,
-      vencidas: 0
-    };
-    
+    const nuevasStats = { pendientes: 0, en_progreso: 0, completadas: 0, vencidas: 0 };
     tareasList.forEach(t => {
       if (t.asignacion_estado === 'pendiente') {
         nuevasStats.pendientes++;
         const fechaEntrega = new Date(t.fecha_entrega);
         fechaEntrega.setHours(0, 0, 0, 0);
-        if (fechaEntrega < hoy) {
-          nuevasStats.vencidas++;
-        }
+        if (fechaEntrega < hoy) nuevasStats.vencidas++;
       } else if (t.asignacion_estado === 'en_progreso') {
         nuevasStats.en_progreso++;
       } else if (t.asignacion_estado === 'completada') {
         nuevasStats.completadas++;
       }
     });
-    
     setStats(nuevasStats);
   };
 
@@ -101,19 +79,16 @@ const PersonalTareas = ({ user }) => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    
     if (files.length + archivos.length > 5) {
       toast.error('Máximo 5 archivos por tarea');
       return;
     }
-    
     for (const file of files) {
       if (file.size > 10 * 1024 * 1024) {
         toast.error(`El archivo ${file.name} excede los 10MB`);
         return;
       }
     }
-    
     setArchivos(prev => [...prev, ...files]);
   };
 
@@ -123,43 +98,26 @@ const PersonalTareas = ({ user }) => {
 
   const handleSubmitResponder = async (e) => {
     e.preventDefault();
-    
     if (!responderForm.comentarios.trim() && archivos.length === 0) {
       toast.error('Debes agregar una descripción o un archivo para responder la tarea');
       return;
     }
-    
     setSubiendo(true);
-    
     try {
       const formData = new FormData();
       formData.append('comentarios', responderForm.comentarios);
-      
-      archivos.forEach(file => {
-        formData.append('archivos', file);
-      });
-      
+      archivos.forEach(file => formData.append('archivos', file));
       const response = await axios.post(
-<<<<<<< HEAD
-        `https://api1.strideutmat.com/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
-=======
         `${API_URL}/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
->>>>>>> 8de2641c5536fb127520fa5acf0cf377b2a31364
         formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
-      
       if (response.data.success) {
         toast.success('¡Respuesta enviada! Tarea completada 🎉');
         setShowResponderModal(false);
         setTareaAResponder(null);
         cargarTareas();
       }
-      
     } catch (error) {
       console.error('Error enviando respuesta:', error);
       toast.error(error.response?.data?.error || 'Error al enviar la respuesta');
@@ -186,17 +144,9 @@ const PersonalTareas = ({ user }) => {
     return 'normal';
   };
 
-  const tieneArchivosRespuesta = (tarea) => {
-    return tarea.archivos_respuesta && tarea.archivos_respuesta.length > 0;
-  };
-
   const tareasFiltradas = tareas.filter(t => {
-    if (filtro === 'pendientes') {
-      return t.asignacion_estado === 'pendiente' || t.asignacion_estado === 'en_progreso';
-    }
-    if (filtro === 'completadas') {
-      return t.asignacion_estado === 'completada';
-    }
+    if (filtro === 'pendientes') return t.asignacion_estado === 'pendiente' || t.asignacion_estado === 'en_progreso';
+    if (filtro === 'completadas') return t.asignacion_estado === 'completada';
     return true;
   });
 
@@ -212,7 +162,6 @@ const PersonalTareas = ({ user }) => {
           </h1>
           <p className="header-subtitle">Gestiona tus tareas asignadas</p>
         </div>
-        
         <div className="stats-circles">
           <div className="stat-circle pendientes">
             <span className="stat-number">{pendientesCount}</span>
@@ -233,22 +182,13 @@ const PersonalTareas = ({ user }) => {
 
       <div className="tareas-filtros">
         <div className="filtro-buttons">
-          <button 
-            className={`filtro-btn ${filtro === 'pendientes' ? 'active' : ''}`}
-            onClick={() => setFiltro('pendientes')}
-          >
+          <button className={`filtro-btn ${filtro === 'pendientes' ? 'active' : ''}`} onClick={() => setFiltro('pendientes')}>
             Pendientes ({pendientesCount})
           </button>
-          <button 
-            className={`filtro-btn ${filtro === 'completadas' ? 'active' : ''}`}
-            onClick={() => setFiltro('completadas')}
-          >
+          <button className={`filtro-btn ${filtro === 'completadas' ? 'active' : ''}`} onClick={() => setFiltro('completadas')}>
             Completadas ({stats.completadas})
           </button>
-          <button 
-            className={`filtro-btn ${filtro === 'todas' ? 'active' : ''}`}
-            onClick={() => setFiltro('todas')}
-          >
+          <button className={`filtro-btn ${filtro === 'todas' ? 'active' : ''}`} onClick={() => setFiltro('todas')}>
             Todas ({tareas.length})
           </button>
         </div>
@@ -272,12 +212,8 @@ const PersonalTareas = ({ user }) => {
               const diasRestantes = getDiasRestantes(tarea.fecha_entrega);
               const estadoClase = getEstadoClase(diasRestantes, tarea.asignacion_estado);
               const puedeResponder = tarea.asignacion_estado !== 'completada';
-              
               return (
-                <div 
-                  key={tarea.id} 
-                  className={`tarea-item ${estadoClase} ${tarea.asignacion_estado}`}
-                >
+                <div key={tarea.id} className={`tarea-item ${estadoClase} ${tarea.asignacion_estado}`}>
                   <div className="tarea-item-header">
                     <div className="tarea-titulo">
                       <h3>{tarea.titulo}</h3>
@@ -293,11 +229,7 @@ const PersonalTareas = ({ user }) => {
                       {tarea.asignacion_estado === 'completada' && '✅ Completada'}
                     </span>
                   </div>
-                  
-                  <p className="tarea-descripcion">
-                    {tarea.descripcion || 'Sin descripción'}
-                  </p>
-                  
+                  <p className="tarea-descripcion">{tarea.descripcion || 'Sin descripción'}</p>
                   <div className="tarea-meta">
                     <div className={`fecha-info ${estadoClase}`}>
                       <span className="meta-icon">📅</span>
@@ -312,24 +244,19 @@ const PersonalTareas = ({ user }) => {
                         )}
                       </span>
                     </div>
-                    
                     <div className="creador-info">
                       <span className="meta-icon"></span>
                       <span>{tarea.creado_por_nombre || 'Sistema'}</span>
                     </div>
                   </div>
-                  
                   {tarea.asignacion_estado === 'completada' && tarea.asignacion_comentarios && (
                     <div className="tarea-comentario">
                       <span className="comentario-icon">💬</span>
                       <span>{tarea.asignacion_comentarios}</span>
                     </div>
                   )}
-                  
-                  {/* SECCIÓN DE ARCHIVOS - ORIGINALES Y RESPUESTA */}
                   {(tarea.archivos?.length > 0 || tarea.archivos_respuesta?.length > 0) && (
                     <div className="tarea-archivos-container">
-                      {/* Archivos originales de la tarea */}
                       {tarea.archivos?.length > 0 && (
                         <div className="archivos-seccion">
                           <div className="archivos-seccion-header">
@@ -338,28 +265,15 @@ const PersonalTareas = ({ user }) => {
                           </div>
                           <div className="archivos-lista-completa">
                             {tarea.archivos.map(arch => (
-                              <a 
-                                key={arch.id}
-                                href={`${API_URL}${arch.url}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="archivo-link-completo"
-                                title={`Haz clic para descargar ${arch.nombre_original}`}
-                              >
-                                <span className="archivo-icono">
-                                  {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
-                                </span>
+                              <a key={arch.id} href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
+                                <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
                                 <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                                <span className="archivo-tamano">
-                                  {(arch.tamano / 1024).toFixed(1)} KB
-                                </span>
+                                <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
                               </a>
                             ))}
                           </div>
                         </div>
                       )}
-
-                      {/* Archivos de respuesta enviados por el usuario */}
                       {tarea.archivos_respuesta?.length > 0 && (
                         <div className="archivos-seccion respuesta">
                           <div className="archivos-seccion-header">
@@ -368,21 +282,10 @@ const PersonalTareas = ({ user }) => {
                           </div>
                           <div className="archivos-lista-completa">
                             {tarea.archivos_respuesta.map(arch => (
-                              <a 
-                                key={arch.id}
-                                href={`${API_URL}${arch.url}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="archivo-link-completo"
-                                title={`Haz clic para descargar ${arch.nombre_original}`}
-                              >
-                                <span className="archivo-icono">
-                                  {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
-                                </span>
+                              <a key={arch.id} href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
+                                <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
                                 <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                                <span className="archivo-tamano">
-                                  {(arch.tamano / 1024).toFixed(1)} KB
-                                </span>
+                                <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
                               </a>
                             ))}
                           </div>
@@ -390,21 +293,13 @@ const PersonalTareas = ({ user }) => {
                       )}
                     </div>
                   )}
-                  
                   {puedeResponder ? (
-                    <button 
-                      className="btn-responder"
-                      onClick={() => handleResponderClick(tarea)}
-                    >
+                    <button className="btn-responder" onClick={() => handleResponderClick(tarea)}>
                       <span className="btn-icon">📝</span>
                       {tarea.asignacion_estado === 'pendiente' ? 'Enviar Respuesta' : 'Actualizar Respuesta'}
                     </button>
                   ) : (
-                    <button 
-                      className="btn-editar-respuesta"
-                      onClick={() => handleEditarRespuesta(tarea)}
-                      title="Editar respuesta"
-                    >
+                    <button className="btn-editar-respuesta" onClick={() => handleEditarRespuesta(tarea)} title="Editar respuesta">
                       <span className="btn-icon">✏️</span>
                       Editar Respuesta
                     </button>
@@ -423,85 +318,52 @@ const PersonalTareas = ({ user }) => {
               <h2>Responder Tarea</h2>
               <button className="modal-close" onClick={() => setShowResponderModal(false)}>×</button>
             </div>
-            
             <form onSubmit={handleSubmitResponder} className="responder-form">
               <div className="tarea-info-resumen">
                 <h3>{tareaAResponder.titulo}</h3>
                 <p className="fecha-entrega-resumen">
-                   Fecha de entrega: {new Date(tareaAResponder.fecha_entrega).toLocaleDateString()}
+                  Fecha de entrega: {new Date(tareaAResponder.fecha_entrega).toLocaleDateString()}
                 </p>
               </div>
-              
               <div className="form-group">
                 <label>Descripción para la tarea <span className="required">*</span></label>
                 <textarea
                   value={responderForm.comentarios}
-                  onChange={(e) => setResponderForm({...responderForm, comentarios: e.target.value})}
-                  placeholder="Redacta la informacion solicitada para completar la tarea. Puedes incluir detalles, pasos realizados, o cualquier información relevante."
+                  onChange={(e) => setResponderForm({ ...responderForm, comentarios: e.target.value })}
+                  placeholder="Redacta la información solicitada para completar la tarea."
                   rows="4"
                   required={archivos.length === 0}
                 />
                 <small className="form-hint">
-                  {!responderForm.comentarios.trim() && archivos.length === 0 
-                    ? 'ⓘ Debes agregar una descripción o un archivo' 
-                    : '✓ Todo bien'}
+                  {!responderForm.comentarios.trim() && archivos.length === 0 ? 'ⓘ Debes agregar una descripción o un archivo' : '✓ Todo bien'}
                 </small>
               </div>
-              
               <div className="form-group">
                 <label>Archivos adjuntos (opcional)</label>
                 <div className="file-upload-area">
-                  <input
-                    type="file"
-                    id="archivos-responder"
-                    multiple
-                    onChange={handleFileChange}
-                    className="file-input"
-                  />
+                  <input type="file" id="archivos-responder" multiple onChange={handleFileChange} className="file-input" />
                   <label htmlFor="archivos-responder" className="file-upload-label">
                     <span className="upload-icon"></span>
                     <span>Seleccionar archivos</span>
                     <span className="upload-hint">Máx. 5 archivos, 10MB c/u</span>
                   </label>
                 </div>
-                
                 {archivos.length > 0 && (
                   <div className="archivos-preview">
                     {archivos.map((file, index) => (
                       <div key={index} className="archivo-preview-item">
-                        <span className="archivo-icon">
-                          {file.type.startsWith('image/') ? '🖼️' : '📄'}
-                        </span>
+                        <span className="archivo-icon">{file.type.startsWith('image/') ? '🖼️' : '📄'}</span>
                         <span className="archivo-nombre">{file.name}</span>
-                        <span className="archivo-tamaño">
-                          {(file.size / 1024).toFixed(1)} KB
-                        </span>
-                        <button
-                          type="button"
-                          className="archivo-remove"
-                          onClick={() => removeArchivo(index)}
-                        >
-                          ×
-                        </button>
+                        <span className="archivo-tamaño">{(file.size / 1024).toFixed(1)} KB</span>
+                        <button type="button" className="archivo-remove" onClick={() => removeArchivo(index)}>×</button>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-              
               <div className="modal-actions">
-                <button 
-                  type="button" 
-                  className="btn-cancelar"
-                  onClick={() => setShowResponderModal(false)}
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn-responder-submit"
-                  disabled={subiendo || (!responderForm.comentarios.trim() && archivos.length === 0)}
-                >
+                <button type="button" className="btn-cancelar" onClick={() => setShowResponderModal(false)}>Cancelar</button>
+                <button type="submit" className="btn-responder-submit" disabled={subiendo || (!responderForm.comentarios.trim() && archivos.length === 0)}>
                   {subiendo ? 'Enviando...' : '📤 Enviar Respuesta'}
                 </button>
               </div>
