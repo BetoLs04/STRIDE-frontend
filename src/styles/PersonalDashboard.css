@@ -2387,3 +2387,61 @@ form {
     gap: 8px;
   }
 }
+
+/* ========== CARRUSEL MODAL - BOTONES DE NAVEGACIÓN ========== */
+.modal-carousel .slick-prev,
+.modal-carousel .slick-next {
+  z-index: 10;
+  width: 35px;
+  height: 35px;
+}
+
+.modal-carousel .slick-prev {
+  left: 10px;
+}
+
+.modal-carousel .slick-next {
+  right: 10px;
+}
+
+.modal-carousel .slick-prev:before,
+.modal-carousel .slick-next:before {
+  font-size: 35px;
+  color: white;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+  opacity: 1;
+}
+
+/* ========== CAMBIAR ESTADO - ALINEADO IZQUIERDA CON BOTONES ========== */
+.modal-actions {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.modal-actions h4 {
+  margin: 0;
+  color: #4b5563;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.estado-selector-modal {
+  flex: 1;
+}
+
+.estado-selector-modal h4 {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .modal-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

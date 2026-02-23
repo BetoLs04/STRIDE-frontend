@@ -7,6 +7,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../styles/PersonalDashboard.css';
 
+const API_URL = 'https://api.strideutmat.com';
+
 const PersonalDashboard = ({ user }) => {
   const navigate = useNavigate();
   const [actividades, setActividades] = useState([]);
@@ -154,9 +156,9 @@ const PersonalDashboard = ({ user }) => {
             },
             'sin-fecha': { 
               actividades: [], 
-              label: '📅 Sin fecha definida', 
+              label: ' Sin fecha definida', 
               color: '#A0A0A0',
-              emoji: '📅',
+              emoji: '',
               orden: 4
             }
           }
@@ -565,7 +567,7 @@ const PersonalDashboard = ({ user }) => {
                 👤 {actividad.creado_por_nombre || 'Sistema'}
               </span>
               <span className="actividad-minimalista-fecha">
-                📅 {new Date(actividad.fecha_inicio).toLocaleDateString('es-ES', { 
+                 {new Date(actividad.fecha_inicio).toLocaleDateString('es-ES', { 
                   day: '2-digit', 
                   month: 'short', 
                   year: 'numeric' 
@@ -660,7 +662,7 @@ const PersonalDashboard = ({ user }) => {
                  periodoActual.periodo === 'mayo-agosto' ? '🌸' : '🍂'}
               </span>
               <div className="periodo-text-banner">
-                <h4>📅 PERÍODO ACTUAL</h4>
+                <h4> PERÍODO ACTUAL</h4>
                 <p>
                   Año {periodoActual.anio} • 
                   {periodoActual.periodo === 'enero-abril' ? ' Enero - Abril' : 
@@ -741,7 +743,7 @@ const PersonalDashboard = ({ user }) => {
         ) : (
           <div className="periodos-container">
             <div className="periodos-controls">
-              <h3>📅 Actividades por Período</h3>
+              <h3> Actividades por Período</h3>
             </div>
 
             {/* Mostrar años con actividades */}
@@ -759,7 +761,7 @@ const PersonalDashboard = ({ user }) => {
                     }}
                   >
                     <div className="año-acordeon-title">
-                      <span className="año-emoji">📅</span>
+                      <span className="año-emoji"></span>
                       <h3>Año {añoData.anio}</h3>
                       {añoData.anio === periodoActual.anio && (
                         <span className="año-actual-badge">AÑO ACTUAL</span>
@@ -879,11 +881,11 @@ const PersonalDashboard = ({ user }) => {
                       <div key={index} className="modal-slide">
                         <div className="modal-slide-content">
                           <img 
-                            src={img.url} 
+                            src={`${API_URL}${img.url}`}
                             alt={`Evidencia ${index + 1} - ${actividadSeleccionada.titulo}`}
                             className="modal-image"
                             onError={(e) => {
-                              e.target.src = '/placeholder.jpg';
+                              e.target.style.display = 'none';
                               e.target.alt = 'Imagen no disponible';
                             }}
                           />
@@ -899,11 +901,11 @@ const PersonalDashboard = ({ user }) => {
               )}
               
               <div className="modal-fechas">
-                <h4>📅 Información de Fechas</h4>
-                <div className="modal-fechas-grid">
+                <h4> Información de Fechas</h4>
+                <div lassName="modal-fechas-grid">
                   <div className="modal-fecha-item">
                     <div className="modal-fecha-header">
-                      <span className="modal-fecha-icon">📅</span>
+                      <span className="modal-fecha-icon"></span>
                       <span className="modal-fecha-label">Fecha de creación:</span>
                     </div>
                     <div className="modal-fecha-valor">
@@ -1120,7 +1122,7 @@ const PersonalDashboard = ({ user }) => {
                       <span className="periodo-preview-icon">
                         {obtenerAnioYPeriodo(formData.fecha_inicio).periodo === 'enero-abril' ? '❄️' : 
                          obtenerAnioYPeriodo(formData.fecha_inicio).periodo === 'mayo-agosto' ? '🌸' : 
-                         obtenerAnioYPeriodo(formData.fecha_inicio).periodo === 'septiembre-diciembre' ? '🍂' : '📅'}
+                         obtenerAnioYPeriodo(formData.fecha_inicio).periodo === 'septiembre-diciembre' ? '🍂' : ''}
                       </span>
                       <span className="periodo-preview-text">
                         Esta actividad pertenecerá a: 
@@ -1133,7 +1135,7 @@ const PersonalDashboard = ({ user }) => {
                     </>
                   ) : (
                     <span className="periodo-preview-empty">
-                      📅 Selecciona una fecha de inicio para ver el año y período
+                       Selecciona una fecha de inicio para ver el año y período
                     </span>
                   )}
                 </div>
