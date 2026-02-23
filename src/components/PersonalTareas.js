@@ -32,7 +32,7 @@ const PersonalTareas = ({ user }) => {
       setLoading(true);
       console.log('🔍 ID del usuario desde props:', user.id);
       
-      const response = await axios.get(`https://api.strideutmat.com/api/university/tareas/personal/${user.id}`);
+      const response = await axios.get(`https://api1.strideutmat.com/api/university/tareas/personal/${user.id}`);
       
       console.log('📦 Respuesta completa:', response.data);
       
@@ -134,7 +134,7 @@ const PersonalTareas = ({ user }) => {
       });
       
       const response = await axios.post(
-        `https://api.strideutmat.com/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
+        `https://api1.strideutmat.com/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
         formData,
         {
           headers: {

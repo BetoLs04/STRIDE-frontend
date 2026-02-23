@@ -47,7 +47,7 @@ const SuperAdminDashboard = ({ admin }) => {
       console.log('🔍 Iniciando carga de datos...');
 
       try {
-        const persRes = await axios.get('https://api.strideutmat.com/api/university/personal');
+        const persRes = await axios.get('https://api1.strideutmat.com/api/university/personal');
         const personalData = persRes.data.data || [];
         
         console.log('👤 DEBUG - Datos de personal recibidos:', {
@@ -70,7 +70,7 @@ const SuperAdminDashboard = ({ admin }) => {
       
       // 1. Obtener estadísticas
       try {
-        const statsRes = await axios.get('https://api.strideutmat.com/api/university/estadisticas');
+        const statsRes = await axios.get('https://api1.strideutmat.com/api/university/estadisticas');
         console.log('📊 Estadísticas:', statsRes.data);
         setEstadisticas(statsRes.data.data || { 
           usuarios: 0, 
@@ -85,7 +85,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
       // 2. Obtener super usuarios
       try {
-        const usersRes = await axios.get('https://api.strideutmat.com/api/university/superusers');
+        const usersRes = await axios.get('https://api1.strideutmat.com/api/university/superusers');
         console.log('👥 Usuarios:', usersRes.data.data?.length || 0);
         setUsuarios(usersRes.data.data || []);
       } catch (error) {
@@ -94,7 +94,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
       // 3. Obtener direcciones
       try {
-        const dirRes = await axios.get('https://api.strideutmat.com/api/university/direcciones');
+        const dirRes = await axios.get('https://api1.strideutmat.com/api/university/direcciones');
         console.log('🏛️ Direcciones:', dirRes.data.data?.length || 0);
         setDirecciones(dirRes.data.data || []);
       } catch (error) {
@@ -103,7 +103,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
       // 4. Obtener directivos
       try {
-        const dirivosRes = await axios.get('https://api.strideutmat.com/api/university/directivos');
+        const dirivosRes = await axios.get('https://api1.strideutmat.com/api/university/directivos');
         console.log('👔 Directivos:', dirivosRes.data.data?.length || 0);
         setDirectivos(dirivosRes.data.data || []);
       } catch (error) {
@@ -112,7 +112,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
       // 5. Obtener personal
       try {
-        const persRes = await axios.get('https://api.strideutmat.com/api/university/personal');
+        const persRes = await axios.get('https://api1.strideutmat.com/api/university/personal');
         console.log('👤 Personal:', persRes.data.data?.length || 0);
         setPersonal(persRes.data.data || []);
       } catch (error) {
@@ -121,7 +121,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
       // 6. Obtener estadísticas de comunicados
       try {
-        const comRes = await axios.get('https://api.strideutmat.com/api/university/comunicados-admin');
+        const comRes = await axios.get('https://api1.strideutmat.com/api/university/comunicados-admin');
         const comunicados = comRes.data.data || [];
         setEstadisticas(prev => ({
           ...prev,
@@ -422,8 +422,8 @@ const SuperAdminDashboard = ({ admin }) => {
             {personal.map(pers => {
               // Construir URL de la foto manualmente
               const fotoUrl = pers.foto_perfil 
-                ? `https://api.strideutmat.com/api/university/personal/foto/${pers.foto_perfil}`
-                : `https://api.strideutmat.com/api/university/personal/foto/default-avatar.png`;
+                ? `https://api1.strideutmat.com/api/university/personal/foto/${pers.foto_perfil}`
+                : `https://api1.strideutmat.com/api/university/personal/foto/default-avatar.png`;
               
               return (
                 <tr key={pers.id}>
@@ -435,7 +435,7 @@ const SuperAdminDashboard = ({ admin }) => {
                         className="personal-foto"
                         onError={(e) => {
                           console.error(`Error cargando foto para ${pers.nombre_completo}:`, pers.foto_perfil);
-                          e.target.src = 'https://api.strideutmat.com/api/university/personal/foto/default-avatar.png';
+                          e.target.src = 'https://api1.strideutmat.com/api/university/personal/foto/default-avatar.png';
                         }}
                       />
                     </div>

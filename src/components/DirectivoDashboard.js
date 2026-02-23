@@ -55,7 +55,7 @@ const DirectivoDashboard = ({ user }) => {
         return;
       }
       
-      const response = await axios.get(`https://api.strideutmat.com/api/university/actividades/direccion/${user.direccion_id}`);
+      const response = await axios.get(`https://api1.strideutmat.com/api/university/actividades/direccion/${user.direccion_id}`);
       setActividades(response.data.data || []);
     } catch (error) {
       console.error('Error fetching actividades:', error);

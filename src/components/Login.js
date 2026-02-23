@@ -29,8 +29,8 @@ const Login = ({ onLogin }) => {
     setLoading(true);
     
     try {
-      console.log('Enviando login a https://api.strideutmat.com/api/university/login');
-      const response = await axios.post('https://api.strideutmat.com/api/university/login', {
+      console.log('Enviando login a https://api1.strideutmat.com/api/university/login');
+      const response = await axios.post('https://api1.strideutmat.com/api/university/login', {
         email: formData.email,
         password: formData.password
       });

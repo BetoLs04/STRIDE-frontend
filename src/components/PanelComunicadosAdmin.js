@@ -626,7 +626,7 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
   const fetchComunicadosAdmin = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://api.strideutmat.com/api/university/comunicados-admin');
+      const response = await axios.get('https://api1.strideutmat.com/api/university/comunicados-admin');
       
       if (response.data.success) {
         setComunicados(response.data.data || []);
@@ -676,11 +676,11 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
 
       if (editId) {
         // Actualizar comunicado existente
-        await axios.put(`https://api.strideutmat.com/api/university/comunicados/${editId}`, comunicadoData);
+        await axios.put(`https://api1.strideutmat.com/api/university/comunicados/${editId}`, comunicadoData);
         toast.success('Comunicado actualizado exitosamente');
       } else {
         // Crear nuevo comunicado
-        await axios.post('https://api.strideutmat.com/api/university/comunicados', comunicadoData);
+        await axios.post('https://api1.strideutmat.com/api/university/comunicados', comunicadoData);
         toast.success('Comunicado publicado exitosamente');
       }
 
@@ -713,7 +713,7 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
     }
 
     try {
-      await axios.delete(`https://api.strideutmat.com/api/university/comunicados/${id}`);
+      await axios.delete(`https://api1.strideutmat.com/api/university/comunicados/${id}`);
       toast.success('Comunicado eliminado exitosamente');
       fetchComunicadosAdmin();
     } catch (error) {

@@ -20,7 +20,7 @@ const LoginGeneral = ({ onLogin }) => {
 
   const checkSuperAdminExistence = async () => {
     try {
-      const response = await axios.get('https://api.strideutmat.com/api/university/superusers');
+      const response = await axios.get('https://api1.strideutmat.com/api/university/superusers');
       const hasSuperAdmin = response.data.data && response.data.data.length > 0;
       setSuperAdminExists(hasSuperAdmin);
       console.log('¿Super Admin existe?', hasSuperAdmin);
@@ -52,7 +52,7 @@ const LoginGeneral = ({ onLogin }) => {
     try {
       console.log('Intentando login general con:', formData.email);
       
-      const response = await axios.post('https://api.strideutmat.com/api/university/login-general', {
+      const response = await axios.post('https://api1.strideutmat.com/api/university/login-general', {
         email: formData.email,
         password: formData.password
       });
