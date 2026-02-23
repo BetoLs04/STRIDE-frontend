@@ -285,6 +285,35 @@ const Home = () => {
                                 }}>
                                   💡 El comunicado continúa. Ve al panel de administración para más detalles.
                                 </span>
+                            {comunicado.link_externo && (
+                                    <div style={{
+                                      marginTop: '1rem',
+                                      paddingTop: '1rem',
+                                      borderTop: '1px dashed #dee2e6'
+                                    }}>
+                                      <a 
+                                        href={comunicado.link_externo}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                          display: 'inline-flex',
+                                          alignItems: 'center',
+                                          gap: '8px',
+                                          color: 'var(--primary-blue)',
+                                          fontWeight: '600',
+                                          fontSize: '0.95rem',
+                                          textDecoration: 'none',
+                                          padding: '8px 16px',
+                                          background: '#f0f4ff',
+                                          borderRadius: '8px',
+                                          border: '1px solid #dbeafe',
+                                          transition: 'all 0.2s ease'
+                                        }}
+                                      >
+                                        🔗 Ver enlace relacionado
+                                      </a>
+                                    </div>
+                                  )}
                               </div>
                             )}
                           </div>
