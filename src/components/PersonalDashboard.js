@@ -695,14 +695,6 @@ const PersonalDashboard = ({ user }) => {
           
           <div className="stat-card">
             <span className="stat-number">
-              {actividades.filter(a => a.creado_por_id === user.id).length}
-            </span>
-            <span className="stat-label">Creadas por mí</span>
-            <div className="stat-icon">👤</div>
-          </div>
-          
-          <div className="stat-card">
-            <span className="stat-number">
               {actividades.filter(a => a.estado === 'completada').length}
             </span>
             <span className="stat-label">Completadas</span>
