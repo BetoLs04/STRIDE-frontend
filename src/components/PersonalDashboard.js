@@ -50,9 +50,9 @@ const PersonalDashboard = ({ user }) => {
     pauseOnHover: true
   };
 
-  // Configuración del carrusel SIN DOTS (para modal)
+  // Configuración del carrusel para modal - CORREGIDA
   const carouselSettingsModal = {
-    dots: false,
+    dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 1,
@@ -60,7 +60,9 @@ const PersonalDashboard = ({ user }) => {
     adaptiveHeight: true,
     arrows: true,
     autoplay: false,
-    pauseOnHover: true
+    pauseOnHover: true,
+    prevArrow: <button type="button" className="slick-prev">❮</button>,
+    nextArrow: <button type="button" className="slick-next">❯</button>
   };
 
   useEffect(() => {
@@ -78,6 +80,7 @@ const PersonalDashboard = ({ user }) => {
     fetchActividades();
   }, [user, navigate]);
 
+  // ========== FUNCIÓN CORREGIDA PARA CARGAR ACTIVIDADES ==========
   const fetchActividades = async () => {
     try {
       if (!user.direccion_id) {
@@ -86,8 +89,20 @@ const PersonalDashboard = ({ user }) => {
         return;
       }
       
-      const response = await axios.get(`https://api1.strideutmat.com/api/university/actividades/direccion/${user.direccion_id}`);
-      setActividades(response.data.data || []);
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/api/university/actividades/direccion/${user.direccion_id}`);
+      const nuevasActividades = response.data.data || [];
+      
+      setActividades(nuevasActividades);
+      
+      // Si hay una actividad seleccionada en el modal, actualizar sus datos
+      if (actividadSeleccionada) {
+        const actividadActualizada = nuevasActividades.find(a => a.id === actividadSeleccionada.id);
+        if (actividadActualizada) {
+          setActividadSeleccionada(actividadActualizada);
+        }
+      }
+      
     } catch (error) {
       console.error('Error fetching actividades:', error);
       toast.error('Error al cargar actividades');
@@ -97,8 +112,7 @@ const PersonalDashboard = ({ user }) => {
     }
   };
 
-  // ✅ NUEVO: Función para construir la URL correcta de imágenes
-  // Maneja casos donde img.url ya viene con URL completa del backend antiguo
+  // ✅ Función para construir la URL correcta de imágenes
   const getImageUrl = (url) => {
     if (!url) return '';
     
@@ -415,7 +429,7 @@ const PersonalDashboard = ({ user }) => {
       console.log('Enviando actividad con', formData.imagenes.length, 'imágenes');
       console.log('Tipo de actividad:', formData.tipo_actividad);
       
-      const response = await axios.post('https://api1.strideutmat.com/api/university/actividades', formDataToSend, {
+      const response = await axios.post(`${API_URL}/api/university/actividades`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -491,47 +505,73 @@ const PersonalDashboard = ({ user }) => {
     return `Finalizó hace ${Math.abs(diffDays)} días`;
   };
 
+  // ========== ACTUALIZAR ESTADO - VERSIÓN CORREGIDA ==========
   const updateEstadoActividad = async (actividadId, nuevoEstado) => {
     try {
-      await axios.put(`https://api1.strideutmat.com/api/university/actividades/${actividadId}/estado`, {
+      console.log('🔄 Actualizando estado:', actividadId, 'a', nuevoEstado);
+      
+      // Hacer la petición al servidor
+      const response = await axios.put(`${API_URL}/api/university/actividades/${actividadId}/estado`, {
         estado: nuevoEstado
       });
       
-      toast.success('Estado actualizado');
-      fetchActividades();
+      if (response.data.success) {
+        // ✅ Actualizar el estado SIN recargar todas las actividades
+        
+        // 1. Actualizar en el array de actividades
+        setActividades(prevActividades => 
+          prevActividades.map(act => 
+            act.id === actividadId 
+              ? { ...act, estado: nuevoEstado }
+              : act
+          )
+        );
+        
+        // 2. Si la actividad seleccionada en el modal es la misma, actualizarla también
+        if (actividadSeleccionada && actividadSeleccionada.id === actividadId) {
+          setActividadSeleccionada(prev => ({
+            ...prev,
+            estado: nuevoEstado
+          }));
+        }
+        
+        toast.success('✅ Estado actualizado correctamente');
+      }
       
     } catch (error) {
-      toast.error('Error al actualizar estado');
+      console.error('❌ Error al actualizar estado:', error);
+      toast.error(error.response?.data?.error || 'Error al actualizar estado');
     }
   };
 
+  // ========== ELIMINAR ACTIVIDAD - VERSIÓN CORREGIDA ==========
   const eliminarActividad = async (actividadId, titulo) => {
-    if (!window.confirm(`¿Estás seguro de eliminar la actividad "${titulo}"? Esta acción no se puede deshacer.`)) {
+    if (!window.confirm(`¿Estás seguro de eliminar la actividad "${titulo}"?`)) {
       return;
     }
     
     try {
-      const response = await axios.delete(`https://api1.strideutmat.com/api/university/actividades/${actividadId}`);
+      const response = await axios.delete(`${API_URL}/api/university/actividades/${actividadId}`);
       
       if (response.data.success) {
-        toast.success('Actividad eliminada exitosamente');
-        
+        // ✅ Eliminar del estado local sin recargar
         setActividades(prev => prev.filter(a => a.id !== actividadId));
         
+        // Si la actividad eliminada está en el modal, cerrarlo
+        if (actividadSeleccionada?.id === actividadId) {
+          cerrarModal();
+        }
+        
+        toast.success('✅ Actividad eliminada');
+        
         if (response.data.imagenesEliminadas > 0) {
-          toast.info(`Se eliminaron ${response.data.imagenesEliminadas} imágenes`);
+          toast.info(`📸 Se eliminaron ${response.data.imagenesEliminadas} imágenes`);
         }
       }
       
     } catch (error) {
-      console.error('Error eliminando actividad:', error);
-      
-      let errorMessage = 'Error al eliminar actividad';
-      if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      }
-      
-      toast.error(errorMessage);
+      console.error('❌ Error eliminando actividad:', error);
+      toast.error(error.response?.data?.error || 'Error al eliminar');
     }
   };
 
@@ -875,7 +915,7 @@ const PersonalDashboard = ({ user }) => {
                 <p>{actividadSeleccionada.tipo_actividad || 'No especificado'}</p>
               </div>
               
-              {/* ✅ CORREGIDO: Carrusel de imágenes usando getImageUrl() */}
+              {/* ✅ Carrusel de imágenes */}
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
                   <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
@@ -952,40 +992,22 @@ const PersonalDashboard = ({ user }) => {
                   <div className="estado-selector-modal">
                     <div className="estado-botones">
                       <button 
-                        className={`estado-btn ${actividadSeleccionada.estado === 'pendiente' ? 'activo' : ''}`}
-                        onClick={() => {
-                          updateEstadoActividad(actividadSeleccionada.id, 'pendiente');
-                          setActividadSeleccionada({
-                            ...actividadSeleccionada,
-                            estado: 'pendiente'
-                          });
-                        }}
+                        className={`estado-btn ${actividadSeleccionada.estado === 'pendiente' ? 'activo pendiente' : ''}`}
+                        onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'pendiente')}
                       >
                         <span className="estado-emoji">⏳</span>
                         <span className="estado-texto">Pendiente</span>
                       </button>
                       <button 
-                        className={`estado-btn ${actividadSeleccionada.estado === 'en_progreso' ? 'activo' : ''}`}
-                        onClick={() => {
-                          updateEstadoActividad(actividadSeleccionada.id, 'en_progreso');
-                          setActividadSeleccionada({
-                            ...actividadSeleccionada,
-                            estado: 'en_progreso'
-                          });
-                        }}
+                        className={`estado-btn ${actividadSeleccionada.estado === 'en_progreso' ? 'activo en_progreso' : ''}`}
+                        onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'en_progreso')}
                       >
                         <span className="estado-emoji">🚀</span>
                         <span className="estado-texto">En Progreso</span>
                       </button>
                       <button 
-                        className={`estado-btn ${actividadSeleccionada.estado === 'completada' ? 'activo' : ''}`}
-                        onClick={() => {
-                          updateEstadoActividad(actividadSeleccionada.id, 'completada');
-                          setActividadSeleccionada({
-                            ...actividadSeleccionada,
-                            estado: 'completada'
-                          });
-                        }}
+                        className={`estado-btn ${actividadSeleccionada.estado === 'completada' ? 'activo completada' : ''}`}
+                        onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'completada')}
                       >
                         <span className="estado-emoji">✅</span>
                         <span className="estado-texto">Completada</span>
