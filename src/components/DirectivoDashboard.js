@@ -6,6 +6,9 @@ import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+// ✅ URL base correcta
+const API_URL = 'https://api1.strideutmat.com';
+
 const DirectivoDashboard = ({ user }) => {
   const navigate = useNavigate();
   const [actividades, setActividades] = useState([]);
@@ -16,8 +19,8 @@ const DirectivoDashboard = ({ user }) => {
 
   // Estado para controlar expansión de años y períodos
   const [expansiones, setExpansiones] = useState({
-    años: {}, // Ej: { '2024': true, '2023': false }
-    periodos: {} // Ej: { '2024-enero-abril': true, '2024-mayo-agosto': false }
+    años: {},
+    periodos: {}
   });
 
   // Configuración del carrusel SIN DOTS
@@ -48,6 +51,23 @@ const DirectivoDashboard = ({ user }) => {
     fetchActividades();
   }, [user, navigate]);
 
+  // ✅ Función para construir la URL correcta de imágenes
+  // Maneja casos donde img.url ya viene con URL completa del backend antiguo
+  const getImageUrl = (url) => {
+    if (!url) return '';
+
+    // Si ya es una URL absoluta (http:// o https://)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      // Extraer solo el path /uploads/... y reconstruir con API_URL correcto
+      const match = url.match(/(\/uploads\/.+)/);
+      if (match) return `${API_URL}${match[1]}`;
+      return url;
+    }
+
+    // Si es un path relativo, concatenar con API_URL
+    return `${API_URL}${url}`;
+  };
+
   const fetchActividades = async () => {
     try {
       if (!user.direccion_id) {
@@ -70,7 +90,6 @@ const DirectivoDashboard = ({ user }) => {
   const abrirModalActividad = (actividad) => {
     setActividadSeleccionada(actividad);
     setModalAbierto(true);
-    // Bloquear scroll del body
     document.body.style.overflow = 'hidden';
   };
 
@@ -78,7 +97,6 @@ const DirectivoDashboard = ({ user }) => {
   const cerrarModal = () => {
     setModalAbierto(false);
     setActividadSeleccionada(null);
-    // Restaurar scroll del body
     document.body.style.overflow = 'auto';
   };
 
@@ -263,7 +281,7 @@ const DirectivoDashboard = ({ user }) => {
     return `Finalizó hace ${Math.abs(diffDays)} días`;
   };
 
-  // Componente simplificado para la tarjeta de actividad (solo título)
+  // Componente simplificado para la tarjeta de actividad
   const TarjetaActividadMinimalista = ({ actividad }) => {
     return (
       <div className="actividad-minimalista-card">
@@ -298,7 +316,6 @@ const DirectivoDashboard = ({ user }) => {
     );
   };
 
-  // Si no hay user, mostrar loading
   if (!user) {
     return (
       <div className="loading-container" style={{ height: '100vh' }}>
@@ -308,13 +325,12 @@ const DirectivoDashboard = ({ user }) => {
     );
   }
 
-  // Obtener actividades agrupadas por año y período
   const agrupacionPorAnio = agruparPorAnioYPeriodo(actividades);
   const periodoActual = obtenerPeriodoActual();
 
   return (
     <div className="dashboard-container">
-      {/* Cabecera con Panel de Directivo a la izquierda y usuario a la derecha */}
+      {/* Cabecera */}
       <div className="dashboard-header">
         <div className="header-left">
           <h1>Panel de Directivo</h1>
@@ -338,7 +354,7 @@ const DirectivoDashboard = ({ user }) => {
       </div>
 
       <div className="dashboard-content">
-        {/* Banner mejorado */}
+        {/* Banner */}
         <div className="dashboard-header-banner">
           <div className="banner-left">
             <h2 className="banner-title">📋 Actividades de mi Dirección</h2>
@@ -365,10 +381,10 @@ const DirectivoDashboard = ({ user }) => {
           </div>
         </div>
         
+        {/* Estadísticas */}
         <div className="dashboard-stats">
           <div className="stat-card" onClick={() => {
-            const pendientes = actividades.filter(a => a.estado === 'pendiente').length;
-            toast.info(`${pendientes} actividades pendientes`);
+            toast.info(`Total de ${actividades.length} actividades`);
           }}>
             <span className="stat-number">{actividades.length}</span>
             <span className="stat-label">Total Actividades</span>
@@ -436,7 +452,6 @@ const DirectivoDashboard = ({ user }) => {
               <h3>📅 Actividades por Período</h3>
             </div>
 
-            {/* Mostrar años con actividades */}
             {agrupacionPorAnio
               .filter(añoData => añoData.actividades.length > 0)
               .map(añoData => (
@@ -470,7 +485,6 @@ const DirectivoDashboard = ({ user }) => {
                   
                   {expansiones.años[añoData.anio] && (
                     <div className="año-acordeon-content">
-                      {/* Mostrar períodos dentro del año */}
                       {Object.entries(añoData.periodos)
                         .filter(([_, periodoData]) => periodoData.actividades.length > 0)
                         .sort(([keyA, a], [keyB, b]) => a.orden - b.orden)
@@ -520,7 +534,7 @@ const DirectivoDashboard = ({ user }) => {
           </div>
         )}
         
-        {/* Resumen por creador mejorado */}
+        {/* Resumen por creador */}
         {actividades.length > 0 && (
           <div className="resumen-creadores-mejorado">
             <div className="resumen-header">
@@ -638,13 +652,21 @@ const DirectivoDashboard = ({ user }) => {
                   🏛️ {actividadSeleccionada.direccion_nombre || 'Sin dirección'}
                 </span>
               </div>
+
+              {/* Tipo de actividad */}
+              {actividadSeleccionada.tipo_actividad && (
+                <div className="modal-tipo-actividad">
+                  <span className="tipo-actividad-label">📌 Tipo de Actividad:</span>
+                  <span className="tipo-actividad-valor">{actividadSeleccionada.tipo_actividad}</span>
+                </div>
+              )}
               
               <div className="modal-descripcion">
                 <h4>📄 Descripción:</h4>
                 <p>{actividadSeleccionada.descripcion || 'Sin descripción'}</p>
               </div>
               
-              {/* Carrusel de imágenes en modal */}
+              {/* ✅ CORREGIDO: Carrusel usando getImageUrl() */}
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
                   <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
@@ -653,11 +675,11 @@ const DirectivoDashboard = ({ user }) => {
                       <div key={index} className="modal-slide">
                         <div className="modal-slide-content">
                           <img 
-                            src={img.url} 
+                            src={getImageUrl(img.url)}
                             alt={`Evidencia ${index + 1} - ${actividadSeleccionada.titulo}`}
                             className="modal-image"
                             onError={(e) => {
-                              e.target.src = '/placeholder.jpg';
+                              e.target.style.display = 'none';
                               e.target.alt = 'Imagen no disponible';
                             }}
                           />
