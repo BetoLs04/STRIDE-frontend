@@ -7,6 +7,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../styles/PersonalDashboard.css';
 
+// ✅ CORREGIDO: usar api1 en lugar de api
 const API_URL = 'https://api1.strideutmat.com';
 
 const PersonalDashboard = ({ user }) => {
@@ -94,6 +95,23 @@ const PersonalDashboard = ({ user }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ NUEVO: Función para construir la URL correcta de imágenes
+  // Maneja casos donde img.url ya viene con URL completa del backend antiguo
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    
+    // Si ya es una URL absoluta (http:// o https://)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      // Extraer solo el path /uploads/... y reconstruir con API_URL correcto
+      const match = url.match(/(\/uploads\/.+)/);
+      if (match) return `${API_URL}${match[1]}`;
+      return url;
+    }
+    
+    // Si es un path relativo, concatenar con API_URL
+    return `${API_URL}${url}`;
   };
 
   // ========== FUNCIONES PARA AGRUPAR POR AÑO Y PERÍODO ==========
@@ -345,13 +363,11 @@ const PersonalDashboard = ({ user }) => {
       return;
     }
     
-    // NUEVA VALIDACIÓN: tipo_actividad es requerido
     if (!formData.tipo_actividad.trim()) {
       toast.error('El tipo de actividad es requerido');
       return;
     }
     
-    // Validar longitud del tipo_actividad
     if (formData.tipo_actividad.length > 100) {
       toast.error('El tipo de actividad no puede exceder los 100 caracteres');
       return;
@@ -362,7 +378,6 @@ const PersonalDashboard = ({ user }) => {
       return;
     }
     
-    // Validar que fecha_inicio esté en el rango permitido
     if (!isFechaInicioValida(formData.fecha_inicio)) {
       toast.error('La fecha de inicio debe ser de los últimos 14 días');
       return;
@@ -386,7 +401,7 @@ const PersonalDashboard = ({ user }) => {
       
       formDataToSend.append('titulo', formData.titulo);
       formDataToSend.append('descripcion', formData.descripcion);
-      formDataToSend.append('tipo_actividad', formData.tipo_actividad); // NUEVO: agregar tipo_actividad
+      formDataToSend.append('tipo_actividad', formData.tipo_actividad);
       formDataToSend.append('fecha_inicio', formData.fecha_inicio);
       formDataToSend.append('fecha_fin', formData.fecha_fin || '');
       formDataToSend.append('direccion_id', user.direccion_id);
@@ -412,7 +427,7 @@ const PersonalDashboard = ({ user }) => {
       setFormData({ 
         titulo: '', 
         descripcion: '', 
-        tipo_actividad: '', // Limpiar este campo también
+        tipo_actividad: '',
         fecha_inicio: '',
         fecha_fin: '',
         imagenes: [] 
@@ -522,14 +537,12 @@ const PersonalDashboard = ({ user }) => {
 
   // ========== FUNCIONES PARA MODAL ==========
 
-  // Función para abrir modal de actividad
   const abrirModalActividad = (actividad) => {
     setActividadSeleccionada(actividad);
     setModalAbierto(true);
     document.body.style.overflow = 'hidden';
   };
 
-  // Función para cerrar modal
   const cerrarModal = () => {
     setModalAbierto(false);
     setActividadSeleccionada(null);
@@ -555,7 +568,6 @@ const PersonalDashboard = ({ user }) => {
 
   // ========== COMPONENTE TARJETA MINIMALISTA ==========
 
-  // Componente para tarjeta de actividad minimalista (similar a DirectivoDashboard)
   const TarjetaActividadMinimalista = ({ actividad }) => {
     return (
       <div className="actividad-minimalista-card">
@@ -616,37 +628,37 @@ const PersonalDashboard = ({ user }) => {
 
   return (
     <div className="dashboard-container">
-      {/* CABECERA CORREGIDA (estilo Directivo) - MANTENIENDO EL ESTILO ORIGINAL */}
+      {/* CABECERA */}
       <div className="dashboard-header">
         <div className="header-left">
           <h1>Panel de Personal</h1>
         </div>
         
         <div className="header-center-personal">
-        <div className="user-info-center">
-          <div className="user-avatar-large">
-            {getInitial()}
-          </div>
-          <div className="user-details-center">
-            <h3>{user.nombre || 'Usuario no identificado'}</h3>
-            <p>
-              <span className="user-cargo-center">{user.puesto || 'Sin puesto'}</span>
-              <span className="user-separator-center"> - </span>
-              <span className="user-direccion-center">{user.direccion_nombre || 'Sin dirección asignada'}</span>
-            </p>
+          <div className="user-info-center">
+            <div className="user-avatar-large">
+              {getInitial()}
+            </div>
+            <div className="user-details-center">
+              <h3>{user.nombre || 'Usuario no identificado'}</h3>
+              <p>
+                <span className="user-cargo-center">{user.puesto || 'Sin puesto'}</span>
+                <span className="user-separator-center"> - </span>
+                <span className="user-direccion-center">{user.direccion_nombre || 'Sin dirección asignada'}</span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
       
-      <div className="header-right-personal">
-        <button className="btn btn-primary" onClick={() => setShowFormActividad(true)}>
-          + Nueva Actividad
-        </button>
-      </div>
+        <div className="header-right-personal">
+          <button className="btn btn-primary" onClick={() => setShowFormActividad(true)}>
+            + Nueva Actividad
+          </button>
+        </div>
       </div>
 
       <div className="dashboard-content">
-        {/* BANNER MEJORADO */}
+        {/* BANNER */}
         <div className="dashboard-header-banner">
           <div className="banner-left">
             <h2 className="banner-title">📋 Gestión de Actividades</h2>
@@ -673,7 +685,7 @@ const PersonalDashboard = ({ user }) => {
           </div>
         </div>
         
-        {/* ESTADÍSTICAS CON ICONOS */}
+        {/* ESTADÍSTICAS */}
         <div className="dashboard-stats">
           <div className="stat-card">
             <span className="stat-number">{actividades.length}</span>
@@ -866,13 +878,12 @@ const PersonalDashboard = ({ user }) => {
                 <p>{actividadSeleccionada.descripcion || 'Sin descripción'}</p>
               </div>
               
-              {/* Mostrar tipo de actividad en modal */}
               <div className="modal-descripcion">
                 <h4>📌 Tipo de Actividad:</h4>
                 <p>{actividadSeleccionada.tipo_actividad || 'No especificado'}</p>
               </div>
               
-              {/* Carrusel de imágenes en modal */}
+              {/* ✅ CORREGIDO: Carrusel de imágenes usando getImageUrl() */}
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
                   <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
@@ -881,7 +892,7 @@ const PersonalDashboard = ({ user }) => {
                       <div key={index} className="modal-slide">
                         <div className="modal-slide-content">
                           <img 
-                            src={`${API_URL}${img.url}`}
+                            src={getImageUrl(img.url)}
                             alt={`Evidencia ${index + 1} - ${actividadSeleccionada.titulo}`}
                             className="modal-image"
                             onError={(e) => {
@@ -902,7 +913,7 @@ const PersonalDashboard = ({ user }) => {
               
               <div className="modal-fechas">
                 <h4> Información de Fechas</h4>
-                <div lassName="modal-fechas-grid">
+                <div className="modal-fechas-grid">
                   <div className="modal-fecha-item">
                     <div className="modal-fecha-header">
                       <span className="modal-fecha-icon"></span>
@@ -1040,7 +1051,6 @@ const PersonalDashboard = ({ user }) => {
                 />
               </div>
               
-              {/* Campo para tipo de actividad (texto libre) */}
               <div className="form-group">
                 <label>Tipo de Actividad *</label>
                 <input
