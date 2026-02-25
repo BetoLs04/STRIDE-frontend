@@ -7,6 +7,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../styles/SuperAdminActividades.css';
 
+// ✅ URL base correcta
+const API_URL = 'https://api1.strideutmat.com';
+
 const SuperAdminActividades = ({ admin }) => {
   const navigate = useNavigate();
   const [actividades, setActividades] = useState([]);
@@ -60,6 +63,23 @@ const SuperAdminActividades = ({ admin }) => {
     fetchTodasActividades();
   }, [admin, navigate]);
 
+  // ✅ Función para construir la URL correcta de imágenes
+  // Maneja casos donde img.url ya viene con URL completa del backend antiguo
+  const getImageUrl = (url) => {
+    if (!url) return '';
+
+    // Si ya es una URL absoluta (http:// o https://)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      // Extraer solo el path /uploads/... y reconstruir con API_URL correcto
+      const match = url.match(/(\/uploads\/.+)/);
+      if (match) return `${API_URL}${match[1]}`;
+      return url;
+    }
+
+    // Si es un path relativo, concatenar con API_URL
+    return `${API_URL}${url}`;
+  };
+
   const fetchDirecciones = async () => {
     try {
       const response = await axios.get('https://api1.strideutmat.com/api/university/direcciones');
@@ -101,9 +121,10 @@ const SuperAdminActividades = ({ admin }) => {
               ...actividad,
               direccion_nombre: direccion.nombre,
               direccion_id: direccion.id,
+              // ✅ CORREGIDO: usar getImageUrl para normalizar URLs de imágenes
               imagenes: actividad.imagenes ? actividad.imagenes.map(img => ({
                 ...img,
-                url: img.url || `/uploads/actividades/${img.ruta_archivo}`
+                url: getImageUrl(img.url || `/uploads/actividades/${img.ruta_archivo}`)
               })) : []
             }));
             
@@ -492,7 +513,6 @@ const SuperAdminActividades = ({ admin }) => {
             >
               Ver detalles
             </button>
-            
           </div>
         </div>
       </div>
@@ -893,7 +913,6 @@ const SuperAdminActividades = ({ admin }) => {
                   const porcentajeCompletadas = actividadesDir.length > 0 ? 
                     Math.round((completadas / actividadesDir.length) * 100) : 0;
                   
-                  // Obtener fecha de la última actividad
                   let ultimaActividad = null;
                   if (actividadesDir.length > 0) {
                     const actividadesOrdenadas = [...actividadesDir].sort((a, b) => 
@@ -993,7 +1012,6 @@ const SuperAdminActividades = ({ admin }) => {
                     <div className="creador-resumen-header">
                       <div className="creador-avatar-grande">
                         {tipo.charAt(0).toUpperCase()}
-                        
                       </div>
                       <div className="creador-info-detallada">
                         <h4>{tipo}</h4>
@@ -1016,23 +1034,17 @@ const SuperAdminActividades = ({ admin }) => {
                       <div className="estadisticas-detalles">
                         <div className="detalle-estado completada">
                           <span className="detalle-icon">✅</span>
-                          <span className="detalle-count">
-                            {completadas}
-                          </span>
+                          <span className="detalle-count">{completadas}</span>
                           <span className="detalle-label">Completadas</span>
                         </div>
                         <div className="detalle-estado en-progreso">
                           <span className="detalle-icon">🚀</span>
-                          <span className="detalle-count">
-                            {enProgreso}
-                          </span>
+                          <span className="detalle-count">{enProgreso}</span>
                           <span className="detalle-label">En Progreso</span>
                         </div>
                         <div className="detalle-estado pendiente">
                           <span className="detalle-icon">⏳</span>
-                          <span className="detalle-count">
-                            {pendientes}
-                          </span>
+                          <span className="detalle-count">{pendientes}</span>
                           <span className="detalle-label">Pendientes</span>
                         </div>
                       </div>
@@ -1088,7 +1100,7 @@ const SuperAdminActividades = ({ admin }) => {
                 <p>{actividadSeleccionada.descripcion || 'Sin descripción'}</p>
               </div>
               
-              {/* Carrusel de imágenes en modal */}
+              {/* ✅ CORREGIDO: Carrusel de imágenes - las URLs ya vienen normalizadas desde fetchTodasActividades */}
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
                   <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
@@ -1097,11 +1109,11 @@ const SuperAdminActividades = ({ admin }) => {
                       <div key={index} className="modal-slide">
                         <div className="modal-slide-content">
                           <img 
-                            src={img.url} 
+                            src={img.url}
                             alt={`Evidencia ${index + 1} - ${actividadSeleccionada.titulo}`}
                             className="modal-image"
                             onError={(e) => {
-                              e.target.src = '/placeholder.jpg';
+                              e.target.style.display = 'none';
                               e.target.alt = 'Imagen no disponible';
                             }}
                           />
@@ -1160,6 +1172,9 @@ const SuperAdminActividades = ({ admin }) => {
             </div>
             
             <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={cerrarModal}>
+                Cerrar
+              </button>
               <button 
                 className="btn btn-danger"
                 onClick={() => {
