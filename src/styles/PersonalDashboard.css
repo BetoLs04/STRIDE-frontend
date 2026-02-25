@@ -2388,57 +2388,93 @@ form {
   }
 }
 
-/* ========== CARRUSEL MODAL - BOTONES DE NAVEGACIÓN ========== */
+/* ========== CARRUSEL MODAL ========== */
+
+/* Contenedor principal del carrusel */
 .modal-carousel {
   position: relative;
-  margin: 0 20px;
+  margin: 0 10px;
 }
 
+/* ESTILOS SUPER ESPECÍFICOS PARA LAS FLECHAS */
 .modal-carousel .slick-prev,
 .modal-carousel .slick-next {
-  z-index: 10;
-  width: 40px;
-  height: 40px;
-  background: rgba(0, 0, 0, 0.6) !important;
-  border-radius: 50%;
-  transition: all 0.3s ease;
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 100 !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: all 0.3s ease !important;
 }
 
 .modal-carousel .slick-prev {
-  left: -15px;
+  left: 10px !important;
 }
 
 .modal-carousel .slick-next {
-  right: -15px;
+  right: 10px !important;
 }
 
-.modal-carousel .slick-prev:hover,
-.modal-carousel .slick-next:hover {
-  background: rgba(0, 0, 0, 0.8) !important;
-  transform: scale(1.1);
-}
-
+/* Las flechas en sí (los íconos) */
 .modal-carousel .slick-prev:before,
 .modal-carousel .slick-next:before {
-  font-size: 24px;
-  color: white;
-  opacity: 1;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  content: '' !important; /* Eliminar el contenido por defecto */
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  font-family: 'Arial', sans-serif !important;
+  font-size: 24px !important;
+  color: white !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-/* Para pantallas pequeñas */
+/* Personalizar los íconos */
+.modal-carousel .slick-prev:before {
+  content: "‹" !important;
+  font-size: 40px !important;
+  font-weight: bold !important;
+}
+
+.modal-carousel .slick-next:before {
+  content: "›" !important;
+  font-size: 40px !important;
+  font-weight: bold !important;
+}
+
+/* Hover effect */
+.modal-carousel .slick-prev:hover,
+.modal-carousel .slick-next:hover {
+  background: rgba(0, 0, 0, 0.9) !important;
+  transform: translateY(-50%) scale(1.1) !important;
+}
+
+/* Asegurar que se ven en móvil */
 @media (max-width: 768px) {
   .modal-carousel .slick-prev {
-    left: -10px;
+    left: 5px !important;
   }
   
   .modal-carousel .slick-next {
-    right: -10px;
+    right: 5px !important;
   }
   
   .modal-carousel .slick-prev:before,
   .modal-carousel .slick-next:before {
-    font-size: 20px;
+    font-size: 30px !important;
   }
 }
 
