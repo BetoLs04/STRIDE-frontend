@@ -2389,27 +2389,57 @@ form {
 }
 
 /* ========== CARRUSEL MODAL - BOTONES DE NAVEGACIÓN ========== */
+.modal-carousel {
+  position: relative;
+  margin: 0 20px;
+}
+
 .modal-carousel .slick-prev,
 .modal-carousel .slick-next {
   z-index: 10;
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
 .modal-carousel .slick-prev {
-  left: 10px;
+  left: -15px;
 }
 
 .modal-carousel .slick-next {
-  right: 10px;
+  right: -15px;
+}
+
+.modal-carousel .slick-prev:hover,
+.modal-carousel .slick-next:hover {
+  background: rgba(0, 0, 0, 0.8) !important;
+  transform: scale(1.1);
 }
 
 .modal-carousel .slick-prev:before,
 .modal-carousel .slick-next:before {
-  font-size: 35px;
+  font-size: 24px;
   color: white;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
   opacity: 1;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Para pantallas pequeñas */
+@media (max-width: 768px) {
+  .modal-carousel .slick-prev {
+    left: -10px;
+  }
+  
+  .modal-carousel .slick-next {
+    right: -10px;
+  }
+  
+  .modal-carousel .slick-prev:before,
+  .modal-carousel .slick-next:before {
+    font-size: 20px;
+  }
 }
 
 /* ========== CAMBIAR ESTADO - ALINEADO IZQUIERDA CON BOTONES ========== */
