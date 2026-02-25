@@ -7,7 +7,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../styles/PersonalDashboard.css';
 
-const API_URL = 'https://api.strideutmat.com';
+const API_URL = 'https://api1.strideutmat.com';
 
 const PersonalDashboard = ({ user }) => {
   const navigate = useNavigate();
