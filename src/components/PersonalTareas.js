@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../styles/PersonalTareas.css';
 
-const API_URL = 'https://api.strideutmat.com';
+const API_URL = 'https://api1.strideutmat.com';
 
 const PersonalTareas = ({ user }) => {
   const [tareas, setTareas] = useState([]);
