@@ -214,6 +214,8 @@ const PersonalTareas = ({ user }) => {
               const puedeResponder = tarea.asignacion_estado !== 'completada';
               return (
                 <div key={tarea.id} className={`tarea-item ${estadoClase} ${tarea.asignacion_estado}`}>
+                  
+                  {/* Encabezado: título y estado */}
                   <div className="tarea-item-header">
                     <div className="tarea-titulo">
                       <h3>{tarea.titulo}</h3>
@@ -229,32 +231,48 @@ const PersonalTareas = ({ user }) => {
                       {tarea.asignacion_estado === 'completada' && '✅ Completada'}
                     </span>
                   </div>
-                  <p className="tarea-descripcion">{tarea.descripcion || 'Sin descripción'}</p>
+
+                  {/* ✅ Descripción completa con saltos de línea respetados */}
+                  {tarea.descripcion && (
+                    <div className="tarea-descripcion-completa">
+                      <p className="tarea-descripcion-texto">
+                        {tarea.descripcion}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ✅ Solo fecha de entrega — se eliminó el creador */}
                   <div className="tarea-meta">
                     <div className={`fecha-info ${estadoClase}`}>
                       <span className="meta-icon">📅</span>
                       <span>
-                        {new Date(tarea.fecha_entrega).toLocaleDateString()}
+                        Entrega: {new Date(tarea.fecha_entrega).toLocaleDateString('es-ES', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
                         {tarea.asignacion_estado !== 'completada' && (
                           <>
-                            {diasRestantes < 0 && ` (Vencida)`}
-                            {diasRestantes === 0 && ' (Hoy)'}
-                            {diasRestantes > 0 && ` (${diasRestantes} días)`}
+                            {diasRestantes < 0 && <strong style={{ color: '#dc2626' }}> · Vencida</strong>}
+                            {diasRestantes === 0 && <strong style={{ color: '#d97706' }}> · Hoy es el último día</strong>}
+                            {diasRestantes === 1 && <strong style={{ color: '#d97706' }}> · Mañana vence</strong>}
+                            {diasRestantes > 1 && <span style={{ color: '#6b7280' }}> · Faltan {diasRestantes} días</span>}
                           </>
                         )}
                       </span>
                     </div>
-                    <div className="creador-info">
-                      <span className="meta-icon"></span>
-                      <span>{tarea.creado_por_nombre || 'Sistema'}</span>
-                    </div>
                   </div>
+
+                  {/* Comentario de respuesta si está completada */}
                   {tarea.asignacion_estado === 'completada' && tarea.asignacion_comentarios && (
                     <div className="tarea-comentario">
                       <span className="comentario-icon">💬</span>
                       <span>{tarea.asignacion_comentarios}</span>
                     </div>
                   )}
+
+                  {/* Archivos adjuntos */}
                   {(tarea.archivos?.length > 0 || tarea.archivos_respuesta?.length > 0) && (
                     <div className="tarea-archivos-container">
                       {tarea.archivos?.length > 0 && (
@@ -293,6 +311,8 @@ const PersonalTareas = ({ user }) => {
                       )}
                     </div>
                   )}
+
+                  {/* Botones de acción */}
                   {puedeResponder ? (
                     <button className="btn-responder" onClick={() => handleResponderClick(tarea)}>
                       <span className="btn-icon">📝</span>
@@ -304,6 +324,7 @@ const PersonalTareas = ({ user }) => {
                       Editar Respuesta
                     </button>
                   )}
+
                 </div>
               );
             })
@@ -311,6 +332,7 @@ const PersonalTareas = ({ user }) => {
         </div>
       )}
 
+      {/* Modal para responder tarea */}
       {showResponderModal && tareaAResponder && (
         <div className="modal-overlay" onClick={() => setShowResponderModal(false)}>
           <div className="modal-content responder-modal" onClick={(e) => e.stopPropagation()}>
@@ -321,8 +343,17 @@ const PersonalTareas = ({ user }) => {
             <form onSubmit={handleSubmitResponder} className="responder-form">
               <div className="tarea-info-resumen">
                 <h3>{tareaAResponder.titulo}</h3>
+                {/* ✅ Descripción completa también en el modal */}
+                {tareaAResponder.descripcion && (
+                  <p className="tarea-descripcion-modal">{tareaAResponder.descripcion}</p>
+                )}
                 <p className="fecha-entrega-resumen">
-                  Fecha de entrega: {new Date(tareaAResponder.fecha_entrega).toLocaleDateString()}
+                  📅 Fecha de entrega: {new Date(tareaAResponder.fecha_entrega).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </p>
               </div>
               <div className="form-group">
@@ -371,6 +402,38 @@ const PersonalTareas = ({ user }) => {
           </div>
         </div>
       )}
+
+      {/* ✅ Estilos adicionales para la descripción */}
+      <style>{`
+        .tarea-descripcion-completa {
+          margin: 10px 0 14px 0;
+          padding: 12px 14px;
+          background: #f8fafc;
+          border-left: 3px solid #94a3b8;
+          border-radius: 0 6px 6px 0;
+        }
+
+        .tarea-descripcion-texto {
+          margin: 0;
+          font-size: 0.92rem;
+          color: #374151;
+          line-height: 1.65;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+
+        .tarea-descripcion-modal {
+          font-size: 0.9rem;
+          color: #4b5563;
+          line-height: 1.6;
+          white-space: pre-wrap;
+          word-break: break-word;
+          margin: 6px 0 10px 0;
+          padding: 10px 12px;
+          background: #f1f5f9;
+          border-radius: 6px;
+        }
+      `}</style>
     </div>
   );
 };
