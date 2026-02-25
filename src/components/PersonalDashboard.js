@@ -50,7 +50,7 @@ const PersonalDashboard = ({ user }) => {
     pauseOnHover: true
   };
 
-  // Configuración del carrusel para modal - CORREGIDA
+ // Configuración del carrusel para modal - VERSIÓN FORZADA
   const carouselSettingsModal = {
     dots: true,
     infinite: true,
@@ -61,8 +61,33 @@ const PersonalDashboard = ({ user }) => {
     arrows: true,
     autoplay: false,
     pauseOnHover: true,
-    prevArrow: <button type="button" className="slick-prev">❮</button>,
-    nextArrow: <button type="button" className="slick-next">❯</button>
+    // Forzar que las flechas sean visibles
+    prevArrow: <button type="button" className="slick-prev" style={{ 
+      position: 'absolute', 
+      left: '10px', 
+      zIndex: 100,
+      background: 'rgba(0,0,0,0.7)',
+      color: 'white',
+      border: 'none',
+      borderRadius: '50%',
+      width: '40px',
+      height: '40px',
+      fontSize: '24px',
+      cursor: 'pointer'
+    }}>‹</button>,
+    nextArrow: <button type="button" className="slick-next" style={{ 
+      position: 'absolute', 
+      right: '10px', 
+      zIndex: 100,
+      background: 'rgba(0,0,0,0.7)',
+      color: 'white',
+      border: 'none',
+      borderRadius: '50%',
+      width: '40px',
+      height: '40px',
+      fontSize: '24px',
+      cursor: 'pointer'
+    }}>›</button>
   };
 
   useEffect(() => {
