@@ -151,13 +151,11 @@ const Header = ({ user, onLogout }) => {
     console.log('📸 Cargando foto:', fotoPerfil);
     
     const urlsToTry = [
-
+      
       `https://api1.strideutmat.com/api/university/personal/foto/${fotoPerfil}`,
-      `/uploads/personal/${fotoPerfil}`,
-      `https://api1.strideutmat.com/api/university/personal/foto/default-avatar.png`
-      `https://api.strideutmat.com/api/university/personal/foto/${fotoPerfil}`,
-      `https://api.strideutmat.com//uploads/personal/${fotoPerfil}`,
-      `https://api.strideutmat.com/api/university/personal/foto/default-avatar.png`
+      `https://api1.strideutmat.com/uploads/personal/${fotoPerfil}`,
+      `https://api1.strideutmat.com/api/university/personal/foto/default-avatar.png`,
+      
     ];
 
     const tryLoadImage = (index) => {
