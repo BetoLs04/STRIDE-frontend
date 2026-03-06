@@ -22,6 +22,12 @@ const getFileUrl = (url) => {
   return `${API_URL}${url}`;
 };
 
+// ✅ Función para parsear fecha sin desfase de timezone
+const parseLocalDate = (dateStr) => {
+  if (!dateStr) return new Date();
+  return new Date(dateStr.split('T')[0] + 'T00:00:00');
+};
+
 const SuperAdminTareas = ({ admin }) => {
   const [tareas, setTareas] = useState([]);
   const [personal, setPersonal] = useState([]);
@@ -158,8 +164,9 @@ const SuperAdminTareas = ({ admin }) => {
     e.preventDefault();
     if (!formData.titulo.trim()) { toast.error('El título es requerido'); return; }
     if (!formData.fecha_entrega) { toast.error('La fecha de entrega es requerida'); return; }
+    // ✅ CORREGIDO: usar parseLocalDate para evitar desfase de timezone
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-    if (new Date(formData.fecha_entrega) < hoy) { toast.error('La fecha de entrega no puede ser en el pasado'); return; }
+    if (parseLocalDate(formData.fecha_entrega) < hoy) { toast.error('La fecha de entrega no puede ser en el pasado'); return; }
     if (Object.keys(usuariosSeleccionados).length === 0) { toast.error('Debe seleccionar al menos un miembro del personal'); return; }
     
     setSubiendo(true);
@@ -278,7 +285,8 @@ const SuperAdminTareas = ({ admin }) => {
 
   const getDiasRestantes = (fechaEntrega) => {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-    const entrega = new Date(fechaEntrega); entrega.setHours(0, 0, 0, 0);
+    // ✅ CORREGIDO: usar parseLocalDate para evitar desfase de timezone
+    const entrega = parseLocalDate(fechaEntrega);
     return Math.ceil((entrega - hoy) / (1000 * 60 * 60 * 24));
   };
 
@@ -403,7 +411,8 @@ const SuperAdminTareas = ({ admin }) => {
                     <div className={`fecha-entrega ${estadoClase}`}>
                       <span className="meta-icon"></span>
                       <span>
-                        {new Date(tarea.fecha_entrega).toLocaleDateString()}
+                        {/* ✅ CORREGIDO: usar parseLocalDate para mostrar fecha correcta */}
+                        {parseLocalDate(tarea.fecha_entrega).toLocaleDateString()}
                         {diasRestantes < 0 && ` (Vencida)`}
                         {diasRestantes === 0 && ' (Hoy)'}
                         {diasRestantes > 0 && ` (${diasRestantes} días)`}
@@ -565,7 +574,6 @@ const SuperAdminTareas = ({ admin }) => {
                   <label>Archivos actuales</label>
                   {tareaAEditar.archivos?.filter(a => !archivosEliminar.includes(a.id)).map(arch => (
                     <div key={arch.id} className="archivo-existente">
-                      {/* ✅ CORREGIDO: URL limpia para archivos existentes en edición */}
                       <a href={getFileUrl(arch.url)} target="_blank" rel="noopener noreferrer">
                         {arch.nombre_original}
                       </a>
@@ -643,7 +651,8 @@ const SuperAdminTareas = ({ admin }) => {
                 <div className="detalle-meta">
                   <div className="meta-item">
                     <span className="meta-label"> Fecha de entrega:</span>
-                    <span>{new Date(selectedTarea.fecha_entrega).toLocaleDateString()}</span>
+                    {/* ✅ CORREGIDO: usar parseLocalDate para mostrar fecha correcta */}
+                    <span>{parseLocalDate(selectedTarea.fecha_entrega).toLocaleDateString()}</span>
                   </div>
                   <div className="meta-item">
                     <span className="meta-label">👤 Creado por:</span>
@@ -660,7 +669,6 @@ const SuperAdminTareas = ({ admin }) => {
                   </div>
                 )}
 
-                {/* ✅ CORREGIDO: Archivos de la tarea con URL limpia */}
                 {selectedTarea.archivos?.length > 0 && (
                   <div className="detalle-archivos">
                     <h4>Archivos de la tarea</h4>
@@ -713,7 +721,6 @@ const SuperAdminTareas = ({ admin }) => {
                               </p>
                             </div>
                           )}
-                          {/* ✅ CORREGIDO: Archivos de respuesta con URL limpia */}
                           {asig.archivos_respuesta?.length > 0 && (
                             <div className="respuesta-archivos">
                               <strong>Archivos enviados:</strong>
