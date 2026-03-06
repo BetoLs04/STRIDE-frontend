@@ -5,6 +5,12 @@ import '../styles/PersonalTareas.css';
 
 const API_URL = 'https://api1.strideutmat.com';
 
+// ✅ Función para parsear fecha sin desfase de timezone
+const parseLocalDate = (dateStr) => {
+  if (!dateStr) return new Date();
+  return new Date(dateStr.split('T')[0] + 'T00:00:00');
+};
+
 const PersonalTareas = ({ user }) => {
   const [tareas, setTareas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,8 +64,8 @@ const PersonalTareas = ({ user }) => {
     tareasList.forEach(t => {
       if (t.asignacion_estado === 'pendiente') {
         nuevasStats.pendientes++;
-        const fechaEntrega = new Date(t.fecha_entrega);
-        fechaEntrega.setHours(0, 0, 0, 0);
+        // ✅ CORREGIDO: usar parseLocalDate para evitar desfase de timezone
+        const fechaEntrega = parseLocalDate(t.fecha_entrega);
         if (fechaEntrega < hoy) nuevasStats.vencidas++;
       } else if (t.asignacion_estado === 'en_progreso') {
         nuevasStats.en_progreso++;
@@ -129,8 +135,8 @@ const PersonalTareas = ({ user }) => {
   const getDiasRestantes = (fechaEntrega) => {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    const entrega = new Date(fechaEntrega);
-    entrega.setHours(0, 0, 0, 0);
+    // ✅ CORREGIDO: usar parseLocalDate para evitar desfase de timezone
+    const entrega = parseLocalDate(fechaEntrega);
     const diffTime = entrega - hoy;
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
@@ -232,7 +238,7 @@ const PersonalTareas = ({ user }) => {
                     </span>
                   </div>
 
-                  {/* ✅ Descripción completa con saltos de línea respetados */}
+                  {/* Descripción completa con saltos de línea respetados */}
                   {tarea.descripcion && (
                     <div className="tarea-descripcion-completa">
                       <p className="tarea-descripcion-texto">
@@ -241,12 +247,12 @@ const PersonalTareas = ({ user }) => {
                     </div>
                   )}
 
-                  {/* ✅ Solo fecha de entrega — se eliminó el creador */}
+                  {/* ✅ CORREGIDO: Fecha de entrega con parseLocalDate */}
                   <div className="tarea-meta">
                     <div className={`fecha-info ${estadoClase}`}>
                       <span className="meta-icon">📅</span>
                       <span>
-                        Entrega: {new Date(tarea.fecha_entrega).toLocaleDateString('es-ES', {
+                        Entrega: {parseLocalDate(tarea.fecha_entrega).toLocaleDateString('es-ES', {
                           weekday: 'long',
                           year: 'numeric',
                           month: 'long',
@@ -343,12 +349,12 @@ const PersonalTareas = ({ user }) => {
             <form onSubmit={handleSubmitResponder} className="responder-form">
               <div className="tarea-info-resumen">
                 <h3>{tareaAResponder.titulo}</h3>
-                {/* ✅ Descripción completa también en el modal */}
                 {tareaAResponder.descripcion && (
                   <p className="tarea-descripcion-modal">{tareaAResponder.descripcion}</p>
                 )}
+                {/* ✅ CORREGIDO: usar parseLocalDate en el modal también */}
                 <p className="fecha-entrega-resumen">
-                  📅 Fecha de entrega: {new Date(tareaAResponder.fecha_entrega).toLocaleDateString('es-ES', {
+                  📅 Fecha de entrega: {parseLocalDate(tareaAResponder.fecha_entrega).toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -403,7 +409,7 @@ const PersonalTareas = ({ user }) => {
         </div>
       )}
 
-      {/* ✅ Estilos adicionales para la descripción */}
+      {/* Estilos adicionales para la descripción */}
       <style>{`
         .tarea-descripcion-completa {
           margin: 10px 0 14px 0;
