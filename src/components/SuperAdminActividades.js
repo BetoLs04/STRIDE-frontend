@@ -611,7 +611,6 @@ const SuperAdminActividades = ({ admin }) => {
 
   return (
     <>
-      <ModalConfirm />
       <div className="dashboard-container">
       {/* Cabecera con Panel de SuperAdmin */}
       <div className="dashboard-header">
