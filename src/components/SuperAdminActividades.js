@@ -294,7 +294,7 @@ const SuperAdminActividades = ({ admin }) => {
     const confirmMessage = `¿Estás seguro de eliminar la actividad?\n\n"${titulo}"\n\nDe la dirección: ${direccion}\n\n⚠️ Esta acción eliminará TODAS las imágenes asociadas y NO se puede deshacer.`;
     
     mostrarConfirm(
-      '🗑️ Eliminar actividad',
+      'Eliminar actividad',
       confirmMessage,
       async () => { await doEliminar(actividadId, titulo, direccion); }
     );
@@ -1212,7 +1212,7 @@ const SuperAdminActividades = ({ admin }) => {
       <div className="confirm-overlay" onClick={cerrarConfirm}>
         <div className="confirm-modal" onClick={e => e.stopPropagation()}>
           <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
-            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '🗑️' : '⚠️'}</span>
+            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '!' : '?'}</span>
           </div>
           <h3 className="confirm-titulo">{confirmModal.titulo}</h3>
           <p className="confirm-mensaje">{confirmModal.mensaje}</p>
