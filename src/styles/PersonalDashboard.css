@@ -2563,7 +2563,14 @@ form {
 }
 
 .confirm-icon {
-  font-size: 2rem;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #ef4444;
+  line-height: 1;
+}
+
+.confirm-icon-wrap.warning .confirm-icon {
+  color: #f59e0b;
 }
 
 .confirm-titulo {
