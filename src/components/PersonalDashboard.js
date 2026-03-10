@@ -87,6 +87,9 @@ const PersonalDashboard = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${API_URL}/api/university/actividades/direccion/${user.direccion_id}`);
       const nuevasActividades = response.data.data || [];
+      
+      console.log('📊 Estados:', nuevasActividades.map(a => ({ titulo: a.titulo, estado: a.estado })));
+      
       setActividades(nuevasActividades);
       // Actualizar actividad seleccionada en modal si está abierto
       if (actividadSeleccionada) {
