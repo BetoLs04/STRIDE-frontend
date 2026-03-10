@@ -336,7 +336,7 @@ const PersonalDashboard = ({ user }) => {
 
   const eliminarImagenExistente = (imagenId) => {
     mostrarConfirm(
-      '🗑️ Eliminar imagen',
+      'Eliminar imagen',
       '¿Estás seguro de que quieres eliminar esta imagen? Esta acción no se puede deshacer.',
       async () => { await doEliminarImagenExistente(imagenId); }
     );
@@ -473,7 +473,7 @@ const PersonalDashboard = ({ user }) => {
 
   const eliminarActividad = (actividadId, titulo) => {
     mostrarConfirm(
-      '🗑️ Eliminar actividad',
+      'Eliminar actividad',
       `¿Estás seguro de eliminar la actividad "${titulo}"? Esta acción eliminará también todas las imágenes asociadas y no se puede deshacer.`,
       async () => { await doEliminarActividad(actividadId, titulo); }
     );
@@ -1053,7 +1053,7 @@ const PersonalDashboard = ({ user }) => {
       <div className="confirm-overlay" onClick={cerrarConfirm}>
         <div className="confirm-modal" onClick={e => e.stopPropagation()}>
           <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
-            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '🗑️' : '⚠️'}</span>
+            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '!' : '?'}</span>
           </div>
           <h3 className="confirm-titulo">{confirmModal.titulo}</h3>
           <p className="confirm-mensaje">{confirmModal.mensaje}</p>
