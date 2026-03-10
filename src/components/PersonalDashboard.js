@@ -20,7 +20,7 @@ const PersonalDashboard = ({ user }) => {
   const [actividadSeleccionada, setActividadSeleccionada] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
 
-  // ✅ NUEVO: Estado para modal de edición
+  // Estado para modal de edición
   const [showEditModal, setShowEditModal] = useState(false);
   const [actividadAEditar, setActividadAEditar] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -88,6 +88,7 @@ const PersonalDashboard = ({ user }) => {
       const response = await axios.get(`${API_URL}/api/university/actividades/direccion/${user.direccion_id}`);
       const nuevasActividades = response.data.data || [];
       setActividades(nuevasActividades);
+      // Actualizar actividad seleccionada en modal si está abierto
       if (actividadSeleccionada) {
         const actividadActualizada = nuevasActividades.find(a => a.id === actividadSeleccionada.id);
         if (actividadActualizada) { setActividadSeleccionada(actividadActualizada); }
@@ -269,7 +270,7 @@ const PersonalDashboard = ({ user }) => {
     };
   }, [formData.imagenes]);
 
-  // ========== ✅ FUNCIONES DE EDICIÓN ==========
+  // ========== FUNCIONES DE EDICIÓN ==========
 
   const abrirModalEdicion = (actividad) => {
     setActividadAEditar(actividad);
@@ -286,7 +287,6 @@ const PersonalDashboard = ({ user }) => {
   };
 
   const cerrarModalEdicion = () => {
-    // Limpiar previews de imágenes nuevas
     editForm.imagenesNuevas.forEach(img => { if (img.preview) { URL.revokeObjectURL(img.preview); } });
     setShowEditModal(false);
     setActividadAEditar(null);
@@ -322,19 +322,16 @@ const PersonalDashboard = ({ user }) => {
     setEditForm(prev => ({ ...prev, imagenesNuevas: prev.imagenesNuevas.filter((_, i) => i !== index) }));
   };
 
-  // ✅ Eliminar imagen existente de la actividad
   const eliminarImagenExistente = async (imagenId) => {
     if (!window.confirm('¿Eliminar esta imagen?')) return;
     try {
       await axios.delete(`${API_URL}/api/university/actividades/imagen/${imagenId}`, {
         data: { creado_por_id: user.id }
       });
-      // Actualizar estado local de la actividad a editar
       setActividadAEditar(prev => ({
         ...prev,
         imagenes: prev.imagenes.filter(img => img.id !== imagenId)
       }));
-      // Actualizar también en el array general de actividades
       setActividades(prev => prev.map(act => {
         if (act.id === actividadAEditar.id) {
           return { ...act, imagenes: act.imagenes.filter(img => img.id !== imagenId) };
@@ -348,7 +345,6 @@ const PersonalDashboard = ({ user }) => {
     }
   };
 
-  // ✅ Guardar cambios de edición
   const handleSubmitEdicion = async (e) => {
     e.preventDefault();
     if (!editForm.titulo.trim()) { toast.error('El título es requerido'); return; }
@@ -380,7 +376,7 @@ const PersonalDashboard = ({ user }) => {
       if (response.data.success) {
         toast.success('Actividad actualizada exitosamente');
         cerrarModalEdicion();
-        fetchActividades(); // Recargar para obtener datos actualizados con nuevas imágenes
+        fetchActividades();
       }
     } catch (error) {
       console.error('Error al editar actividad:', error);
@@ -420,15 +416,28 @@ const PersonalDashboard = ({ user }) => {
     return `Finalizó hace ${Math.abs(diffDays)} días`;
   };
 
+  // ✅ FUNCIÓN CORREGIDA: updateEstadoActividad
   const updateEstadoActividad = async (actividadId, nuevoEstado) => {
     try {
-      const response = await axios.put(`${API_URL}/api/university/actividades/${actividadId}/estado`, { estado: nuevoEstado });
+      const response = await axios.put(
+        `${API_URL}/api/university/actividades/${actividadId}/estado`,
+        { estado: nuevoEstado }
+      );
+
+      console.log('📡 Respuesta actualizar estado:', response.data);
+
       if (response.data.success) {
-        setActividades(prev => prev.map(act => act.id === actividadId ? { ...act, estado: nuevoEstado } : act));
+        // Actualizar en la lista principal
+        setActividades(prev => prev.map(act =>
+          act.id === actividadId ? { ...act, estado: nuevoEstado } : act
+        ));
+        // Actualizar en el modal si está abierto
         if (actividadSeleccionada && actividadSeleccionada.id === actividadId) {
           setActividadSeleccionada(prev => ({ ...prev, estado: nuevoEstado }));
         }
         toast.success('✅ Estado actualizado correctamente');
+      } else {
+        toast.error(response.data.error || 'Error al actualizar estado');
       }
     } catch (error) {
       console.error('❌ Error al actualizar estado:', error);
@@ -530,6 +539,9 @@ const PersonalDashboard = ({ user }) => {
           </div>
         </div>
         <div className="header-right-personal">
+          <button className="btn btn-secondary" onClick={fetchActividades} title="Actualizar actividades" style={{ marginRight: '10px' }}>
+            🔄 Actualizar
+          </button>
           <button className="btn btn-primary" onClick={() => setShowFormActividad(true)}>+ Nueva Actividad</button>
         </div>
       </div>
@@ -546,7 +558,7 @@ const PersonalDashboard = ({ user }) => {
                 {periodoActual.periodo === 'enero-abril' ? '❄️' : periodoActual.periodo === 'mayo-agosto' ? '🌸' : '🍂'}
               </span>
               <div className="periodo-text-banner">
-                <h4> PERÍODO ACTUAL</h4>
+                <h4>PERÍODO ACTUAL</h4>
                 <p>Año {periodoActual.anio} • {periodoActual.periodo === 'enero-abril' ? ' Enero - Abril' : periodoActual.periodo === 'mayo-agosto' ? ' Mayo - Agosto' : ' Septiembre - Diciembre'}</p>
               </div>
             </div>
@@ -581,7 +593,7 @@ const PersonalDashboard = ({ user }) => {
           </div>
         ) : (
           <div className="periodos-container">
-            <div className="periodos-controls"><h3> Actividades por Período</h3></div>
+            <div className="periodos-controls"><h3>Actividades por Período</h3></div>
             {agrupacionPorAnio.filter(añoData => añoData.actividades.length > 0).map(añoData => (
               <div key={añoData.anio} className="año-acordeon">
                 <div className="año-acordeon-header" onClick={() => toggleAnioExpandido(añoData.anio)} style={{ backgroundColor: añoData.anio === periodoActual.anio ? '#e8f4fd' : '#f8f9fa' }}>
@@ -677,7 +689,7 @@ const PersonalDashboard = ({ user }) => {
                 </div>
               )}
               <div className="modal-fechas">
-                <h4> Información de Fechas</h4>
+                <h4>Información de Fechas</h4>
                 <div className="modal-fechas-grid">
                   <div className="modal-fecha-item">
                     <div className="modal-fecha-header"><span className="modal-fecha-icon"></span><span className="modal-fecha-label">Fecha de creación:</span></div>
@@ -702,18 +714,29 @@ const PersonalDashboard = ({ user }) => {
                   </div>
                 </div>
               </div>
+
+              {/* Cambiar estado - solo si es el creador */}
               {actividadSeleccionada.creado_por_id === user.id && (
                 <div className="modal-actions">
                   <h4>⚙️ Cambiar Estado:</h4>
                   <div className="estado-selector-modal">
                     <div className="estado-botones">
-                      <button className={`estado-btn ${actividadSeleccionada.estado === 'pendiente' ? 'activo pendiente' : ''}`} onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'pendiente')}>
+                      <button
+                        className={`estado-btn ${actividadSeleccionada.estado === 'pendiente' ? 'activo pendiente' : ''}`}
+                        onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'pendiente')}
+                      >
                         <span className="estado-emoji">⏳</span><span className="estado-texto">Pendiente</span>
                       </button>
-                      <button className={`estado-btn ${actividadSeleccionada.estado === 'en_progreso' ? 'activo en_progreso' : ''}`} onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'en_progreso')}>
+                      <button
+                        className={`estado-btn ${actividadSeleccionada.estado === 'en_progreso' ? 'activo en_progreso' : ''}`}
+                        onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'en_progreso')}
+                      >
                         <span className="estado-emoji">🚀</span><span className="estado-texto">En Progreso</span>
                       </button>
-                      <button className={`estado-btn ${actividadSeleccionada.estado === 'completada' ? 'activo completada' : ''}`} onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'completada')}>
+                      <button
+                        className={`estado-btn ${actividadSeleccionada.estado === 'completada' ? 'activo completada' : ''}`}
+                        onClick={() => updateEstadoActividad(actividadSeleccionada.id, 'completada')}
+                      >
                         <span className="estado-emoji">✅</span><span className="estado-texto">Completada</span>
                       </button>
                     </div>
@@ -723,7 +746,6 @@ const PersonalDashboard = ({ user }) => {
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={cerrarModal}>Cerrar</button>
-              {/* ✅ NUEVO: Botón Editar (solo si es el creador) */}
               {actividadSeleccionada.creado_por_id === user.id && (
                 <button
                   className="btn btn-primary"
@@ -745,7 +767,7 @@ const PersonalDashboard = ({ user }) => {
         </div>
       )}
 
-      {/* ========== ✅ MODAL DE EDICIÓN ========== */}
+      {/* ========== MODAL DE EDICIÓN ========== */}
       {showEditModal && actividadAEditar && (
         <div className="form-modal" style={{ zIndex: 10001 }}>
           <div className="form-modal-content large-modal">
@@ -755,18 +777,15 @@ const PersonalDashboard = ({ user }) => {
               <button className="close-btn" onClick={cerrarModalEdicion}>×</button>
             </div>
             <form onSubmit={handleSubmitEdicion}>
-              {/* Título */}
               <div className="form-group">
                 <label>Título de la Actividad *</label>
                 <input type="text" name="titulo" value={editForm.titulo} onChange={handleEditChange} placeholder="Título de la actividad" required />
               </div>
-              {/* Tipo */}
               <div className="form-group">
                 <label>Tipo de Actividad *</label>
                 <input type="text" name="tipo_actividad" value={editForm.tipo_actividad} onChange={handleEditChange} placeholder="Ej: Taller, Conferencia, Reunión..." required maxLength="100" />
                 <small className="form-hint">{editForm.tipo_actividad.length} / 100 caracteres</small>
               </div>
-              {/* Descripción */}
               <div className="form-group">
                 <label>Descripción</label>
                 <textarea name="descripcion" value={editForm.descripcion} onChange={handleEditChange} placeholder="Describe los detalles de la actividad..." rows="4" maxLength="2000" />
@@ -777,7 +796,6 @@ const PersonalDashboard = ({ user }) => {
                   </small>
                 </div>
               </div>
-              {/* Fechas */}
               <div className="form-grid dates-grid">
                 <div className="form-group">
                   <label>Fecha de Inicio *</label>
@@ -789,7 +807,6 @@ const PersonalDashboard = ({ user }) => {
                 </div>
               </div>
 
-              {/* ✅ Imágenes existentes con opción de eliminar */}
               {actividadAEditar.imagenes && actividadAEditar.imagenes.length > 0 && (
                 <div className="form-group">
                   <label>Imágenes actuales ({actividadAEditar.imagenes.length}/5)</label>
@@ -813,21 +830,16 @@ const PersonalDashboard = ({ user }) => {
                             fontSize: '14px', cursor: 'pointer', lineHeight: '1',
                             display: 'flex', alignItems: 'center', justifyContent: 'center'
                           }}
-                        >
-                          ×
-                        </button>
+                        >×</button>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* ✅ Agregar nuevas imágenes */}
               {(actividadAEditar.imagenes?.length || 0) < 5 && (
                 <div className="form-group">
-                  <label>
-                    Agregar imágenes ({(actividadAEditar.imagenes?.length || 0) + editForm.imagenesNuevas.length}/5 en total)
-                  </label>
+                  <label>Agregar imágenes ({(actividadAEditar.imagenes?.length || 0) + editForm.imagenesNuevas.length}/5 en total)</label>
                   <div className="image-upload-area">
                     <input
                       type="file"
@@ -866,9 +878,7 @@ const PersonalDashboard = ({ user }) => {
                               fontSize: '14px', cursor: 'pointer', lineHeight: '1',
                               display: 'flex', alignItems: 'center', justifyContent: 'center'
                             }}
-                          >
-                            ×
-                          </button>
+                          >×</button>
                           <div style={{ fontSize: '10px', textAlign: 'center', marginTop: '2px', color: '#28a745', fontWeight: 'bold' }}>Nueva</div>
                         </div>
                       ))}
@@ -899,7 +909,7 @@ const PersonalDashboard = ({ user }) => {
         </div>
       )}
 
-      {/* Modal para nueva actividad */}
+      {/* ========== MODAL NUEVA ACTIVIDAD ========== */}
       {showFormActividad && (
         <div className="form-modal">
           <div className="form-modal-content large-modal">
@@ -922,7 +932,7 @@ const PersonalDashboard = ({ user }) => {
                 </small>
               </div>
               <div className="form-group">
-                <label>Descripción (Minimo 120 palabras)</label>
+                <label>Descripción (Mínimo 120 palabras)</label>
                 <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} placeholder="Describe los detalles de la actividad, objetivos, participantes, etc..." rows="4" maxLength="2000" />
                 <div className="word-counter">
                   <small>
@@ -956,7 +966,7 @@ const PersonalDashboard = ({ user }) => {
                       </span>
                     </>
                   ) : (
-                    <span className="periodo-preview-empty"> Selecciona una fecha de inicio para ver el año y período</span>
+                    <span className="periodo-preview-empty">Selecciona una fecha de inicio para ver el año y período</span>
                   )}
                 </div>
               </div>
