@@ -48,6 +48,11 @@ const PersonalDashboard = ({ user }) => {
     periodos: {}
   });
 
+  // ✅ Modal de confirmación personalizado
+  const [confirmModal, setConfirmModal] = useState({ visible: false, titulo: '', mensaje: '', onAceptar: null, tipo: 'danger' });
+  const mostrarConfirm = (titulo, mensaje, onAceptar, tipo = 'danger') => setConfirmModal({ visible: true, titulo, mensaje, onAceptar, tipo });
+  const cerrarConfirm = () => setConfirmModal({ visible: false, titulo: '', mensaje: '', onAceptar: null, tipo: 'danger' });
+
   const carouselSettings = {
     dots: true,
     infinite: true,
@@ -329,8 +334,15 @@ const PersonalDashboard = ({ user }) => {
     setEditForm(prev => ({ ...prev, imagenesNuevas: prev.imagenesNuevas.filter((_, i) => i !== index) }));
   };
 
-  const eliminarImagenExistente = async (imagenId) => {
-    if (!window.confirm('¿Eliminar esta imagen?')) return;
+  const eliminarImagenExistente = (imagenId) => {
+    mostrarConfirm(
+      '🗑️ Eliminar imagen',
+      '¿Estás seguro de que quieres eliminar esta imagen? Esta acción no se puede deshacer.',
+      async () => { await doEliminarImagenExistente(imagenId); }
+    );
+  };
+
+  const doEliminarImagenExistente = async (imagenId) => {
     try {
       await axios.delete(`${API_URL}/api/university/actividades/imagen/${imagenId}`, {
         data: { creado_por_id: user.id }
@@ -459,8 +471,15 @@ const PersonalDashboard = ({ user }) => {
     }
   };
 
-  const eliminarActividad = async (actividadId, titulo) => {
-    if (!window.confirm(`¿Estás seguro de eliminar la actividad "${titulo}"?`)) return;
+  const eliminarActividad = (actividadId, titulo) => {
+    mostrarConfirm(
+      '🗑️ Eliminar actividad',
+      `¿Estás seguro de eliminar la actividad "${titulo}"? Esta acción eliminará también todas las imágenes asociadas y no se puede deshacer.`,
+      async () => { await doEliminarActividad(actividadId, titulo); }
+    );
+  };
+
+  const doEliminarActividad = async (actividadId, titulo) => {
     try {
       const response = await axios.delete(`${API_URL}/api/university/actividades/${actividadId}`);
       if (response.data.success) {
@@ -534,8 +553,37 @@ const PersonalDashboard = ({ user }) => {
   const agrupacionPorAnio = agruparPorAnioYPeriodo(actividades);
   const periodoActual = obtenerPeriodoActual();
 
+
+
+  // ✅ Componente Modal de Confirmación
+  const ModalConfirm = () => {
+    if (!confirmModal.visible) return null;
+    return (
+      <div className="confirm-overlay" onClick={cerrarConfirm}>
+        <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+          <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
+            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '🗑️' : '⚠️'}</span>
+          </div>
+          <h3 className="confirm-titulo">{confirmModal.titulo}</h3>
+          <p className="confirm-mensaje">{confirmModal.mensaje}</p>
+          <div className="confirm-actions">
+            <button className="btn btn-secondary" onClick={cerrarConfirm}>Cancelar</button>
+            <button
+              className={`btn ${confirmModal.tipo === 'danger' ? 'btn-danger' : 'btn-warning'}`}
+              onClick={() => { confirmModal.onAceptar && confirmModal.onAceptar(); cerrarConfirm(); }}
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="dashboard-container">
+    <>
+      <ModalConfirm />
+      <div className="dashboard-container">
       {/* CABECERA */}
       <div className="dashboard-header">
         <div className="header-left"><h1>Panel de Personal</h1></div>
@@ -772,7 +820,7 @@ const PersonalDashboard = ({ user }) => {
                 </button>
               )}
               {actividadSeleccionada.creado_por_id === user.id && (
-                <button className="btn btn-danger" onClick={() => { if (window.confirm(`¿Eliminar la actividad "${actividadSeleccionada.titulo}"?`)) { eliminarActividad(actividadSeleccionada.id, actividadSeleccionada.titulo); cerrarModal(); } }}>
+                <button className="btn btn-danger" onClick={() => { eliminarActividad(actividadSeleccionada.id, actividadSeleccionada.titulo); cerrarModal(); }}>
                   🗑️ Eliminar Actividad
                 </button>
               )}
@@ -1027,6 +1075,7 @@ const PersonalDashboard = ({ user }) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
