@@ -76,7 +76,7 @@ const DirectivoDashboard = ({ user }) => {
   // ✅ Fix zona horaria: parsear fecha sin conversión UTC
   const parseFecha = (dateString) => {
     if (!dateString) return null;
-    const solo = dateString.split('T')[0];
+    const solo = dateString.split('T')[0].split(' ')[0];
     const [y, m, d] = solo.split('-');
     return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
   };
@@ -272,7 +272,7 @@ const DirectivoDashboard = ({ user }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     try {
-      const solo = dateString.split('T')[0];
+      const solo = dateString.split('T')[0].split(' ')[0];
       const [y, m, d] = solo.split('-');
       const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
       return date.toLocaleDateString('es-ES', {
