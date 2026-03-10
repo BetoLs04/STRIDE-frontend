@@ -51,21 +51,34 @@ const DirectivoDashboard = ({ user }) => {
     fetchActividades();
   }, [user, navigate]);
 
+  // Auto-expandir año y período actual al cargar
+  useEffect(() => {
+    if (actividades.length > 0) {
+      const { anio, periodo } = obtenerPeriodoActual();
+      setExpansiones({
+        años: { [anio]: true },
+        periodos: { [`${anio}-${periodo}`]: true }
+      });
+    }
+  }, [actividades]);
+
   // ✅ Función para construir la URL correcta de imágenes
-  // Maneja casos donde img.url ya viene con URL completa del backend antiguo
   const getImageUrl = (url) => {
     if (!url) return '';
-
-    // Si ya es una URL absoluta (http:// o https://)
     if (url.startsWith('http://') || url.startsWith('https://')) {
-      // Extraer solo el path /uploads/... y reconstruir con API_URL correcto
       const match = url.match(/(\/uploads\/.+)/);
       if (match) return `${API_URL}${match[1]}`;
       return url;
     }
-
-    // Si es un path relativo, concatenar con API_URL
     return `${API_URL}${url}`;
+  };
+
+  // ✅ Fix zona horaria: parsear fecha sin conversión UTC
+  const parseFecha = (dateString) => {
+    if (!dateString) return null;
+    const solo = dateString.split('T')[0];
+    const [y, m, d] = solo.split('-');
+    return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
   };
 
   const fetchActividades = async () => {
@@ -122,7 +135,8 @@ const DirectivoDashboard = ({ user }) => {
   const obtenerAnioYPeriodo = (fecha) => {
     if (!fecha) return { anio: 'Sin año', periodo: 'sin-fecha', anioNum: 0 };
     
-    const fechaActividad = new Date(fecha);
+    // ✅ Fix zona horaria
+    const fechaActividad = parseFecha(fecha);
     const anio = fechaActividad.getFullYear();
     const mes = fechaActividad.getMonth() + 1;
     
@@ -254,10 +268,13 @@ const DirectivoDashboard = ({ user }) => {
     return <span className={`badge ${estadoInfo.class}`}>{estadoInfo.label}</span>;
   };
 
+  // ✅ Fix zona horaria en formatDate
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     try {
-      const date = new Date(dateString);
+      const solo = dateString.split('T')[0];
+      const [y, m, d] = solo.split('-');
+      const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
       return date.toLocaleDateString('es-ES', {
         weekday: 'long',
         year: 'numeric',
@@ -269,12 +286,13 @@ const DirectivoDashboard = ({ user }) => {
     }
   };
 
+  // ✅ Fix zona horaria en getDiasRestantes
   const getDiasRestantes = (fechaFin) => {
     if (!fechaFin) return null;
     const hoy = new Date();
-    const fin = new Date(fechaFin);
-    const diffTime = fin - hoy;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    hoy.setHours(0, 0, 0, 0);
+    const fin = parseFecha(fechaFin);
+    const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
     
     if (diffDays > 0) return `Faltan ${diffDays} días`;
     if (diffDays === 0) return 'Finaliza hoy';
@@ -292,8 +310,9 @@ const DirectivoDashboard = ({ user }) => {
               <span className="actividad-minimalista-creador">
                 👤 {actividad.creado_por_nombre || 'Sistema'}
               </span>
+              {/* ✅ Fix zona horaria en tarjeta */}
               <span className="actividad-minimalista-fecha">
-                📅 {new Date(actividad.fecha_inicio).toLocaleDateString('es-ES', { 
+                📅 {parseFecha(actividad.fecha_inicio)?.toLocaleDateString('es-ES', { 
                   day: '2-digit', 
                   month: 'short', 
                   year: 'numeric' 
@@ -605,6 +624,7 @@ const DirectivoDashboard = ({ user }) => {
                       
                       <div className="creador-ultima-actividad">
                         <span className="ultima-label">Última actividad:</span>
+                        {/* ✅ fecha_creacion viene con hora real del servidor, no necesita fix */}
                         <span className="ultima-fecha">
                           {actividadesCreador.length > 0 ? 
                             new Date(actividadesCreador[0].fecha_creacion).toLocaleDateString('es-ES', { 
@@ -653,7 +673,6 @@ const DirectivoDashboard = ({ user }) => {
                 </span>
               </div>
 
-              {/* Tipo de actividad */}
               {actividadSeleccionada.tipo_actividad && (
                 <div className="modal-tipo-actividad">
                   <span className="tipo-actividad-label">📌 Tipo de Actividad:</span>
@@ -666,7 +685,6 @@ const DirectivoDashboard = ({ user }) => {
                 <p>{actividadSeleccionada.descripcion || 'Sin descripción'}</p>
               </div>
               
-              {/* ✅ CORREGIDO: Carrusel usando getImageUrl() */}
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
                   <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
@@ -726,7 +744,8 @@ const DirectivoDashboard = ({ user }) => {
                       {formatDate(actividadSeleccionada.fecha_fin)}
                       {actividadSeleccionada.fecha_fin && (
                         <span className="modal-dias-restantes">
-                          <span className={`dias-restantes ${new Date(actividadSeleccionada.fecha_fin) < new Date() ? 'finalizado' : 'activo'}`}>
+                          {/* ✅ Fix zona horaria en comparación del modal */}
+                          <span className={`dias-restantes ${parseFecha(actividadSeleccionada.fecha_fin) < new Date() ? 'finalizado' : 'activo'}`}>
                             {getDiasRestantes(actividadSeleccionada.fecha_fin)}
                           </span>
                         </span>
