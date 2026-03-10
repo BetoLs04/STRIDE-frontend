@@ -64,20 +64,22 @@ const SuperAdminActividades = ({ admin }) => {
   }, [admin, navigate]);
 
   // ✅ Función para construir la URL correcta de imágenes
-  // Maneja casos donde img.url ya viene con URL completa del backend antiguo
   const getImageUrl = (url) => {
     if (!url) return '';
-
-    // Si ya es una URL absoluta (http:// o https://)
     if (url.startsWith('http://') || url.startsWith('https://')) {
-      // Extraer solo el path /uploads/... y reconstruir con API_URL correcto
       const match = url.match(/(\/uploads\/.+)/);
       if (match) return `${API_URL}${match[1]}`;
       return url;
     }
-
-    // Si es un path relativo, concatenar con API_URL
     return `${API_URL}${url}`;
+  };
+
+  // ✅ Fix zona horaria: parsear fecha sin conversión UTC
+  const parseFecha = (dateString) => {
+    if (!dateString) return null;
+    const solo = dateString.split('T')[0];
+    const [y, m, d] = solo.split('-');
+    return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
   };
 
   const fetchDirecciones = async () => {
@@ -121,7 +123,6 @@ const SuperAdminActividades = ({ admin }) => {
               ...actividad,
               direccion_nombre: direccion.nombre,
               direccion_id: direccion.id,
-              // ✅ CORREGIDO: usar getImageUrl para normalizar URLs de imágenes
               imagenes: actividad.imagenes ? actividad.imagenes.map(img => ({
                 ...img,
                 url: getImageUrl(img.url || `/uploads/actividades/${img.ruta_archivo}`)
@@ -166,7 +167,8 @@ const SuperAdminActividades = ({ admin }) => {
   const obtenerAnioYPeriodo = (fecha) => {
     if (!fecha) return { anio: 'Sin año', periodo: 'sin-fecha', anioNum: 0 };
     
-    const fechaActividad = new Date(fecha);
+    // ✅ Fix zona horaria
+    const fechaActividad = parseFecha(fecha);
     const anio = fechaActividad.getFullYear();
     const mes = fechaActividad.getMonth() + 1;
     
@@ -383,10 +385,13 @@ const SuperAdminActividades = ({ admin }) => {
     return <span className={`badge ${estadoInfo.class}`}>{estadoInfo.label}</span>;
   };
 
+  // ✅ Fix zona horaria en formatDate
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     try {
-      const date = new Date(dateString);
+      const solo = dateString.split('T')[0];
+      const [y, m, d] = solo.split('-');
+      const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
       return date.toLocaleDateString('es-ES', {
         weekday: 'long',
         year: 'numeric',
@@ -414,12 +419,13 @@ const SuperAdminActividades = ({ admin }) => {
     }
   };
 
+  // ✅ Fix zona horaria en getDiasRestantes
   const getDiasRestantes = (fechaFin) => {
     if (!fechaFin) return null;
     const hoy = new Date();
-    const fin = new Date(fechaFin);
-    const diffTime = fin - hoy;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    hoy.setHours(0, 0, 0, 0);
+    const fin = parseFecha(fechaFin);
+    const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
     
     if (diffDays > 0) return `Faltan ${diffDays} días`;
     if (diffDays === 0) return 'Finaliza hoy';
@@ -463,11 +469,12 @@ const SuperAdminActividades = ({ admin }) => {
       return false;
     }
     
-    if (filtros.fecha_inicio && new Date(actividad.fecha_inicio) < new Date(filtros.fecha_inicio)) {
+    // ✅ Fix zona horaria en filtros de fecha
+    if (filtros.fecha_inicio && parseFecha(actividad.fecha_inicio) < parseFecha(filtros.fecha_inicio)) {
       return false;
     }
     
-    if (filtros.fecha_fin && new Date(actividad.fecha_inicio) > new Date(filtros.fecha_fin)) {
+    if (filtros.fecha_fin && parseFecha(actividad.fecha_inicio) > parseFecha(filtros.fecha_fin)) {
       return false;
     }
     
@@ -492,8 +499,9 @@ const SuperAdminActividades = ({ admin }) => {
                   {actividad.creado_por_tipo === 'personal' ? '👤 Personal' : '👔 Directivo'}
                 </span>
               </span>
+              {/* ✅ Fix zona horaria en tarjeta */}
               <span className="actividad-minimalista-fecha">
-                📅 {new Date(actividad.fecha_inicio).toLocaleDateString('es-ES', { 
+                📅 {parseFecha(actividad.fecha_inicio)?.toLocaleDateString('es-ES', { 
                   day: '2-digit', 
                   month: 'short', 
                   year: 'numeric' 
@@ -800,8 +808,6 @@ const SuperAdminActividades = ({ admin }) => {
           </div>
         ) : (
           <div className="periodos-container">
-
-            {/* Mostrar años con actividades */}
             {agrupacionPorAnioFiltrada
               .filter(añoData => añoData.actividades.length > 0)
               .map(añoData => (
@@ -835,7 +841,6 @@ const SuperAdminActividades = ({ admin }) => {
                   
                   {expansiones.años[añoData.anio] && (
                     <div className="año-acordeon-content">
-                      {/* Mostrar períodos dentro del año */}
                       {Object.entries(añoData.periodos)
                         .filter(([_, periodoData]) => periodoData.actividades.length > 0)
                         .sort(([keyA, a], [keyB, b]) => a.orden - b.orden)
@@ -886,7 +891,7 @@ const SuperAdminActividades = ({ admin }) => {
           </div>
         )}
 
-        {/* Resumen por direcciones - VERSIÓN TABLA COMPACTA */}
+        {/* Resumen por direcciones */}
         {actividades.length > 0 && direcciones.length > 0 && (
           <div className="resumen-creadores-mejorado compacto-direcciones">
             <div className="resumen-header compacto-direcciones">
@@ -971,6 +976,7 @@ const SuperAdminActividades = ({ admin }) => {
                       </td>
                       
                       <td className="col-ultima">
+                        {/* ✅ Fix zona horaria en tabla */}
                         <span className={`fecha-ultima ${!ultimaActividad ? 'vacia' : ''}`}>
                           {ultimaActividad ? 
                             new Date(ultimaActividad.fecha_creacion).toLocaleDateString('es-ES', { 
@@ -1004,8 +1010,6 @@ const SuperAdminActividades = ({ admin }) => {
                 const completadas = actividadesDeEsteTipo.filter(a => a.estado === 'completada').length;
                 const enProgreso = actividadesDeEsteTipo.filter(a => a.estado === 'en_progreso').length;
                 const pendientes = actividadesDeEsteTipo.filter(a => a.estado === 'pendiente').length;
-                const porcentajeCompletadas = actividadesDeEsteTipo.length > 0 ? 
-                  Math.round((completadas / actividadesDeEsteTipo.length) * 100) : 0;
                 
                 return (
                   <div key={index} className="creador-resumen-card">
@@ -1087,7 +1091,6 @@ const SuperAdminActividades = ({ admin }) => {
                 </span>
               </div>
               
-              {/* Tipo de actividad */}
               {actividadSeleccionada.tipo_actividad && (
                 <div className="modal-tipo-actividad">
                   <span className="tipo-actividad-label">📌 Tipo de Actividad:</span>
@@ -1100,7 +1103,6 @@ const SuperAdminActividades = ({ admin }) => {
                 <p>{actividadSeleccionada.descripcion || 'Sin descripción'}</p>
               </div>
               
-              {/* ✅ CORREGIDO: Carrusel de imágenes - las URLs ya vienen normalizadas desde fetchTodasActividades */}
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
                   <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
@@ -1160,7 +1162,8 @@ const SuperAdminActividades = ({ admin }) => {
                       {formatDate(actividadSeleccionada.fecha_fin)}
                       {actividadSeleccionada.fecha_fin && (
                         <span className="modal-dias-restantes">
-                          <span className={`dias-restantes ${new Date(actividadSeleccionada.fecha_fin) < new Date() ? 'finalizado' : 'activo'}`}>
+                          {/* ✅ Fix zona horaria en comparación del modal */}
+                          <span className={`dias-restantes ${parseFecha(actividadSeleccionada.fecha_fin) < new Date() ? 'finalizado' : 'activo'}`}>
                             {getDiasRestantes(actividadSeleccionada.fecha_fin)}
                           </span>
                         </span>
