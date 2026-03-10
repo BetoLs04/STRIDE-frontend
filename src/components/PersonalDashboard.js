@@ -555,34 +555,8 @@ const PersonalDashboard = ({ user }) => {
 
 
 
-  // ✅ Componente Modal de Confirmación
-  const ModalConfirm = () => {
-    if (!confirmModal.visible) return null;
-    return (
-      <div className="confirm-overlay" onClick={cerrarConfirm}>
-        <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-          <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
-            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '🗑️' : '⚠️'}</span>
-          </div>
-          <h3 className="confirm-titulo">{confirmModal.titulo}</h3>
-          <p className="confirm-mensaje">{confirmModal.mensaje}</p>
-          <div className="confirm-actions">
-            <button className="btn btn-secondary" onClick={cerrarConfirm}>Cancelar</button>
-            <button
-              className={`btn ${confirmModal.tipo === 'danger' ? 'btn-danger' : 'btn-warning'}`}
-              onClick={() => { confirmModal.onAceptar && confirmModal.onAceptar(); cerrarConfirm(); }}
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <ModalConfirm />
       <div className="dashboard-container">
       {/* CABECERA */}
       <div className="dashboard-header">
@@ -1075,6 +1049,26 @@ const PersonalDashboard = ({ user }) => {
         </div>
       )}
     </div>
+    {confirmModal.visible && (
+      <div className="confirm-overlay" onClick={cerrarConfirm}>
+        <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+          <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
+            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '🗑️' : '⚠️'}</span>
+          </div>
+          <h3 className="confirm-titulo">{confirmModal.titulo}</h3>
+          <p className="confirm-mensaje">{confirmModal.mensaje}</p>
+          <div className="confirm-actions">
+            <button className="btn btn-secondary" onClick={cerrarConfirm}>Cancelar</button>
+            <button
+              className={`btn ${confirmModal.tipo === 'danger' ? 'btn-danger' : 'btn-warning'}`}
+              onClick={() => { confirmModal.onAceptar && confirmModal.onAceptar(); cerrarConfirm(); }}
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 };
