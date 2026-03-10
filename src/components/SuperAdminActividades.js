@@ -34,6 +34,11 @@ const SuperAdminActividades = ({ admin }) => {
     periodos: {}
   });
 
+  // ✅ Modal de confirmación personalizado
+  const [confirmModal, setConfirmModal] = useState({ visible: false, titulo: '', mensaje: '', onAceptar: null, tipo: 'danger' });
+  const mostrarConfirm = (titulo, mensaje, onAceptar, tipo = 'danger') => setConfirmModal({ visible: true, titulo, mensaje, onAceptar, tipo });
+  const cerrarConfirm = () => setConfirmModal({ visible: false, titulo: '', mensaje: '', onAceptar: null, tipo: 'danger' });
+
   // Configuración del carrusel SIN DOTS
   const carouselSettings = {
     dots: false,
@@ -288,9 +293,14 @@ const SuperAdminActividades = ({ admin }) => {
   const eliminarActividad = async (actividadId, titulo, direccion) => {
     const confirmMessage = `¿Estás seguro de eliminar la actividad?\n\n"${titulo}"\n\nDe la dirección: ${direccion}\n\n⚠️ Esta acción eliminará TODAS las imágenes asociadas y NO se puede deshacer.`;
     
-    if (!window.confirm(confirmMessage)) {
-      return;
-    }
+    mostrarConfirm(
+      '🗑️ Eliminar actividad',
+      confirmMessage,
+      async () => { await doEliminar(actividadId, titulo, direccion); }
+    );
+  };
+
+  const doEliminar = async (actividadId, titulo, direccion) => {
     
     try {
       const response = await axios({
@@ -600,7 +610,9 @@ const SuperAdminActividades = ({ admin }) => {
   }
 
   return (
-    <div className="dashboard-container">
+    <>
+      <ModalConfirm />
+      <div className="dashboard-container">
       {/* Cabecera con Panel de SuperAdmin */}
       <div className="dashboard-header">
         <div className="header-left">
@@ -1181,14 +1193,12 @@ const SuperAdminActividades = ({ admin }) => {
               <button 
                 className="btn btn-danger"
                 onClick={() => {
-                  if (window.confirm(`¿Estás seguro de eliminar esta actividad?\n\n"${actividadSeleccionada.titulo}"\n\n⚠️ Esta acción NO se puede deshacer.`)) {
-                    eliminarActividad(
-                      actividadSeleccionada.id, 
-                      actividadSeleccionada.titulo, 
-                      actividadSeleccionada.direccion_nombre
-                    );
-                    cerrarModal();
-                  }
+                  eliminarActividad(
+                    actividadSeleccionada.id,
+                    actividadSeleccionada.titulo,
+                    actividadSeleccionada.direccion_nombre
+                  );
+                  cerrarModal();
                 }}
               >
                 🗑️ Eliminar Actividad
@@ -1199,6 +1209,31 @@ const SuperAdminActividades = ({ admin }) => {
       )}
     </div>
   );
+
+  // ✅ Componente Modal de Confirmación
+  const ModalConfirm = () => {
+    if (!confirmModal.visible) return null;
+    return (
+      <div className="confirm-overlay" onClick={cerrarConfirm}>
+        <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+          <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
+            <span className="confirm-icon">{confirmModal.tipo === 'danger' ? '🗑️' : '⚠️'}</span>
+          </div>
+          <h3 className="confirm-titulo">{confirmModal.titulo}</h3>
+          <p className="confirm-mensaje">{confirmModal.mensaje}</p>
+          <div className="confirm-actions">
+            <button className="btn btn-secondary" onClick={cerrarConfirm}>Cancelar</button>
+            <button
+              className={`btn ${confirmModal.tipo === 'danger' ? 'btn-danger' : 'btn-warning'}`}
+              onClick={() => { confirmModal.onAceptar && confirmModal.onAceptar(); cerrarConfirm(); }}
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 };
 
 export default SuperAdminActividades;
