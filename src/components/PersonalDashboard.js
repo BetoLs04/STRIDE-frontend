@@ -285,8 +285,8 @@ const PersonalDashboard = ({ user }) => {
       titulo: actividad.titulo || '',
       descripcion: actividad.descripcion || '',
       tipo_actividad: actividad.tipo_actividad || '',
-      fecha_inicio: actividad.fecha_inicio ? actividad.fecha_inicio.split('T')[0] : '',
-      fecha_fin: actividad.fecha_fin ? actividad.fecha_fin.split('T')[0] : '',
+      fecha_inicio: actividad.fecha_inicio ? actividad.fecha_inicio.split(' ')[0].split('T')[0] : '',
+      fecha_fin: actividad.fecha_fin ? actividad.fecha_fin.split(' ')[0].split('T')[0] : '',
       imagenesNuevas: []
     });
     setShowEditModal(true);
@@ -409,7 +409,7 @@ const PersonalDashboard = ({ user }) => {
     if (!dateString) return 'No definida';
     try {
       // ✅ Fix zona horaria: construir fecha manualmente para evitar desfase UTC
-      const solo = dateString.split('T')[0];
+      const solo = dateString.split('T')[0].split(' ')[0];
       const [y, m, d] = solo.split('-');
       const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
       return date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -502,7 +502,7 @@ const PersonalDashboard = ({ user }) => {
             <div className="actividad-minimalista-metadata">
               <span className="actividad-minimalista-creador">👤 {actividad.creado_por_nombre || 'Sistema'}</span>
               <span className="actividad-minimalista-fecha">
-                {new Date(actividad.fecha_inicio.split('T')[0] + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                {new Date(actividad.fecha_inicio.split(' ')[0].split('T')[0] + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
               </span>
               {getEstadoBadge(actividad.estado)}
             </div>
@@ -719,7 +719,7 @@ const PersonalDashboard = ({ user }) => {
                       {formatDate(actividadSeleccionada.fecha_fin)}
                       {actividadSeleccionada.fecha_fin && (
                         <span className="modal-dias-restantes">
-                          <span className={`dias-restantes ${new Date(actividadSeleccionada.fecha_fin.split('T')[0] + 'T12:00:00') < new Date() ? 'finalizado' : 'activo'}`}>
+                          <span className={`dias-restantes ${new Date(actividadSeleccionada.fecha_fin.split(' ')[0].split('T')[0] + 'T12:00:00') < new Date() ? 'finalizado' : 'activo'}`}>
                             {getDiasRestantes(actividadSeleccionada.fecha_fin)}
                           </span>
                         </span>
