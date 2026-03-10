@@ -79,6 +79,13 @@ const PersonalDashboard = ({ user }) => {
     if (!user) { navigate('/login'); return; }
     if (user.tipo !== 'personal') { toast.error('Acceso no autorizado'); navigate('/login'); return; }
     fetchActividades();
+
+    // ✅ Expandir año y período actual automáticamente al cargar
+    const { anio, periodo } = obtenerPeriodoActual();
+    setExpansiones({
+      años: { [anio]: true },
+      periodos: { [`${anio}-${periodo}`]: true }
+    });
   }, [user, navigate]);
 
   const fetchActividades = async () => {
@@ -87,9 +94,6 @@ const PersonalDashboard = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${API_URL}/api/university/actividades/direccion/${user.direccion_id}`);
       const nuevasActividades = response.data.data || [];
-      
-      console.log('📊 Estados:', nuevasActividades.map(a => ({ titulo: a.titulo, estado: a.estado })));
-      
       setActividades(nuevasActividades);
       // Actualizar actividad seleccionada en modal si está abierto
       if (actividadSeleccionada) {
@@ -404,7 +408,10 @@ const PersonalDashboard = ({ user }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     try {
-      const date = new Date(dateString);
+      // ✅ Fix zona horaria: construir fecha manualmente para evitar desfase UTC
+      const solo = dateString.split('T')[0];
+      const [y, m, d] = solo.split('-');
+      const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
       return date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     } catch (error) { return 'Fecha inválida'; }
   };
@@ -412,7 +419,11 @@ const PersonalDashboard = ({ user }) => {
   const getDiasRestantes = (fechaFin) => {
     if (!fechaFin) return null;
     const hoy = new Date();
-    const fin = new Date(fechaFin);
+    hoy.setHours(0, 0, 0, 0);
+    // ✅ Fix zona horaria
+    const solo = fechaFin.split('T')[0];
+    const [y, m, d] = solo.split('-');
+    const fin = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
     const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
     if (diffDays > 0) return `Faltan ${diffDays} días`;
     if (diffDays === 0) return 'Finaliza hoy';
@@ -491,7 +502,7 @@ const PersonalDashboard = ({ user }) => {
             <div className="actividad-minimalista-metadata">
               <span className="actividad-minimalista-creador">👤 {actividad.creado_por_nombre || 'Sistema'}</span>
               <span className="actividad-minimalista-fecha">
-                {new Date(actividad.fecha_inicio).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                {new Date(actividad.fecha_inicio.split('T')[0] + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
               </span>
               {getEstadoBadge(actividad.estado)}
             </div>
@@ -708,7 +719,7 @@ const PersonalDashboard = ({ user }) => {
                       {formatDate(actividadSeleccionada.fecha_fin)}
                       {actividadSeleccionada.fecha_fin && (
                         <span className="modal-dias-restantes">
-                          <span className={`dias-restantes ${new Date(actividadSeleccionada.fecha_fin) < new Date() ? 'finalizado' : 'activo'}`}>
+                          <span className={`dias-restantes ${new Date(actividadSeleccionada.fecha_fin.split('T')[0] + 'T12:00:00') < new Date() ? 'finalizado' : 'activo'}`}>
                             {getDiasRestantes(actividadSeleccionada.fecha_fin)}
                           </span>
                         </span>
