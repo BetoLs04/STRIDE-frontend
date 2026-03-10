@@ -1208,12 +1208,7 @@ const SuperAdminActividades = ({ admin }) => {
         </div>
       )}
     </div>
-  );
-
-  // ✅ Componente Modal de Confirmación
-  const ModalConfirm = () => {
-    if (!confirmModal.visible) return null;
-    return (
+    {confirmModal.visible && (
       <div className="confirm-overlay" onClick={cerrarConfirm}>
         <div className="confirm-modal" onClick={e => e.stopPropagation()}>
           <div className={`confirm-icon-wrap ${confirmModal.tipo}`}>
@@ -1232,8 +1227,9 @@ const SuperAdminActividades = ({ admin }) => {
           </div>
         </div>
       </div>
-    );
-  };
+    )}
+  </>
+  );
 };
 
 export default SuperAdminActividades;
