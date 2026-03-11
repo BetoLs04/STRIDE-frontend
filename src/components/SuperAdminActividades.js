@@ -379,6 +379,16 @@ const SuperAdminActividades = ({ admin }) => {
     };
   }, [modalAbierto]);
 
+  useEffect(() => {
+    if (actividades.length > 0) {
+      const { anio } = obtenerPeriodoActual();
+      setExpansiones({
+        años: { [anio]: true },
+        periodos: {}
+      });
+    }
+  }, [actividades]);
+  
   const getInitial = () => {
     if (!admin || !admin.username) return '?';
     return admin.username.charAt(0).toUpperCase();
