@@ -54,14 +54,14 @@ const DirectivoDashboard = ({ user }) => {
   // Auto-expandir año y período actual al cargar
   useEffect(() => {
     if (actividades.length > 0) {
-      const { anio, periodo } = obtenerPeriodoActual();
+      const { anio } = obtenerPeriodoActual();
       setExpansiones({
         años: { [anio]: true },
-        periodos: { [`${anio}-${periodo}`]: true }
+        periodos: {}
       });
     }
   }, [actividades]);
-
+  
   // ✅ Función para construir la URL correcta de imágenes
   const getImageUrl = (url) => {
     if (!url) return '';
