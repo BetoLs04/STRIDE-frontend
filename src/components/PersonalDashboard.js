@@ -145,10 +145,10 @@ const PersonalDashboard = ({ user }) => {
         agrupacion[anio] = {
           anio, anioNum, actividades: [],
           periodos: {
-            'enero-abril': { actividades: [], label: '❄️ Enero - Abril', color: '#4A90E2', emoji: '❄️', orden: 1 },
-            'mayo-agosto': { actividades: [], label: '🌸 Mayo - Agosto', color: '#50C878', emoji: '🌸', orden: 2 },
-            'septiembre-diciembre': { actividades: [], label: '🍂 Septiembre - Diciembre', color: '#FF7F50', emoji: '🍂', orden: 3 },
-            'sin-fecha': { actividades: [], label: ' Sin fecha definida', color: '#A0A0A0', emoji: '', orden: 4 }
+            'enero-abril': { actividades: [], label: '❄️ Enero - Abril', color: '#4A90E2', orden: 1 },
+            'mayo-agosto': { actividades: [], label: '🌸 Mayo - Agosto', color: '#50C878', orden: 2 },
+            'septiembre-diciembre': { actividades: [], label: '🍂 Septiembre - Diciembre', color: '#FF7F50', orden: 3 },
+            'sin-fecha': { actividades: [], label: ' Sin fecha definida', color: '#A0A0A0', orden: 4 }
           }
         };
       }
