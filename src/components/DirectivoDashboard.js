@@ -671,19 +671,19 @@ const DirectivoDashboard = ({ user }) => {
 
               {actividadSeleccionada.tipo_actividad && (
                 <div className="modal-tipo-actividad">
-                  <span className="tipo-actividad-label">📌 Tipo de Actividad:</span>
+                  <span className="tipo-actividad-label"> Tipo de Actividad:</span>
                   <span className="tipo-actividad-valor">{actividadSeleccionada.tipo_actividad}</span>
                 </div>
               )}
               
               <div className="modal-descripcion">
-                <h4>📄 Descripción:</h4>
+                <h4> Descripción:</h4>
                 <p>{actividadSeleccionada.descripcion || 'Sin descripción'}</p>
               </div>
               
               {actividadSeleccionada.imagenes && actividadSeleccionada.imagenes.length > 0 && (
                 <div className="modal-imagenes">
-                  <h4>🖼️ Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
+                  <h4> Galería de Evidencias ({actividadSeleccionada.imagenes.length})</h4>
                   <Slider {...carouselSettings} className="modal-carousel">
                     {actividadSeleccionada.imagenes.map((img, index) => (
                       <div key={index} className="modal-slide">
@@ -723,7 +723,7 @@ const DirectivoDashboard = ({ user }) => {
                   
                   <div className="modal-fecha-item">
                     <div className="modal-fecha-header">
-                      <span className="modal-fecha-icon">🚀</span>
+                      <span className="modal-fecha-icon"></span>
                       <span className="modal-fecha-label">Fecha de inicio:</span>
                     </div>
                     <div className="modal-fecha-valor">
@@ -733,7 +733,7 @@ const DirectivoDashboard = ({ user }) => {
                   
                   <div className="modal-fecha-item">
                     <div className="modal-fecha-header">
-                      <span className="modal-fecha-icon">🏁</span>
+                      <span className="modal-fecha-icon"></span>
                       <span className="modal-fecha-label">Fecha de fin:</span>
                     </div>
                     <div className="modal-fecha-valor">
@@ -762,7 +762,7 @@ const DirectivoDashboard = ({ user }) => {
                   toast.info('Funcionalidad de comentarios próximamente');
                 }}
               >
-                💬 Agregar Comentario
+                 Agregar Comentario
               </button>
             </div>
           </div>
