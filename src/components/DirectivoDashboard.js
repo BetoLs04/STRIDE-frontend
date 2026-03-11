@@ -170,28 +170,24 @@ const DirectivoDashboard = ({ user }) => {
               actividades: [], 
               label: '❄️ Enero - Abril', 
               color: '#4A90E2',
-              emoji: '❄️',
               orden: 1
             },
             'mayo-agosto': { 
               actividades: [], 
               label: '🌸 Mayo - Agosto', 
               color: '#50C878',
-              emoji: '🌸',
               orden: 2
             },
             'septiembre-diciembre': { 
               actividades: [], 
               label: '🍂 Septiembre - Diciembre', 
               color: '#FF7F50',
-              emoji: '🍂',
               orden: 3
             },
             'sin-fecha': { 
               actividades: [], 
-              label: '📅 Sin fecha definida', 
+              label: 'Sin fecha definida', 
               color: '#A0A0A0',
-              emoji: '📅',
               orden: 4
             }
           }
@@ -312,7 +308,7 @@ const DirectivoDashboard = ({ user }) => {
               </span>
               {/* ✅ Fix zona horaria en tarjeta */}
               <span className="actividad-minimalista-fecha">
-                📅 {parseFecha(actividad.fecha_inicio)?.toLocaleDateString('es-ES', { 
+                 {parseFecha(actividad.fecha_inicio)?.toLocaleDateString('es-ES', { 
                   day: '2-digit', 
                   month: 'short', 
                   year: 'numeric' 
@@ -327,7 +323,7 @@ const DirectivoDashboard = ({ user }) => {
               className="btn btn-primary btn-small"
               onClick={() => abrirModalActividad(actividad)}
             >
-              👁️ Ver detalles
+              Ver detalles
             </button>
           </div>
         </div>
@@ -389,7 +385,7 @@ const DirectivoDashboard = ({ user }) => {
                  periodoActual.periodo === 'mayo-agosto' ? '🌸' : '🍂'}
               </span>
               <div className="periodo-text-banner">
-                <h4>📅 PERÍODO ACTUAL</h4>
+                <h4>PERÍODO ACTUAL</h4>
                 <p>
                   Año {periodoActual.anio} • 
                   {periodoActual.periodo === 'enero-abril' ? ' Enero - Abril' : 
@@ -468,7 +464,7 @@ const DirectivoDashboard = ({ user }) => {
         ) : (
           <div className="periodos-container">
             <div className="periodos-controls">
-              <h3>📅 Actividades por Período</h3>
+              <h3>Actividades por Período</h3>
             </div>
 
             {agrupacionPorAnio
@@ -485,7 +481,7 @@ const DirectivoDashboard = ({ user }) => {
                     }}
                   >
                     <div className="año-acordeon-title">
-                      <span className="año-emoji">📅</span>
+                      <span className="año-emoji"></span>
                       <h3>Año {añoData.anio}</h3>
                       {añoData.anio === periodoActual.anio && (
                         <span className="año-actual-badge">AÑO ACTUAL</span>
@@ -713,11 +709,11 @@ const DirectivoDashboard = ({ user }) => {
               )}
               
               <div className="modal-fechas">
-                <h4>📅 Información de Fechas</h4>
+                <h4>Información de Fechas</h4>
                 <div className="modal-fechas-grid">
                   <div className="modal-fecha-item">
                     <div className="modal-fecha-header">
-                      <span className="modal-fecha-icon">📅</span>
+                      <span className="modal-fecha-icon"></span>
                       <span className="modal-fecha-label">Fecha de creación:</span>
                     </div>
                     <div className="modal-fecha-valor">
