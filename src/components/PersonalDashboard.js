@@ -89,7 +89,7 @@ const PersonalDashboard = ({ user }) => {
     const { anio, periodo } = obtenerPeriodoActual();
     setExpansiones({
       años: { [anio]: true },
-      periodos: { [`${anio}-${periodo}`]: true }
+      periodos: {}
     });
   }, [user, navigate]);
 
