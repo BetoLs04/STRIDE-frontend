@@ -528,7 +528,7 @@ const PersonalDashboard = ({ user }) => {
           </div>
           <div className="actividad-minimalista-actions">
             <button className="btn btn-primary btn-small" onClick={() => abrirModalActividad(actividad)}>
-              👁️ Ver detalles
+              Ver detalles
             </button>
             {actividad.creado_por_id === user.id && (
               <button className="btn btn-danger btn-small" onClick={() => eliminarActividad(actividad.id, actividad.titulo)} title="Eliminar esta actividad" style={{ marginLeft: '10px' }}>
@@ -576,7 +576,7 @@ const PersonalDashboard = ({ user }) => {
         </div>
         <div className="header-right-personal">
           <button className="btn btn-secondary" onClick={fetchActividades} title="Actualizar actividades" style={{ marginRight: '10px' }}>
-            🔄 Actualizar
+            Actualizar
           </button>
           <button className="btn btn-primary" onClick={() => setShowFormActividad(true)}>+ Nueva Actividad</button>
         </div>
