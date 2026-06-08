@@ -145,74 +145,6 @@ const Home = () => {
               </div>
             ) : (
               <>
-                {/* Controles de navegación - Flechas Superiores */}
-                {comunicados.length > 1 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    padding: '1.5rem 2.5rem 0',
-                    borderBottom: 'none'
-                  }}>
-                    <div style={{ display: 'flex', gap: '15px' }}>
-                      <button 
-                        onClick={goToPrev}
-                        style={{
-                          padding: '0.6rem 1.2rem',
-                          borderRadius: '8px',
-                          border: '2px solid var(--primary-blue)',
-                          background: 'white',
-                          color: 'var(--primary-blue)',
-                          fontWeight: 'bold',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          transition: 'all 0.3s ease',
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'var(--primary-blue)';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'white';
-                          e.currentTarget.style.color = 'var(--primary-blue)';
-                        }}
-                      >
-                        ← Anterior
-                      </button>
-                      
-                      <button 
-                        onClick={goToNext}
-                        style={{
-                          padding: '0.6rem 1.2rem',
-                          borderRadius: '8px',
-                          border: '2px solid var(--primary-blue)',
-                          background: 'white',
-                          color: 'var(--primary-blue)',
-                          fontWeight: 'bold',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          transition: 'all 0.3s ease',
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'var(--primary-blue)';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'white';
-                          e.currentTarget.style.color = 'var(--primary-blue)';
-                        }}
-                      >
-                        Siguiente →
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* Carrusel principal */}
                 <Slider 
@@ -225,7 +157,7 @@ const Home = () => {
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
-                          padding: '0rem 2.5rem 1.5rem 2.5rem',
+                          padding: '2.5rem 2.5rem 1.5rem 2.5rem',
                           minHeight: 'auto',
                           display: 'flex',
                           flexDirection: 'column'
@@ -281,23 +213,91 @@ const Home = () => {
 
                             <div style={{
                               display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.3rem',
-                              marginTop: '0.5rem'
+                              flexDirection: 'column',
+                              alignItems: 'flex-end',
+                              gap: '0.8rem',
+                              marginTop: '0.2rem'
                             }}>
-                              <span style={{
-                                color: 'var(--secondary-blue)',
-                                fontSize: '1rem'
+                              {/* Botones de navegación integrados */}
+                              {comunicados.length > 1 && (
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                  <button 
+                                    onClick={goToPrev}
+                                    style={{
+                                      padding: '0.4rem 0.8rem',
+                                      borderRadius: '8px',
+                                      border: '2px solid var(--primary-blue)',
+                                      background: 'white',
+                                      color: 'var(--primary-blue)',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '5px',
+                                      fontSize: '0.85rem',
+                                      transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.background = 'var(--primary-blue)';
+                                      e.currentTarget.style.color = 'white';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.background = 'white';
+                                      e.currentTarget.style.color = 'var(--primary-blue)';
+                                    }}
+                                  >
+                                    ← Anterior
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={goToNext}
+                                    style={{
+                                      padding: '0.4rem 0.8rem',
+                                      borderRadius: '8px',
+                                      border: '2px solid var(--primary-blue)',
+                                      background: 'white',
+                                      color: 'var(--primary-blue)',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '5px',
+                                      fontSize: '0.85rem',
+                                      transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.background = 'var(--primary-blue)';
+                                      e.currentTarget.style.color = 'white';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.background = 'white';
+                                      e.currentTarget.style.color = 'var(--primary-blue)';
+                                    }}
+                                  >
+                                    Siguiente →
+                                  </button>
+                                </div>
+                              )}
+
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.3rem'
                               }}>
-                                📅
-                              </span>
-                              <span style={{
-                                fontSize: '1rem',
-                                color: 'var(--medium-gray)',
-                                fontWeight: '500'
-                              }}>
-                                {formatDate(comunicado.fecha_publicacion)}
-                              </span>
+                                <span style={{
+                                  color: 'var(--secondary-blue)',
+                                  fontSize: '1rem'
+                                }}>
+                                  📅
+                                </span>
+                                <span style={{
+                                  fontSize: '1rem',
+                                  color: 'var(--medium-gray)',
+                                  fontWeight: '500'
+                                }}>
+                                  {formatDate(comunicado.fecha_publicacion)}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
