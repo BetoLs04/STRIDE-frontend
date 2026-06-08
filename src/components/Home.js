@@ -145,25 +145,73 @@ const Home = () => {
               </div>
             ) : (
               <>
-                {/* Controles de navegación - Flechas MEJORADAS */}
+                {/* Controles de navegación - Flechas Superiores */}
                 {comunicados.length > 1 && (
-                  <>
-                    <button 
-                      onClick={goToPrev}
-                      className="carousel-nav-btn prev"
-                      aria-label="Comunicado anterior"
-                    >
-                      ←
-                    </button>
-                    
-                    <button 
-                      onClick={goToNext}
-                      className="carousel-nav-btn next"
-                      aria-label="Siguiente comunicado"
-                    >
-                      →
-                    </button>
-                  </>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                    padding: '1.5rem 2.5rem 0',
+                    borderBottom: 'none'
+                  }}>
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                      <button 
+                        onClick={goToPrev}
+                        style={{
+                          padding: '0.6rem 1.2rem',
+                          borderRadius: '8px',
+                          border: '2px solid var(--primary-blue)',
+                          background: 'white',
+                          color: 'var(--primary-blue)',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--primary-blue)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'white';
+                          e.currentTarget.style.color = 'var(--primary-blue)';
+                        }}
+                      >
+                        ← Anterior
+                      </button>
+                      
+                      <button 
+                        onClick={goToNext}
+                        style={{
+                          padding: '0.6rem 1.2rem',
+                          borderRadius: '8px',
+                          border: '2px solid var(--primary-blue)',
+                          background: 'white',
+                          color: 'var(--primary-blue)',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--primary-blue)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'white';
+                          e.currentTarget.style.color = 'var(--primary-blue)';
+                        }}
+                      >
+                        Siguiente →
+                      </button>
+                    </div>
+                  </div>
                 )}
 
                 {/* Carrusel principal */}
