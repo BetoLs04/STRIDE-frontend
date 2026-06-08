@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill-new';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.snow.css';
 import '../styles/App.css';
 
 // Componente principal PanelComunicadosAdmin
