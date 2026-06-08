@@ -157,7 +157,7 @@ const Home = () => {
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
-                          padding: '2.5rem 2.5rem 1.5rem 2.5rem',
+                          padding: '1.5rem',
                           minHeight: 'auto',
                           display: 'flex',
                           flexDirection: 'column'
@@ -306,7 +306,7 @@ const Home = () => {
                             className="comunicado-content-html"
                             style={{
                               flex: 1,
-                              padding: '2rem',
+                              padding: '1.5rem',
                               background: '#f8fafc',
                               borderRadius: '10px',
                               border: '1px solid #e9ecef',
