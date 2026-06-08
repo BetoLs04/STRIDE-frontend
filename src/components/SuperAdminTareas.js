@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import ReactQuill from 'react-quill-new';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import 'react-quill-new/dist/quill.snow.css';
 import '../styles/SuperAdminTareas.css';
 import DownloadButton from './DownloadButton';
 
@@ -29,6 +31,25 @@ const parseLocalDate = (dateStr) => {
 };
 
 const SuperAdminTareas = ({ admin }) => {
+
+  const quillModules = useMemo(() => ({
+    toolbar: [
+      [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'align': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+      ['blockquote', 'link'],
+      ['clean']
+    ]
+  }), []);
+
+  const quillFormats = [
+    'font', 'size', 'bold', 'italic', 'underline', 'strike',
+    'color', 'background', 'header', 'align',
+    'list', 'bullet', 'indent', 'blockquote', 'link'
+  ];
   const [tareas, setTareas] = useState([]);
   const [personal, setPersonal] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -465,7 +486,17 @@ const SuperAdminTareas = ({ admin }) => {
                 </div>
                 <div className="form-group">
                   <label>Descripción</label>
-                  <textarea name="descripcion" value={formData.descripcion} onChange={handleInputChange} placeholder="Describe los detalles de la tarea..." rows="4" />
+                  <div className="quill-editor-wrapper">
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.descripcion}
+                      onChange={(html) => setFormData(prev => ({ ...prev, descripcion: html }))}
+                      modules={quillModules}
+                      formats={quillFormats}
+                      placeholder="Describe los detalles de la tarea..."
+                      style={{ background: 'white' }}
+                    />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Fecha de entrega *</label>
@@ -564,7 +595,16 @@ const SuperAdminTareas = ({ admin }) => {
                 </div>
                 <div className="form-group">
                   <label>Descripción</label>
-                  <textarea name="descripcion" value={formData.descripcion} onChange={handleInputChange} rows="4" />
+                  <div className="quill-editor-wrapper">
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.descripcion}
+                      onChange={(html) => setFormData(prev => ({ ...prev, descripcion: html }))}
+                      modules={quillModules}
+                      formats={quillFormats}
+                      style={{ background: 'white' }}
+                    />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Fecha de entrega *</label>
@@ -663,9 +703,11 @@ const SuperAdminTareas = ({ admin }) => {
                 {selectedTarea.descripcion && (
                   <div className="detalle-descripcion">
                     <h4>Descripción</h4>
-                    <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                      {selectedTarea.descripcion}
-                    </p>
+                    <div
+                      className="ql-editor"
+                      style={{ padding: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                      dangerouslySetInnerHTML={{ __html: selectedTarea.descripcion }}
+                    />
                   </div>
                 )}
 
