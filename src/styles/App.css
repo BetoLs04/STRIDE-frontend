@@ -5073,7 +5073,97 @@ body {
 }
 
 /* ===== EDITOR DE TEXTO ENRIQUECIDO - VERSIÓN MEJORADA ===== */
+/* ===== QUILL EDITOR - ESTILOS TIPO WORD ===== */
+.quill-editor-wrapper {
+  border: 2px solid #e0e6ef;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 0.5rem;
+  background: white;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow {
+  background: #f4f7fb;
+  border: none;
+  border-bottom: 2px solid #e0e6ef;
+  padding: 10px 12px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-formats {
+  margin-right: 8px;
+}
+
+.quill-editor-wrapper .ql-container.ql-snow {
+  border: none;
+  font-size: 1rem;
+  font-family: 'Calibri', 'Arial', sans-serif;
+}
+
+.quill-editor-wrapper .ql-editor {
+  min-height: 320px;
+  max-height: 550px;
+  overflow-y: auto;
+  padding: 16px 20px;
+  line-height: 1.7;
+  color: #212529;
+  font-size: 1rem;
+}
+
+.quill-editor-wrapper .ql-editor.ql-blank::before {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.quill-editor-wrapper .ql-snow .ql-stroke {
+  stroke: #495057;
+}
+
+.quill-editor-wrapper .ql-snow .ql-fill {
+  fill: #495057;
+}
+
+.quill-editor-wrapper .ql-snow .ql-picker {
+  color: #495057;
+}
+
+.quill-editor-wrapper .ql-snow.ql-toolbar button:hover,
+.quill-editor-wrapper .ql-snow .ql-toolbar button:hover {
+  background: #e2eafc;
+  border-radius: 4px;
+}
+
+.quill-editor-wrapper .ql-snow.ql-toolbar button.ql-active,
+.quill-editor-wrapper .ql-snow .ql-toolbar button.ql-active {
+  background: #dce8fd;
+  border-radius: 4px;
+  color: var(--primary-blue);
+}
+
+.quill-editor-wrapper .ql-snow.ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--primary-blue);
+}
+
+.quill-editor-wrapper .ql-snow.ql-toolbar button.ql-active .ql-fill {
+  fill: var(--primary-blue);
+}
+
+/* Scrollbar elegante en el editor */
+.quill-editor-wrapper .ql-editor::-webkit-scrollbar {
+  width: 6px;
+}
+.quill-editor-wrapper .ql-editor::-webkit-scrollbar-thumb {
+  background: #cdd3da;
+  border-radius: 3px;
+}
+.quill-editor-wrapper .ql-editor::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .rich-text-editor-container {
+
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;

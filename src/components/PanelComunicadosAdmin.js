@@ -1,608 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import ReactQuill, { Quill } from 'react-quill';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import 'react-quill/dist/quill.snow.css';
 import '../styles/App.css';
-
-// Componente de Editor de Texto Enriquecido MEJORADO
-const RichTextEditor = ({ value, onChange, placeholder, rows = 10 }) => {
-  const editorRef = useRef(null);
-  const [isBold, setIsBold] = useState(false);
-  const [isItalic, setIsItalic] = useState(false);
-  const [isUnderline, setIsUnderline] = useState(false);
-  const [fontSize, setFontSize] = useState('16');
-  const [textAlign, setTextAlign] = useState('left');
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [textColor, setTextColor] = useState('#000000');
-  const [bgColor, setBgColor] = useState('#ffffff');
-
-  // Inicializar el contenido del editor
-  useEffect(() => {
-    if (editorRef.current && value !== editorRef.current.innerHTML) {
-      editorRef.current.innerHTML = value || '';
-    }
-  }, [value]);
-
-  // Actualizar estado de la barra de herramientas
-  const updateToolbarState = () => {
-    if (!editorRef.current) return;
-    
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0 && selection.toString().length > 0) {
-      try {
-        setIsBold(document.queryCommandState('bold'));
-        setIsItalic(document.queryCommandState('italic'));
-        setIsUnderline(document.queryCommandState('underline'));
-      } catch (error) {
-        console.log('Error actualizando toolbar:', error);
-      }
-    }
-  };
-
-  // Manejar cambios en el editor
-  const handleEditorInput = () => {
-    if (editorRef.current) {
-      const htmlContent = editorRef.current.innerHTML;
-      onChange(htmlContent);
-      updateToolbarState();
-    }
-  };
-
-  // Ejecutar comandos de formato
-  const execCommand = (command, value = null) => {
-    try {
-      // Guardar selección actual
-      const selection = window.getSelection();
-      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-      
-      // Restaurar foco al editor si se perdió
-      if (!editorRef.current.contains(document.activeElement)) {
-        editorRef.current.focus();
-      }
-      
-      // Ejecutar comando
-      document.execCommand('styleWithCSS', false, true);
-      if (value) {
-        document.execCommand(command, false, value);
-      } else {
-        document.execCommand(command, false, null);
-      }
-      
-      // Restaurar selección si existía
-      if (range) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-      
-      // Actualizar contenido
-      handleEditorInput();
-      
-      // Mantener foco en el editor
-      editorRef.current.focus();
-      
-    } catch (error) {
-      console.error('Error ejecutando comando:', error);
-    }
-  };
-
-  const formatText = (command) => {
-    execCommand(command);
-    
-    // Actualizar estado de botones
-    if (command === 'bold') setIsBold(!isBold);
-    if (command === 'italic') setIsItalic(!isItalic);
-    if (command === 'underline') setIsUnderline(!isUnderline);
-  };
-
-  const handleTextAlign = (align) => {
-    execCommand('justify' + align);
-    setTextAlign(align);
-  };
-
-  // Función mejorada para cambiar tamaño de fuente
-  const handleFontSize = (e) => {
-    const size = e.target.value;
-    if (size >= 8 && size <= 72) {
-      // Aplicar tamaño directamente al contenido seleccionado
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0 && selection.toString().length > 0) {
-        const range = selection.getRangeAt(0);
-        const span = document.createElement('span');
-        span.style.fontSize = size + 'px';
-        
-        try {
-          range.surroundContents(span);
-        } catch (error) {
-          // Si hay error, usar insertHTML
-          const selectedText = selection.toString();
-          document.execCommand('insertHTML', false, `<span style="font-size: ${size}px">${selectedText}</span>`);
-        }
-      } else {
-        // Si no hay texto seleccionado, aplicar al siguiente texto que se escriba
-        execCommand('fontSize', '7'); // Esto es necesario para algunos navegadores
-      }
-      
-      setFontSize(size);
-      handleEditorInput();
-    }
-  };
-
-  const handleTextColor = (color) => {
-    execCommand('foreColor', color);
-    setTextColor(color);
-    setShowColorPicker(false);
-  };
-
-  const handleBgColor = (color) => {
-    execCommand('backColor', color);
-    setBgColor(color);
-  };
-
-  const insertList = (type) => {
-    execCommand(type === 'ordered' ? 'insertOrderedList' : 'insertUnorderedList');
-  };
-
-  const clearFormatting = () => {
-    execCommand('removeFormat');
-    setIsBold(false);
-    setIsItalic(false);
-    setIsUnderline(false);
-    setTextAlign('left');
-    setFontSize('16');
-    setTextColor('#000000');
-    setBgColor('#ffffff');
-    
-    // También limpiar estilos inline
-    if (editorRef.current) {
-      const elements = editorRef.current.querySelectorAll('[style]');
-      elements.forEach(el => {
-        el.removeAttribute('style');
-      });
-    }
-  };
-
-  const insertLink = () => {
-    const url = prompt('Ingrese la URL del enlace:', 'https://');
-    if (url) {
-      // Verificar si hay texto seleccionado
-      const selection = window.getSelection();
-      if (selection.toString().length === 0) {
-        alert('Por favor, seleccione el texto que desea convertir en enlace.');
-        return;
-      }
-      execCommand('createLink', url);
-    }
-  };
-
-  // Manejar teclas especiales para mantener el orden del texto
-  const handleKeyDown = (e) => {
-    // Permitir atajos de teclado comunes
-    if (e.ctrlKey || e.metaKey) {
-      switch(e.key) {
-        case 'b':
-          e.preventDefault();
-          formatText('bold');
-          break;
-        case 'i':
-          e.preventDefault();
-          formatText('italic');
-          break;
-        case 'u':
-          e.preventDefault();
-          formatText('underline');
-          break;
-        case 'z':
-          if (!e.shiftKey) {
-            e.preventDefault();
-            execCommand('undo');
-          }
-          break;
-        case 'y':
-          if (!e.shiftKey) {
-            e.preventDefault();
-            execCommand('redo');
-          }
-          break;
-      }
-    }
-  };
-
-  // Manejar pegado de texto para limpiar formato
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const text = e.clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
-    handleEditorInput();
-  };
-
-  // Función para insertar texto con formato específico
-  const insertFormattedText = (text, format = {}) => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const span = document.createElement('span');
-      
-      // Aplicar formato
-      if (format.bold) span.style.fontWeight = 'bold';
-      if (format.italic) span.style.fontStyle = 'italic';
-      if (format.underline) span.style.textDecoration = 'underline';
-      if (format.fontSize) span.style.fontSize = format.fontSize + 'px';
-      if (format.color) span.style.color = format.color;
-      
-      const textNode = document.createTextNode(text);
-      span.appendChild(textNode);
-      range.deleteContents();
-      range.insertNode(span);
-      
-      handleEditorInput();
-    }
-  };
-
-  const textContent = value ? value.replace(/<[^>]*>/g, '') : '';
-  const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
-  const charCount = textContent.length;
-
-  return (
-    <div className="rich-text-editor-container">
-      {/* Barra de herramientas MEJORADA */}
-      <div className="editor-toolbar">
-        {/* Formato de texto */}
-        <div className="toolbar-group">
-          <button 
-            type="button"
-            className={`toolbar-btn ${isBold ? 'active' : ''}`}
-            onClick={() => formatText('bold')}
-            title="Negrita (Ctrl+B)"
-          >
-            <strong>B</strong>
-          </button>
-          <button 
-            type="button"
-            className={`toolbar-btn ${isItalic ? 'active' : ''}`}
-            onClick={() => formatText('italic')}
-            title="Cursiva (Ctrl+I)"
-          >
-            <em>I</em>
-          </button>
-          <button 
-            type="button"
-            className={`toolbar-btn ${isUnderline ? 'active' : ''}`}
-            onClick={() => formatText('underline')}
-            title="Subrayado (Ctrl+U)"
-          >
-            <u>U</u>
-          </button>
-        </div>
-
-        {/* Alineación - CON BOTÓN DE JUSTIFICAR */}
-        <div className="toolbar-group">
-          <button 
-            type="button"
-            className={`toolbar-btn ${textAlign === 'left' ? 'active' : ''}`}
-            onClick={() => handleTextAlign('left')}
-            title="Alinear izquierda"
-          >
-            ←
-          </button>
-          <button 
-            type="button"
-            className={`toolbar-btn ${textAlign === 'center' ? 'active' : ''}`}
-            onClick={() => handleTextAlign('center')}
-            title="Centrar"
-          >
-            ↔
-          </button>
-          <button 
-            type="button"
-            className={`toolbar-btn ${textAlign === 'right' ? 'active' : ''}`}
-            onClick={() => handleTextAlign('right')}
-            title="Alinear derecha"
-          >
-            →
-          </button>
-          <button 
-            type="button"
-            className={`toolbar-btn ${textAlign === 'justify' ? 'active' : ''}`}
-            onClick={() => handleTextAlign('full')}
-            title="Justificar texto"
-          >
-            ☰
-          </button>
-        </div>
-
-        {/* Tamaño de fuente - EN PIXELES */}
-        <div className="toolbar-group">
-          <div className="font-size-container" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <button 
-              type="button"
-              className="toolbar-btn"
-              onClick={() => {
-                const current = parseInt(fontSize);
-                if (current > 8) {
-                  handleFontSize({ target: { value: (current - 1).toString() } });
-                }
-              }}
-              title="Reducir tamaño"
-              style={{ padding: '6px 8px' }}
-            >
-              A−
-            </button>
-            
-            <select 
-              className="toolbar-select"
-              value={fontSize}
-              onChange={handleFontSize}
-              title="Tamaño de fuente"
-              style={{ minWidth: '80px' }}
-            >
-              <option value="8">8px</option>
-              <option value="9">9px</option>
-              <option value="10">10px</option>
-              <option value="11">11px</option>
-              <option value="12">12px</option>
-              <option value="13">13px</option>
-              <option value="14">14px</option>
-              <option value="15">15px</option>
-              <option value="16">16px</option>
-              <option value="17">17px</option>
-              <option value="18">18px</option>
-              <option value="20">20px</option>
-              <option value="22">22px</option>
-              <option value="24">24px</option>
-              <option value="26">26px</option>
-              <option value="28">28px</option>
-              <option value="32">32px</option>
-              <option value="36">36px</option>
-              <option value="40">40px</option>
-              <option value="48">48px</option>
-            </select>
-            
-            <button 
-              type="button"
-              className="toolbar-btn"
-              onClick={() => {
-                const current = parseInt(fontSize);
-                if (current < 72) {
-                  handleFontSize({ target: { value: (current + 1).toString() } });
-                }
-              }}
-              title="Aumentar tamaño"
-              style={{ padding: '6px 8px' }}
-            >
-              A+
-            </button>
-          </div>
-        </div>
-
-        {/* Color de texto */}
-        <div className="toolbar-group">
-          <div className="color-picker-container">
-            <button 
-              type="button"
-              className="toolbar-btn"
-              onClick={() => setShowColorPicker(!showColorPicker)}
-              title="Color de texto"
-              style={{ 
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <span style={{ color: textColor }}>A</span>
-              <div style={{
-                width: '15px',
-                height: '3px',
-                backgroundColor: textColor,
-                borderRadius: '2px'
-              }}></div>
-            </button>
-            
-            {showColorPicker && (
-              <div className="color-picker-popup">
-                <div style={{ marginBottom: '10px' }}>
-                  <input
-                    type="color"
-                    value={textColor}
-                    onChange={(e) => handleTextColor(e.target.value)}
-                    style={{ width: '100%', height: '40px', cursor: 'pointer', border: 'none' }}
-                  />
-                </div>
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(6, 1fr)', 
-                  gap: '4px',
-                  marginBottom: '10px'
-                }}>
-                  {['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', 
-                    '#800000', '#008000', '#000080', '#808000', '#800080', '#008080',
-                    '#FFA500', '#FFC0CB', '#00FFFF', '#FFD700', '#C0C0C0', '#FFFFFF'].map(color => (
-                    <button
-                      key={color}
-                      type="button"
-                      className="color-option"
-                      style={{ 
-                        backgroundColor: color, 
-                        width: '20px', 
-                        height: '20px',
-                        border: color === '#FFFFFF' ? '1px solid #ccc' : 'none'
-                      }}
-                      onClick={() => handleTextColor(color)}
-                      title={color}
-                    />
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: '5px' }}>
-                  <input
-                    type="text"
-                    value={textColor}
-                    onChange={(e) => handleTextColor(e.target.value)}
-                    placeholder="#000000"
-                    style={{ 
-                      flex: 1, 
-                      padding: '6px', 
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      fontSize: '12px'
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="toolbar-btn"
-                    onClick={() => setShowColorPicker(false)}
-                    style={{ padding: '6px 10px', fontSize: '12px' }}
-                  >
-                    OK
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Color de fondo */}
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => {
-              const color = prompt('Color de fondo (ej: #FF0000):', bgColor);
-              if (color) handleBgColor(color);
-            }}
-            title="Color de fondo"
-            style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-          >
-            <span>🎨</span>
-            <div style={{
-              width: '15px',
-              height: '3px',
-              backgroundColor: bgColor,
-              borderRadius: '2px'
-            }}></div>
-          </button>
-        </div>
-
-        {/* Listas y enlaces */}
-        <div className="toolbar-group">
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => insertList('unordered')}
-            title="Lista con viñetas"
-          >
-            •
-          </button>
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => insertList('ordered')}
-            title="Lista numerada"
-          >
-            1.
-          </button>
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={insertLink}
-            title="Insertar enlace"
-          >
-            🔗
-          </button>
-        </div>
-
-        {/* Encabezados */}
-        <div className="toolbar-group">
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => insertFormattedText('', { fontSize: 24, bold: true })}
-            title="Título grande"
-          >
-            H1
-          </button>
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => insertFormattedText('', { fontSize: 20, bold: true })}
-            title="Subtítulo"
-          >
-            H2
-          </button>
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => insertFormattedText('', { fontSize: 16, bold: true })}
-            title="Encabezado"
-          >
-            H3
-          </button>
-        </div>
-
-        {/* Acciones */}
-        <div className="toolbar-group">
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => execCommand('undo')}
-            title="Deshacer (Ctrl+Z)"
-          >
-            ↩️
-          </button>
-          <button 
-            type="button"
-            className="toolbar-btn"
-            onClick={() => execCommand('redo')}
-            title="Rehacer (Ctrl+Y)"
-          >
-            ↪️
-          </button>
-          <button 
-            type="button"
-            className="toolbar-btn btn-danger"
-            onClick={clearFormatting}
-            title="Limpiar formato"
-          >
-            🧹
-          </button>
-        </div>
-      </div>
-
-      {/* Área de edición */}
-      <div
-        ref={editorRef}
-        className="rich-text-editor"
-        contentEditable
-        suppressContentEditableWarning
-        onInput={handleEditorInput}
-        onKeyDown={handleKeyDown}
-        onKeyUp={updateToolbarState}
-        onMouseUp={updateToolbarState}
-        onPaste={handlePaste}
-        onBlur={handleEditorInput}
-        data-placeholder={placeholder}
-        style={{
-          minHeight: `${rows * 24}px`,
-          fontFamily: 'Arial, sans-serif',
-          lineHeight: '1.6',
-          fontSize: fontSize + 'px',
-          color: textColor,
-          backgroundColor: bgColor,
-          textAlign: textAlign
-        }}
-      />
-
-      {/* Contador de caracteres y palabras (SIN VISTA PREVIA) */}
-      <div className="editor-stats">
-        <span>
-          📝 <strong>{wordCount}</strong> palabras
-        </span>
-        <span>
-          🔤 <strong>{charCount}</strong> caracteres
-        </span>
-        <span>
-          ✏️ Editor activo
-        </span>
-      </div>
-    </div>
-  );
-};
 
 // Componente principal PanelComunicadosAdmin
 const PanelComunicadosAdmin = ({ admin, onClose }) => {
@@ -770,6 +171,34 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
     }
   };
 
+  // Configuración completa de la barra de herramientas estilo Word
+  const quillModules = useMemo(() => ({
+    toolbar: [
+      [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'align': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+      ['blockquote', 'code-block'],
+      ['link'],
+      ['clean']
+    ]
+  }), []);
+
+  const quillFormats = [
+    'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'script',
+    'header',
+    'align',
+    'list', 'bullet', 'indent',
+    'blockquote', 'code-block',
+    'link'
+  ];
+
   return (
     <div className="panel-comunicados-admin">
       <div className="panel-header">
@@ -808,17 +237,22 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
             <div className="form-group full-width">
               <label htmlFor="contenido">Contenido *</label>
               
-              {/* Editor de texto enriquecido MEJORADO */}
-              <RichTextEditor
-                value={formData.contenidoHtml}
-                onChange={handleContentChange}
-                placeholder="Escribe el contenido del comunicado aquí..."
-                rows={12}
-              />
+              {/* Editor de texto enriquecido con Quill - Estilo Word */}
+              <div className="quill-editor-wrapper">
+                <ReactQuill
+                  theme="snow"
+                  value={formData.contenidoHtml}
+                  onChange={handleContentChange}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Escribe el contenido del comunicado aquí..."
+                  style={{ minHeight: '300px', background: 'white' }}
+                />
+              </div>
               
-              <div className="word-counter">
+              <div className="word-counter" style={{ marginTop: '0.5rem' }}>
                 <span style={{ color: 'var(--secondary-blue)' }}>
-                  📊 {formData.contenido.length} caracteres • {formData.contenido.split(/\s+/).filter(w => w).length} palabras
+                  📊 {formData.contenidoHtml.replace(/<[^>]*>/g, '').length} caracteres • {formData.contenidoHtml.replace(/<[^>]*>/g, '').split(/\s+/).filter(w => w).length} palabras
                 </span>
               </div>
             </div>
