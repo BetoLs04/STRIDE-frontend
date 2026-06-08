@@ -15,6 +15,8 @@ const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderRef = useRef(null);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   // Configuración del carrusel SIMPLIFICADA
   const carouselSettings = {
     dots: false, // Desactivamos los dots nativos
@@ -35,7 +37,21 @@ const Home = () => {
   useEffect(() => {
     checkSuperAdminExistence();
     fetchComunicadosRecientes();
+    
+    // Check if user is logged in
+    const user = localStorage.getItem('stride_user');
+    if (user) {
+      setIsLoggedIn(true);
+    }
   }, []);
+
+  const handleLinkClick = (url) => {
+    if (isLoggedIn) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      alert('🔒 Por favor inicie sesión para acceder a este enlace.');
+    }
+  };
 
   const checkSuperAdminExistence = async () => {
     try {
@@ -495,30 +511,33 @@ const Home = () => {
         </div>
       )}
 
-      {/* Features Grid */}
+      {/* Enlaces y Recursos */}
       <div className="features-grid" style={{ marginTop: '3rem' }}>
-        <div className="feature-card">
-          <div className="feature-icon">👑</div>
-          <h3>Super Administración</h3>
-          <p>Control total del sistema, creación de direcciones, directivos, personal y comunicados oficiales.</p>
+        <div 
+          className="feature-card" 
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1KGx6xJbtxp-Cszxzp3kt-quJFiNUAza7ERufQrb6UuM/edit?pli=1&gid=440700565#gid=440700565')}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>POA</h3>
         </div>
         
-        <div className="feature-card">
-          <div className="feature-icon">👔</div>
-          <h3>Panel Directivo</h3>
-          <p>Gestión de actividades y supervisión del personal de su dirección.</p>
+        <div 
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1OsH2fEAE6-3gwiM3w6Lf6q2U2AO3ngharO1lmLCJVHM/edit?gid=1961082688#gid=1961082688')}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📈' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>SEPLADE</h3>
         </div>
         
-        <div className="feature-card">
-          <div className="feature-icon">👥</div>
-          <h3>Área Personal</h3>
-          <p>Creación y seguimiento de actividades asignadas por dirección.</p>
-        </div>
-        
-        <div className="feature-card">
-          <div className="feature-icon">📢</div>
-          <h3>Comunicados Oficiales</h3>
-          <p>Publicación y visualización de comunicados importantes de la administración.</p>
+        <div 
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1sQp7fI2Fhe8qWpz22XR3yXbZRy2-Q774MHmlra0RrM8/edit?gid=1451121733#gid=1451121733')}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📋' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>MATRIZ DE INDICADORES</h3>
         </div>
       </div>
     </div>
