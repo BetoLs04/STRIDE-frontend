@@ -157,7 +157,7 @@ const Home = () => {
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
-                          padding: '0.5rem',
+                          padding: '0',
                           minHeight: 'auto',
                           display: 'flex',
                           flexDirection: 'column'
