@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Slider from 'react-slick';
+import { toast } from 'react-toastify';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../styles/App.css';
@@ -49,7 +50,7 @@ const Home = () => {
     if (isLoggedIn) {
       window.open(url, '_blank', 'noopener,noreferrer');
     } else {
-      alert('🔒 Por favor inicie sesión para acceder a este enlace.');
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
     }
   };
 
