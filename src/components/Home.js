@@ -186,64 +186,70 @@ const Home = () => {
                           <div style={{
                             marginBottom: '0.2rem',
                             paddingBottom: '0.4rem',
-                            borderBottom: '2px solid #e9ecef'
+                            borderBottom: '2px solid #e9ecef',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start'
                           }}>
-                            <h3 style={{
-                              margin: '0 0 0.3rem -2px',
-                              color: 'var(--primary-blue)',
-                              fontSize: '1.8rem',
-                              lineHeight: '1.2',
-                              fontWeight: '700',
-                              paddingLeft: '2px'
-                            }}>
-                              {comunicado.titulo}
-                            </h3>
-                            
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.8rem',
-                              flexWrap: 'wrap'
-                            }}>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.3rem'
+                            <div>
+                              <h3 style={{
+                                margin: '0 0 0.3rem -2px',
+                                color: 'var(--primary-blue)',
+                                fontSize: '2.2rem',
+                                lineHeight: '1.2',
+                                fontWeight: '700',
+                                paddingLeft: '2px'
                               }}>
-                                <span style={{
-                                  color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'
-                                }}>
-                                  👤
-                                </span>
-                                <span style={{
-                                  fontSize: '0.85rem',
-                                  color: 'var(--medium-gray)',
-                                  fontWeight: '500'
-                                }}>
-                                  {comunicado.publicado_por_nombre || 'Administración'}
-                                </span>
-                              </div>
+                                {comunicado.titulo}
+                              </h3>
                               
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.3rem'
+                                gap: '0.8rem',
+                                flexWrap: 'wrap'
                               }}>
-                                <span style={{
-                                  color: 'var(--secondary-blue)',
-                                  fontSize: '0.9rem'
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem'
                                 }}>
-                                  📅
-                                </span>
-                                <span style={{
-                                  fontSize: '0.85rem',
-                                  color: 'var(--medium-gray)',
-                                  fontWeight: '500'
-                                }}>
-                                  {formatDate(comunicado.fecha_publicacion)}
-                                </span>
+                                  <span style={{
+                                    color: 'var(--secondary-blue)',
+                                    fontSize: '1rem'
+                                  }}>
+                                    👤
+                                  </span>
+                                  <span style={{
+                                    fontSize: '1rem',
+                                    color: 'var(--medium-gray)',
+                                    fontWeight: '500'
+                                  }}>
+                                    {comunicado.publicado_por_nombre || 'Administración'}
+                                  </span>
+                                </div>
                               </div>
+                            </div>
+
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                              marginTop: '0.5rem'
+                            }}>
+                              <span style={{
+                                color: 'var(--secondary-blue)',
+                                fontSize: '1rem'
+                              }}>
+                                📅
+                              </span>
+                              <span style={{
+                                fontSize: '1rem',
+                                color: 'var(--medium-gray)',
+                                fontWeight: '500'
+                              }}>
+                                {formatDate(comunicado.fecha_publicacion)}
+                              </span>
                             </div>
                           </div>
 
@@ -252,13 +258,13 @@ const Home = () => {
                             className="comunicado-content-html"
                             style={{
                               flex: 1,
-                              padding: '1.5rem',
+                              padding: '2rem',
                               background: '#f8fafc',
                               borderRadius: '10px',
                               border: '1px solid #e9ecef',
                               overflowY: 'auto',
-                              maxHeight: '400px',
-                              minHeight: '200px'
+                              maxHeight: '600px',
+                              minHeight: '300px'
                             }}
                           >
                             <div 

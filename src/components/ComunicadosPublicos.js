@@ -137,15 +137,19 @@ const fetchComunicados = async () => {
               onMouseLeave={(e) => e.currentTarget.style.background = '#f8f9fa'}
             >
               <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 0.5rem 0', color: '#003366', fontSize: '1.2rem' }}>
-                  {comunicado.titulo}
-                </h3>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.9rem', color: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: '1rem' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#003366', fontSize: '1.5rem' }}>
+                      {comunicado.titulo}
+                    </h3>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '1rem', color: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        👤 {comunicado.publicado_por_nombre || 'Administración'}
+                      </span>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '1rem', color: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' }}>
                     📅 {formatDate(comunicado.fecha_publicacion)}
-                  </span>
-                  <span style={{ fontSize: '0.9rem', color: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    👤 {comunicado.publicado_por_nombre || 'Administración'}
                   </span>
                 </div>
               </div>
@@ -171,7 +175,7 @@ const fetchComunicados = async () => {
                 borderTop: '1px solid #e9ecef',
                 animation: 'slideDown 0.3s ease-out'
               }}>
-                <div style={{ lineHeight: '1.8', color: '#343a40', marginBottom: '1.5rem' }}>
+                <div style={{ lineHeight: '1.8', color: '#343a40', marginBottom: '1.5rem', fontSize: '1.1rem', padding: '1rem' }}>
                   {comunicado.contenido.split('\n').map((paragraph, index) => (
                     <p key={index} style={{ marginBottom: '1rem' }}>{paragraph}</p>
                   ))}
