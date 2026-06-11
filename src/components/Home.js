@@ -326,7 +326,8 @@ const Home = () => {
                               background: '#f8fafc',
                               borderRadius: '10px',
                               border: '1px solid #e9ecef',
-                              overflowX: 'auto'
+                              overflowY: 'auto',
+                              overflowX: 'hidden'
                             }}
                           >
                             <div
