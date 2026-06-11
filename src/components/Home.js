@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Slider from 'react-slick';
 import { toast } from 'react-toastify';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import '../styles/App.css';
 
 const Home = () => {
@@ -13,24 +10,10 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [comunicados, setComunicados] = useState([]);
   const [comunicadosLoading, setComunicadosLoading] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const sliderRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideKey, setSlideKey] = useState(0);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const carouselSettings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: false,
-    arrows: false,
-    adaptiveHeight: false,
-    afterChange: (current) => setCurrentSlide(current),
-    vertical: true,
-    verticalSwiping: true
-  };
 
   useEffect(() => {
     checkSuperAdminExistence();
@@ -95,20 +78,21 @@ const Home = () => {
   };
 
   const goToSlide = (index) => {
-    if (sliderRef.current) {
-      sliderRef.current.slickGoTo(index);
+    setCurrentIndex(index);
+    setSlideKey(prev => prev + 1);
+  };
+
+  const goNext = () => {
+    if (currentIndex < comunicados.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setSlideKey(prev => prev + 1);
     }
   };
 
-  const goToNext = () => {
-    if (sliderRef.current) {
-      sliderRef.current.slickNext();
-    }
-  };
-
-  const goToPrev = () => {
-    if (sliderRef.current) {
-      sliderRef.current.slickPrev();
+  const goPrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      setSlideKey(prev => prev + 1);
     }
   };
 
@@ -127,14 +111,8 @@ const Home = () => {
 
       {/* Carrusel Vertical de Comunicados */}
       {comunicados.length > 0 && (
-        <div className="comunicados-carousel-section" style={{
-          margin: '4rem 0',
-          padding: '0',
-          background: 'transparent',
-          borderRadius: '0',
-          boxShadow: 'none',
-          overflow: 'visible',
-          border: 'none'
+        <div style={{
+          margin: '4rem 0'
         }}>
           {comunicadosLoading ? (
             <div className="loading-container" style={{ minHeight: '300px', padding: '3rem' }}>
@@ -143,60 +121,56 @@ const Home = () => {
             </div>
           ) : (
             <>
-              <Slider {...carouselSettings} ref={sliderRef}>
-                {comunicados.map((comunicado) => (
-                  <div key={comunicado.id} style={{ padding: '0.5rem 0' }}>
-                    <div className="comunicado-card-admin expanded">
-                      <div className="comunicado-header-admin" style={{ cursor: 'default' }}>
-                        <div className="comunicado-title-admin">
-                          <h3>
-                            {comunicado.titulo}
-                            {comunicado.link_externo && (
-                              <span className="link-indicator" title="Tiene enlace">🔗</span>
-                            )}
-                          </h3>
-                          <div className="comunicado-meta-admin">
-                            <span className="comunicado-fecha-admin">
-                              📅 {formatDate(comunicado.fecha_publicacion)}
-                            </span>
-                            <span className="comunicado-creador-admin">
-                              👤 {comunicado.publicado_por_nombre || 'Administración'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="comunicado-content-admin">
-                        <div
-                          className="comunicado-contenido-admin"
-                          lang="es"
-                          dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
-                        />
-
-                        {comunicado.link_externo && (
-                          <div className="comunicado-link-admin">
-                            <strong>Enlace relacionado: </strong>
-                            <a
-                              href={comunicado.link_externo}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="link-externo-admin"
-                            >
-                              {comunicado.link_externo}
-                            </a>
-                          </div>
+              <div key={slideKey} className="comunicado-vertical-slide">
+                <div className="comunicado-card-admin expanded">
+                  <div className="comunicado-header-admin" style={{ cursor: 'default' }}>
+                    <div className="comunicado-title-admin">
+                      <h3>
+                        {comunicados[currentIndex].titulo}
+                        {comunicados[currentIndex].link_externo && (
+                          <span className="link-indicator" title="Tiene enlace">🔗</span>
                         )}
+                      </h3>
+                      <div className="comunicado-meta-admin">
+                        <span className="comunicado-fecha-admin">
+                          📅 {formatDate(comunicados[currentIndex].fecha_publicacion)}
+                        </span>
+                        <span className="comunicado-creador-admin">
+                          👤 {comunicados[currentIndex].publicado_por_nombre || 'Administración'}
+                        </span>
                       </div>
                     </div>
                   </div>
-                ))}
-              </Slider>
+
+                  <div className="comunicado-content-admin">
+                    <div
+                      className="comunicado-contenido-admin"
+                      lang="es"
+                      dangerouslySetInnerHTML={{ __html: comunicados[currentIndex].contenido }}
+                    />
+
+                    {comunicados[currentIndex].link_externo && (
+                      <div className="comunicado-link-admin">
+                        <strong>Enlace relacionado: </strong>
+                        <a
+                          href={comunicados[currentIndex].link_externo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link-externo-admin"
+                        >
+                          {comunicados[currentIndex].link_externo}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {/* Navegación inferior */}
               {comunicados.length > 1 && (
                 <div style={{
                   padding: '1rem 0',
-                  marginTop: '0.5rem',
+                  marginTop: '1rem',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -212,7 +186,7 @@ const Home = () => {
                       <button
                         key={index}
                         onClick={() => goToSlide(index)}
-                        className={`carousel-dot ${currentSlide === index ? 'active' : ''}`}
+                        className={`carousel-dot ${currentIndex === index ? 'active' : ''}`}
                         title={`Ir al comunicado ${index + 1}`}
                         aria-label={`Ir al comunicado ${index + 1}`}
                       />
@@ -229,21 +203,31 @@ const Home = () => {
                       color: 'var(--medium-gray)',
                       fontSize: '0.95rem'
                     }}>
-                      Comunicado <strong>{currentSlide + 1}</strong> de <strong>{comunicados.length}</strong>
+                      Comunicado <strong>{currentIndex + 1}</strong> de <strong>{comunicados.length}</strong>
                     </span>
 
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button
-                        onClick={goToPrev}
+                        onClick={goPrev}
+                        disabled={currentIndex === 0}
                         className="btn btn-primary btn-small"
-                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          fontSize: '0.85rem',
+                          opacity: currentIndex === 0 ? 0.5 : 1
+                        }}
                       >
                         ↑ Anterior
                       </button>
                       <button
-                        onClick={goToNext}
+                        onClick={goNext}
+                        disabled={currentIndex === comunicados.length - 1}
                         className="btn btn-primary btn-small"
-                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          fontSize: '0.85rem',
+                          opacity: currentIndex === comunicados.length - 1 ? 0.5 : 1
+                        }}
                       >
                         Siguiente ↓
                       </button>
@@ -289,7 +273,6 @@ const Home = () => {
           <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>POA</h3>
         </div>
-
 
         <div
           className="feature-card"

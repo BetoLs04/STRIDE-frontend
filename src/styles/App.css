@@ -6192,6 +6192,22 @@ body {
 }
 
 /* Puntos de navegación - más compactos */
+/* Animación de deslizamiento vertical para comunicados */
+.comunicado-vertical-slide {
+  animation: slideVertical 0.35s ease-out;
+}
+
+@keyframes slideVertical {
+  from {
+    transform: translateY(25px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .carousel-dots-container {
   display: flex;
   gap: 6px;
