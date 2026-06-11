@@ -5072,8 +5072,9 @@ body {
 
 /* Mejora para el contenedor del contenido */
 .comunicado-content-html {
-  scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ===== EDITOR DE TEXTO ENRIQUECIDO - VERSIÓN MEJORADA ===== */
