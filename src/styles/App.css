@@ -5072,7 +5072,10 @@ body {
 
 /* Mejora para el contenedor del contenido */
 .comunicado-content-html {
+  width: 100%;
   overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* ===== EDITOR DE TEXTO ENRIQUECIDO - VERSIÓN MEJORADA ===== */
