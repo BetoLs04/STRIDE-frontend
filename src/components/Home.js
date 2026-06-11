@@ -328,7 +328,7 @@ const Home = () => {
                               borderRadius: '10px',
                               border: '1px solid #e9ecef',
                               overflowY: 'auto',
-                              overflowX: 'hidden'
+                              overflowX: 'auto'
                             }}
                           >
                             <div
