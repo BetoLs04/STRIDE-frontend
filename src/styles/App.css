@@ -5151,8 +5151,8 @@ body {
 /* Mejora para el contenedor del contenido */
 .comunicado-content-html {
   width: 100%;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: normal;
   hyphens: auto;
 }
 
