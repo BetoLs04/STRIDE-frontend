@@ -5064,6 +5064,7 @@ body {
 .comunicado-content-html {
   width: 100%;
   white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 /* ===== EDITOR DE TEXTO ENRIQUECIDO - VERSIÓN MEJORADA ===== */
