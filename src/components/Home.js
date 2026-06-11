@@ -174,8 +174,7 @@ const Home = () => {
                           lang="es"
                           style={{
                             overflowWrap: 'break-word',
-                            wordWrap: 'break-word',
-                            wordBreak: 'break-word'
+                            wordWrap: 'break-word'
                           }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
                         />
