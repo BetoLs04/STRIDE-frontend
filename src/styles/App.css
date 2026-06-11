@@ -5073,6 +5073,7 @@ body {
 /* Mejora para el contenedor del contenido */
 .comunicado-content-html {
   width: 100%;
+  white-space: pre-wrap;
 }
 
 /* ===== EDITOR DE TEXTO ENRIQUECIDO - VERSIÓN MEJORADA ===== */
