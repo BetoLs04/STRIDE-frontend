@@ -326,8 +326,7 @@ const Home = () => {
                               background: '#f8fafc',
                               borderRadius: '10px',
                               border: '1px solid #e9ecef',
-                              overflow: 'hidden',
-                              overflowWrap: 'break-word'
+                              overflow: 'hidden'
                             }}
                           >
                             <div
@@ -335,9 +334,7 @@ const Home = () => {
                               style={{
                                 lineHeight: '1.5',
                                 fontSize: '1rem',
-                                color: '#212529',
-                                overflowWrap: 'break-word',
-                                wordBreak: 'normal'
+                                color: '#212529'
                               }}
                             />
 
