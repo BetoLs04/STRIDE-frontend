@@ -4773,33 +4773,28 @@ body {
 .comunicado-content-html h1,
 .comunicado-content-html h2,
 .comunicado-content-html h3 {
-  color: var(--primary-blue);
-  margin-top: 1.5em;
-  margin-bottom: 0.8em;
-  font-weight: 600;
-  line-height: 1.3;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  line-height: 1.2;
 }
 
 .comunicado-content-html h1 {
-  font-size: 1.8rem;
-  border-bottom: 2px solid var(--soft-yellow);
-  padding-bottom: 0.3em;
+  font-size: 2em;
 }
 
 .comunicado-content-html h2 {
-  font-size: 1.5rem;
-  color: var(--turquesa);
+  font-size: 1.5em;
 }
 
 .comunicado-content-html h3 {
-  font-size: 1.3rem;
+  font-size: 1.17em;
 }
 
 .comunicado-content-html p {
-  margin-bottom: 1.2em;
-  line-height: 1.7;
-  text-align: justify;
-  font-size: 1.1rem;
+  margin: 0;
+  padding: 0;
+  line-height: 1.42;
 }
 
 .comunicado-content-html .ql-align-center { text-align: center; }
@@ -4836,15 +4831,14 @@ body {
 
 .comunicado-content-html ul,
 .comunicado-content-html ol {
-  margin-left: 2em;
-  margin-bottom: 1.2em;
-  padding-left: 0;
+  margin: 0;
+  padding-left: 1.5em;
 }
 
 .comunicado-content-html li {
-  margin-bottom: 0.6em;
-  padding-left: 0.5em;
-  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  line-height: 1.42;
 }
 
 .comunicado-content-html ul li {
@@ -4856,14 +4850,10 @@ body {
 }
 
 .comunicado-content-html blockquote {
-  border-left: 4px solid var(--soft-yellow);
-  margin: 1.5em 0;
-  padding-left: 1.5em;
-  font-style: italic;
-  color: #555;
-  background: rgba(246, 198, 103, 0.05);
-  padding: 1em 1.5em;
-  border-radius: 0 8px 8px 0;
+  border-left: 4px solid #ccc;
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  color: #666;
 }
 
 .comunicado-content-html code {
@@ -5522,24 +5512,27 @@ body {
 
 /* Estilos para contenido en comunicados */
 .comunicado-contenido-admin {
-  line-height: 1.7;
+  line-height: 1.42;
   font-size: 16px;
+  white-space: pre-wrap;
 }
 
 .comunicado-contenido-admin h1,
 .comunicado-contenido-admin h2,
 .comunicado-contenido-admin h3 {
-  color: var(--primary-blue);
-  margin-top: 1.5em;
-  margin-bottom: 0.8em;
-  font-weight: 600;
-  line-height: 1.3;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
 }
 
+.comunicado-contenido-admin h1 { font-size: 2em; }
+.comunicado-contenido-admin h2 { font-size: 1.5em; }
+.comunicado-contenido-admin h3 { font-size: 1.17em; }
+
 .comunicado-contenido-admin p {
-  margin-bottom: 1.2em;
-  line-height: 1.6;
-  text-align: justify;
+  margin: 0;
+  padding: 0;
+  line-height: 1.42;
 }
 
 .comunicado-contenido-admin .ql-align-center { text-align: center; }
@@ -5548,12 +5541,14 @@ body {
 
 .comunicado-contenido-admin ul,
 .comunicado-contenido-admin ol {
-  margin-left: 2em;
-  margin-bottom: 1.2em;
+  margin: 0;
+  padding-left: 1.5em;
 }
 
 .comunicado-contenido-admin li {
-  margin-bottom: 0.6em;
+  margin: 0;
+  padding: 0;
+  line-height: 1.42;
 }
 
 /* Estilos para upload de foto en FormNuevoPersonal */

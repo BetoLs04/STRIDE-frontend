@@ -332,8 +332,6 @@ const Home = () => {
                             <div
                               dangerouslySetInnerHTML={renderHtmlContent(comunicado.contenido)}
                               style={{
-                                lineHeight: '1.5',
-                                fontSize: '1rem',
                                 color: '#212529'
                               }}
                             />
