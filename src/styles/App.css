@@ -5152,8 +5152,7 @@ body {
 .comunicado-content-html {
   width: 100%;
   white-space: pre-wrap;
-  overflow-wrap: normal;
-  hyphens: none;
+  overflow-wrap: break-word;
 }
 
 /* ===== EDITOR DE TEXTO ENRIQUECIDO - VERSIÓN MEJORADA ===== */
@@ -5677,8 +5676,7 @@ body {
   line-height: 1.42;
   font-size: 16px;
   white-space: pre-wrap;
-  overflow-wrap: normal;
-  hyphens: none;
+  overflow-wrap: break-word;
 }
 
 .comunicado-contenido-admin h1,
