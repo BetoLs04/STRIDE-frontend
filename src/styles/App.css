@@ -5073,7 +5073,6 @@ body {
 /* Mejora para el contenedor del contenido */
 .comunicado-content-html {
   overflow: hidden;
-  word-break: break-word;
   overflow-wrap: break-word;
 }
 
