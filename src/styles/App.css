@@ -4875,6 +4875,7 @@ body {
   margin: 0 0 1.2em 0;
   padding: 0;
   line-height: 1.6;
+  text-align: justify;
 }
 
 .comunicado-content-html .ql-align-center {
@@ -5703,6 +5704,7 @@ body {
   margin: 0 0 1.2em 0;
   padding: 0;
   line-height: 1.6;
+  text-align: justify;
 }
 
 .comunicado-contenido-admin .ql-align-center {
