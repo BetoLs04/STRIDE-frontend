@@ -374,6 +374,7 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                       <div className="comunicado-content-admin">
                         <div 
                           className="comunicado-contenido-admin"
+                          lang="es"
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
                         />
                         

@@ -321,6 +321,7 @@ const Home = () => {
                           {/* Contenido CON FORMATO HTML - COMPACTO */}
                           <div
                             className="comunicado-content-html"
+                            lang="es"
                             style={{
                               padding: '0.5rem',
                               background: '#f8fafc',
