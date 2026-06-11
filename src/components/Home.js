@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Slider from 'react-slick';
 import { toast } from 'react-toastify';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import '../styles/App.css';
 
 const Home = () => {
@@ -13,27 +10,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [comunicados, setComunicados] = useState([]);
   const [comunicadosLoading, setComunicadosLoading] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const sliderRef = useRef(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Configuración del carrusel SIMPLIFICADA
-  const carouselSettings = {
-    dots: false, // Desactivamos los dots nativos
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: false,
-    arrows: false,
-    adaptiveHeight: true,
-    afterChange: (current) => setCurrentSlide(current),
-    fade: false,
-    swipe: true,
-    touchMove: true,
-    draggable: true
-  };
 
   useEffect(() => {
     checkSuperAdminExistence();
@@ -98,37 +76,6 @@ const Home = () => {
     }
   };
 
-  const goToSlide = (index) => {
-    if (sliderRef.current) {
-      sliderRef.current.slickGoTo(index);
-    }
-  };
-
-  const goToNext = () => {
-    if (sliderRef.current) {
-      sliderRef.current.slickNext();
-    }
-  };
-
-  const goToPrev = () => {
-    if (sliderRef.current) {
-      sliderRef.current.slickPrev();
-    }
-  };
-
-  // Función para renderizar HTML con estilos
-  const renderHtmlContent = (html) => {
-    return { __html: html || '' };
-  };
-
-  // Función para extraer texto plano para vista previa
-  const extractPlainText = (html) => {
-    if (!html) return '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    return tempDiv.textContent || tempDiv.innerText || '';
-  };
-
   if (loading) {
     return (
       <div className="loading-container">
@@ -142,347 +89,70 @@ const Home = () => {
     <div className="home-container">
       {/* Hero Section */}
 
-      {/* Carrusel de Comunicados - CON ESTILOS IGUALES AL PANEL */}
+      {/* Comunicados - Vista tipo administrador */}
       {comunicados.length > 0 && (
         <div className="comunicados-carousel-section" style={{
           margin: '4rem 0',
-          background: 'white',
-          borderRadius: '15px',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
-          overflow: 'hidden',
-          border: '1px solid #e9ecef'
+          padding: '0',
+          background: 'transparent',
+          borderRadius: '0',
+          boxShadow: 'none',
+          overflow: 'visible',
+          border: 'none'
         }}>
-
-          {/* Contenido del carrusel */}
-          <div style={{ padding: '0', position: 'relative' }}>
-            {comunicadosLoading ? (
-              <div className="loading-container" style={{ minHeight: '300px', padding: '3rem' }}>
-                <div className="spinner"></div>
-                <p>Cargando comunicados...</p>
-              </div>
-            ) : (
-              <>
-
-                {/* Carrusel principal */}
-                <Slider
-                  {...carouselSettings}
-                  ref={sliderRef}
-                >
-                  {comunicados.map((comunicado) => {
-                    const plainText = extractPlainText(comunicado.contenido);
-
-                    return (
-                      <div key={comunicado.id} className="comunicado-slide">
-                        <div style={{
-                          padding: '0',
-                          minHeight: 'auto',
-                          display: 'flex',
-                          flexDirection: 'column'
-                        }}>
-                          {/* Título y metadatos - COMPACTADO */}
-                          <div style={{
-                            marginBottom: '0.2rem',
-                            paddingBottom: '0.4rem',
-                            borderBottom: '2px solid #e9ecef',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start'
-                          }}>
-                            <div>
-                              <h3 style={{
-                                margin: '0 0 0.3rem -2px',
-                                color: 'var(--primary-blue)',
-                                fontSize: '2.2rem',
-                                lineHeight: '1.2',
-                                fontWeight: '700',
-                                paddingLeft: '2px'
-                              }}>
-                                {comunicado.titulo}
-                              </h3>
-
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.8rem',
-                                flexWrap: 'wrap'
-                              }}>
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.3rem'
-                                }}>
-                                  <span style={{
-                                    color: 'var(--secondary-blue)',
-                                    fontSize: '1rem'
-                                  }}>
-                                    👤
-                                  </span>
-                                  <span style={{
-                                    fontSize: '1rem',
-                                    color: 'var(--medium-gray)',
-                                    fontWeight: '500'
-                                  }}>
-                                    {comunicado.publicado_por_nombre || 'Administración'}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'flex-end',
-                              gap: '0.8rem',
-                              marginTop: '0.2rem'
-                            }}>
-                              {/* Botones de navegación integrados */}
-                              {comunicados.length > 1 && (
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                  <button
-                                    onClick={goToPrev}
-                                    style={{
-                                      padding: '0.4rem 0.8rem',
-                                      borderRadius: '8px',
-                                      border: '2px solid var(--primary-blue)',
-                                      background: 'white',
-                                      color: 'var(--primary-blue)',
-                                      fontWeight: 'bold',
-                                      cursor: 'pointer',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '5px',
-                                      fontSize: '0.85rem',
-                                      transition: 'all 0.3s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.background = 'var(--primary-blue)';
-                                      e.currentTarget.style.color = 'white';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.background = 'white';
-                                      e.currentTarget.style.color = 'var(--primary-blue)';
-                                    }}
-                                  >
-                                    ← Siguiente
-                                  </button>
-
-                                  <button
-                                    onClick={goToNext}
-                                    style={{
-                                      padding: '0.4rem 0.8rem',
-                                      borderRadius: '8px',
-                                      border: '2px solid var(--primary-blue)',
-                                      background: 'white',
-                                      color: 'var(--primary-blue)',
-                                      fontWeight: 'bold',
-                                      cursor: 'pointer',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '5px',
-                                      fontSize: '0.85rem',
-                                      transition: 'all 0.3s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.background = 'var(--primary-blue)';
-                                      e.currentTarget.style.color = 'white';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.background = 'white';
-                                      e.currentTarget.style.color = 'var(--primary-blue)';
-                                    }}
-                                  >
-                                    Anterior →
-                                  </button>
-                                </div>
-                              )}
-
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.3rem'
-                              }}>
-                                <span style={{
-                                  color: 'var(--secondary-blue)',
-                                  fontSize: '1rem'
-                                }}>
-                                  📅
-                                </span>
-                                <span style={{
-                                  fontSize: '1rem',
-                                  color: 'var(--medium-gray)',
-                                  fontWeight: '500'
-                                }}>
-                                  {formatDate(comunicado.fecha_publicacion)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Contenido CON FORMATO HTML - COMPACTO */}
-                          <div
-                            className="comunicado-content-html"
-                            lang="es"
-                            style={{
-                              padding: '0.25rem 0.5rem',
-                              background: '#f8fafc',
-                              borderRadius: '10px',
-                              border: '1px solid #e9ecef',
-                              overflowY: 'auto',
-                              overflowX: 'auto'
-                            }}
-                          >
-                            <div
-                              dangerouslySetInnerHTML={renderHtmlContent(comunicado.contenido)}
-                              style={{
-                                color: '#212529'
-                              }}
-                            />
-
-                            {plainText.length > 1500 && (
-                              <div style={{
-                                marginTop: '1.5rem',
-                                paddingTop: '1rem',
-                                borderTop: '1px dashed #dee2e6',
-                                textAlign: 'center'
-                              }}>
-                                <span style={{
-                                  color: 'var(--medium-gray)',
-                                  fontSize: '0.9rem',
-                                  fontStyle: 'italic'
-                                }}>
-                                  💡 El comunicado continúa. Ve al panel de administración para más detalles.
-                                </span>
-                              </div>
-                            )}
-
-                            {/* ===== ENLACE EXTERNO ===== */}
-                            {comunicado.link_externo && (
-                              <div style={{
-                                marginTop: '1rem',
-                                paddingTop: '1rem',
-                                borderTop: '1px dashed #dee2e6',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                flexWrap: 'wrap'
-                              }}>
-                                {/* Enlace clickeable */}
-                                <a
-                                  href={comunicado.link_externo}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    color: 'var(--primary-blue)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem',
-                                    textDecoration: 'none',
-                                    padding: '8px 14px',
-                                    background: '#f0f4ff',
-                                    borderRadius: '8px',
-                                    border: '1px solid #dbeafe',
-                                    maxWidth: '350px',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                >
-                                  🔗 {comunicado.link_externo}
-                                </a>
-
-                                {/* Botón copiar */}
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(comunicado.link_externo)
-                                      .then(() => {
-                                        const btn = document.getElementById(`copy-btn-${comunicado.id}`);
-                                        if (btn) {
-                                          btn.textContent = '✅ Copiado';
-                                          setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
-                                        }
-                                      })
-                                      .catch(() => alert('No se pudo copiar: ' + comunicado.link_externo));
-                                  }}
-                                  id={`copy-btn-${comunicado.id}`}
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '8px 14px',
-                                    background: '#f8fafc',
-                                    border: '1px solid #e2e8f0',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.85rem',
-                                    color: '#475569',
-                                    fontWeight: '500',
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                >
-                                  📋 Copiar
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </Slider>
-
-                {/* Navegación inferior */}
-                {comunicados.length > 1 && (
-                  <div style={{
-                    padding: '1.5rem 2rem',
-                    background: '#f8f9fa',
-                    borderTop: '1px solid #e9ecef',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '1rem'
-                  }}>
-                    {/* Puntos de navegación MEJORADOS */}
-                    <div style={{
-                      display: 'flex',
-                      gap: '8px',
-                      alignItems: 'center'
-                    }}>
-                      {comunicados.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => goToSlide(index)}
-                          className={`carousel-dot ${currentSlide === index ? 'active' : ''}`}
-                          title={`Ir al comunicado ${index + 1}`}
-                          aria-label={`Ir al comunicado ${index + 1}`}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Información y controles */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1.5rem',
-                      flexWrap: 'wrap'
-                    }}>
-                      <div style={{
-                        textAlign: 'center',
-                        color: 'var(--medium-gray)',
-                        fontSize: '0.95rem'
-                      }}>
-                        <span>
-                          Comunicado <strong>{currentSlide + 1}</strong> de <strong>{comunicados.length}</strong>
+          {comunicadosLoading ? (
+            <div className="loading-container" style={{ minHeight: '300px', padding: '3rem' }}>
+              <div className="spinner"></div>
+              <p>Cargando comunicados...</p>
+            </div>
+          ) : (
+            <div className="comunicados-grid-admin">
+              {comunicados.map((comunicado) => (
+                <div key={comunicado.id} className="comunicado-card-admin expanded">
+                  <div className="comunicado-header-admin" style={{ cursor: 'default' }}>
+                    <div className="comunicado-title-admin">
+                      <h3>
+                        {comunicado.titulo}
+                        {comunicado.link_externo && (
+                          <span className="link-indicator" title="Tiene enlace">🔗</span>
+                        )}
+                      </h3>
+                      <div className="comunicado-meta-admin">
+                        <span className="comunicado-fecha-admin">
+                          📅 {formatDate(comunicado.fecha_publicacion)}
+                        </span>
+                        <span className="comunicado-creador-admin">
+                          👤 {comunicado.publicado_por_nombre || 'Administración'}
                         </span>
                       </div>
                     </div>
                   </div>
-                )}
-              </>
-            )}
-          </div>
+
+                  <div className="comunicado-content-admin">
+                    <div
+                      className="comunicado-contenido-admin"
+                      lang="es"
+                      dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
+                    />
+
+                    {comunicado.link_externo && (
+                      <div className="comunicado-link-admin">
+                        <strong>Enlace relacionado: </strong>
+                        <a
+                          href={comunicado.link_externo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link-externo-admin"
+                        >
+                          {comunicado.link_externo}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
