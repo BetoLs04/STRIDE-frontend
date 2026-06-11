@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Slider from 'react-slick';
 import { toast } from 'react-toastify';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import '../styles/App.css';
 
 const Home = () => {
@@ -10,14 +13,29 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [comunicados, setComunicados] = useState([]);
   const [comunicadosLoading, setComunicadosLoading] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const carouselSettings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: false,
+    arrows: false,
+    adaptiveHeight: false,
+    afterChange: (current) => setCurrentSlide(current),
+    vertical: true,
+    verticalSwiping: true
+  };
 
   useEffect(() => {
     checkSuperAdminExistence();
     fetchComunicadosRecientes();
 
-    // Check if user is logged in
     const user = localStorage.getItem('stride_user');
     if (user) {
       setIsLoggedIn(true);
@@ -76,6 +94,24 @@ const Home = () => {
     }
   };
 
+  const goToSlide = (index) => {
+    if (sliderRef.current) {
+      sliderRef.current.slickGoTo(index);
+    }
+  };
+
+  const goToNext = () => {
+    if (sliderRef.current) {
+      sliderRef.current.slickNext();
+    }
+  };
+
+  const goToPrev = () => {
+    if (sliderRef.current) {
+      sliderRef.current.slickPrev();
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -89,7 +125,7 @@ const Home = () => {
     <div className="home-container">
       {/* Hero Section */}
 
-      {/* Comunicados - Vista tipo administrador */}
+      {/* Carrusel Vertical de Comunicados */}
       {comunicados.length > 0 && (
         <div className="comunicados-carousel-section" style={{
           margin: '4rem 0',
@@ -106,52 +142,116 @@ const Home = () => {
               <p>Cargando comunicados...</p>
             </div>
           ) : (
-            <div className="comunicados-grid-admin">
-              {comunicados.map((comunicado) => (
-                <div key={comunicado.id} className="comunicado-card-admin expanded">
-                  <div className="comunicado-header-admin" style={{ cursor: 'default' }}>
-                    <div className="comunicado-title-admin">
-                      <h3>
-                        {comunicado.titulo}
+            <>
+              <Slider {...carouselSettings} ref={sliderRef}>
+                {comunicados.map((comunicado) => (
+                  <div key={comunicado.id} style={{ padding: '0.5rem 0' }}>
+                    <div className="comunicado-card-admin expanded">
+                      <div className="comunicado-header-admin" style={{ cursor: 'default' }}>
+                        <div className="comunicado-title-admin">
+                          <h3>
+                            {comunicado.titulo}
+                            {comunicado.link_externo && (
+                              <span className="link-indicator" title="Tiene enlace">🔗</span>
+                            )}
+                          </h3>
+                          <div className="comunicado-meta-admin">
+                            <span className="comunicado-fecha-admin">
+                              📅 {formatDate(comunicado.fecha_publicacion)}
+                            </span>
+                            <span className="comunicado-creador-admin">
+                              👤 {comunicado.publicado_por_nombre || 'Administración'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="comunicado-content-admin">
+                        <div
+                          className="comunicado-contenido-admin"
+                          lang="es"
+                          dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
+                        />
+
                         {comunicado.link_externo && (
-                          <span className="link-indicator" title="Tiene enlace">🔗</span>
+                          <div className="comunicado-link-admin">
+                            <strong>Enlace relacionado: </strong>
+                            <a
+                              href={comunicado.link_externo}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="link-externo-admin"
+                            >
+                              {comunicado.link_externo}
+                            </a>
+                          </div>
                         )}
-                      </h3>
-                      <div className="comunicado-meta-admin">
-                        <span className="comunicado-fecha-admin">
-                          📅 {formatDate(comunicado.fecha_publicacion)}
-                        </span>
-                        <span className="comunicado-creador-admin">
-                          👤 {comunicado.publicado_por_nombre || 'Administración'}
-                        </span>
                       </div>
                     </div>
                   </div>
+                ))}
+              </Slider>
 
-                  <div className="comunicado-content-admin">
-                    <div
-                      className="comunicado-contenido-admin"
-                      lang="es"
-                      dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
-                    />
+              {/* Navegación inferior */}
+              {comunicados.length > 1 && (
+                <div style={{
+                  padding: '1rem 0',
+                  marginTop: '0.5rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '1rem'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'center'
+                  }}>
+                    {comunicados.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        className={`carousel-dot ${currentSlide === index ? 'active' : ''}`}
+                        title={`Ir al comunicado ${index + 1}`}
+                        aria-label={`Ir al comunicado ${index + 1}`}
+                      />
+                    ))}
+                  </div>
 
-                    {comunicado.link_externo && (
-                      <div className="comunicado-link-admin">
-                        <strong>Enlace relacionado: </strong>
-                        <a
-                          href={comunicado.link_externo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="link-externo-admin"
-                        >
-                          {comunicado.link_externo}
-                        </a>
-                      </div>
-                    )}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    flexWrap: 'wrap'
+                  }}>
+                    <span style={{
+                      color: 'var(--medium-gray)',
+                      fontSize: '0.95rem'
+                    }}>
+                      Comunicado <strong>{currentSlide + 1}</strong> de <strong>{comunicados.length}</strong>
+                    </span>
+
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={goToPrev}
+                        className="btn btn-primary btn-small"
+                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                      >
+                        ↑ Anterior
+                      </button>
+                      <button
+                        onClick={goToNext}
+                        className="btn btn-primary btn-small"
+                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                      >
+                        Siguiente ↓
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       )}
