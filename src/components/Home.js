@@ -38,7 +38,7 @@ const Home = () => {
   useEffect(() => {
     checkSuperAdminExistence();
     fetchComunicadosRecientes();
-    
+
     // Check if user is logged in
     const user = localStorage.getItem('stride_user');
     if (user) {
@@ -71,7 +71,7 @@ const Home = () => {
     try {
       setComunicadosLoading(true);
       const response = await axios.get('https://api1.strideutmat.com/api/university/comunicados-recientes?limit=10');
-      
+
       if (response.data.success) {
         setComunicados(response.data.data || []);
       }
@@ -141,10 +141,10 @@ const Home = () => {
   return (
     <div className="home-container">
       {/* Hero Section */}
-      
+
       {/* Carrusel de Comunicados - CON ESTILOS IGUALES AL PANEL */}
       {comunicados.length > 0 && (
-        <div className="comunicados-carousel-section" style={{ 
+        <div className="comunicados-carousel-section" style={{
           margin: '4rem 0',
           background: 'white',
           borderRadius: '15px',
@@ -152,7 +152,7 @@ const Home = () => {
           overflow: 'hidden',
           border: '1px solid #e9ecef'
         }}>
-          
+
           {/* Contenido del carrusel */}
           <div style={{ padding: '0', position: 'relative' }}>
             {comunicadosLoading ? (
@@ -164,13 +164,13 @@ const Home = () => {
               <>
 
                 {/* Carrusel principal */}
-                <Slider 
-                  {...carouselSettings} 
+                <Slider
+                  {...carouselSettings}
                   ref={sliderRef}
                 >
                   {comunicados.map((comunicado) => {
                     const plainText = extractPlainText(comunicado.contenido);
-                    
+
                     return (
                       <div key={comunicado.id} className="comunicado-slide">
                         <div style={{
@@ -199,7 +199,7 @@ const Home = () => {
                               }}>
                                 {comunicado.titulo}
                               </h3>
-                              
+
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -238,7 +238,7 @@ const Home = () => {
                               {/* Botones de navegación integrados */}
                               {comunicados.length > 1 && (
                                 <div style={{ display: 'flex', gap: '10px' }}>
-                                  <button 
+                                  <button
                                     onClick={goToPrev}
                                     style={{
                                       padding: '0.4rem 0.8rem',
@@ -263,10 +263,10 @@ const Home = () => {
                                       e.currentTarget.style.color = 'var(--primary-blue)';
                                     }}
                                   >
-                                    ← Anterior
+                                    ← Siguiente
                                   </button>
-                                  
-                                  <button 
+
+                                  <button
                                     onClick={goToNext}
                                     style={{
                                       padding: '0.4rem 0.8rem',
@@ -291,7 +291,7 @@ const Home = () => {
                                       e.currentTarget.style.color = 'var(--primary-blue)';
                                     }}
                                   >
-                                    Siguiente →
+                                    Anterior →
                                   </button>
                                 </div>
                               )}
@@ -318,29 +318,25 @@ const Home = () => {
                             </div>
                           </div>
 
-                          {/* Contenido CON FORMATO HTML */}
-                          <div 
+                          {/* Contenido CON FORMATO HTML - COMPACTO */}
+                          <div
                             className="comunicado-content-html"
                             style={{
-                              flex: 1,
                               padding: '0.5rem',
                               background: '#f8fafc',
                               borderRadius: '10px',
-                              border: '1px solid #e9ecef',
-                              overflowY: 'auto',
-                              maxHeight: '600px',
-                              minHeight: '300px'
+                              border: '1px solid #e9ecef'
                             }}
                           >
-                            <div 
+                            <div
                               dangerouslySetInnerHTML={renderHtmlContent(comunicado.contenido)}
                               style={{
-                                lineHeight: '1.7',
-                                fontSize: '1.1rem',
+                                lineHeight: '1.5',
+                                fontSize: '1rem',
                                 color: '#212529'
                               }}
                             />
-                            
+
                             {plainText.length > 1500 && (
                               <div style={{
                                 marginTop: '1.5rem',
@@ -370,7 +366,7 @@ const Home = () => {
                                 flexWrap: 'wrap'
                               }}>
                                 {/* Enlace clickeable */}
-                                <a 
+                                <a
                                   href={comunicado.link_externo}
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -463,7 +459,7 @@ const Home = () => {
                         />
                       ))}
                     </div>
-                    
+
                     {/* Información y controles */}
                     <div style={{
                       display: 'flex',
@@ -491,9 +487,9 @@ const Home = () => {
 
       {/* Si no hay comunicados */}
       {!comunicadosLoading && comunicados.length === 0 && (
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '4rem', 
+        <div style={{
+          textAlign: 'center',
+          padding: '4rem',
           background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
           borderRadius: '15px',
           margin: '3rem 0',
@@ -514,16 +510,16 @@ const Home = () => {
 
       {/* Enlaces y Recursos */}
       <div className="features-grid" style={{ marginTop: '3rem' }}>
-        <div 
-          className="feature-card" 
+        <div
+          className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
           onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1KGx6xJbtxp-Cszxzp3kt-quJFiNUAza7ERufQrb6UuM/edit?pli=1&gid=440700565#gid=440700565')}
         >
           <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>POA</h3>
         </div>
-        
-        <div 
+
+        <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
           onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1OsH2fEAE6-3gwiM3w6Lf6q2U2AO3ngharO1lmLCJVHM/edit?gid=1961082688#gid=1961082688')}
@@ -531,8 +527,8 @@ const Home = () => {
           <div className="feature-icon">{isLoggedIn ? '📈' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>SEPLADE</h3>
         </div>
-        
-        <div 
+
+        <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
           onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1sQp7fI2Fhe8qWpz22XR3yXbZRy2-Q774MHmlra0RrM8/edit?gid=1451121733#gid=1451121733')}

@@ -4802,6 +4802,10 @@ body {
   font-size: 1.1rem;
 }
 
+.comunicado-content-html .ql-align-center { text-align: center; }
+.comunicado-content-html .ql-align-right { text-align: right; }
+.comunicado-content-html .ql-align-justify { text-align: justify; }
+
 .comunicado-content-html strong,
 .comunicado-content-html b {
   font-weight: 700;
@@ -5537,6 +5541,10 @@ body {
   line-height: 1.6;
   text-align: justify;
 }
+
+.comunicado-contenido-admin .ql-align-center { text-align: center; }
+.comunicado-contenido-admin .ql-align-right { text-align: right; }
+.comunicado-contenido-admin .ql-align-justify { text-align: justify; }
 
 .comunicado-contenido-admin ul,
 .comunicado-contenido-admin ol {
