@@ -323,7 +323,7 @@ const Home = () => {
                             className="comunicado-content-html"
                             lang="es"
                             style={{
-                              padding: '0.5rem',
+                              padding: '0.25rem 0.5rem',
                               background: '#f8fafc',
                               borderRadius: '10px',
                               border: '1px solid #e9ecef',

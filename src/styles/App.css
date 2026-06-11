@@ -4872,10 +4872,11 @@ body {
 }
 
 .comunicado-content-html p {
-  margin: 0 0 1.2em 0;
+  margin: 0 0 1em 0;
   padding: 0;
-  line-height: 1.6;
+  line-height: 1.5;
   text-align: justify;
+  font-size: 0.95rem;
 }
 
 .comunicado-content-html .ql-align-center {
@@ -5701,10 +5702,11 @@ body {
 }
 
 .comunicado-contenido-admin p {
-  margin: 0 0 1.2em 0;
+  margin: 0 0 1em 0;
   padding: 0;
-  line-height: 1.6;
+  line-height: 1.5;
   text-align: justify;
+  font-size: 0.95rem;
 }
 
 .comunicado-contenido-admin .ql-align-center {
