@@ -308,11 +308,18 @@ const PersonalTareas = ({ user }) => {
                           </div>
                           <div className="archivos-lista-completa">
                             {tarea.archivos.map(arch => (
-                              <a key={arch.id} href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
-                                <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                                <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                                <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
-                              </a>
+                              <div key={arch.id}>
+                                {tarea.creado_por_nombre && (
+                                  <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600, marginBottom: '4px', paddingLeft: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    👤 {tarea.creado_por_nombre}
+                                  </div>
+                                )}
+                                <a href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
+                                  <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                                  <span className="archivo-nombre-completo">{arch.nombre_original}</span>
+                                  <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
+                                </a>
+                              </div>
                             ))}
                           </div>
                         </div>
