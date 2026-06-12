@@ -173,7 +173,6 @@ const Home = () => {
                           className="comunicado-contenido-admin"
                           lang="es"
                           style={{
-                            wordBreak: 'keep-all',
                             overflow: 'hidden',
                             fontSize: '0.95rem'
                           }}
