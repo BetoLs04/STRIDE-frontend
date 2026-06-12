@@ -337,8 +337,12 @@ const SuperAdminTareas = ({ admin }) => {
   };
 
   const verDetalleTarea = (tarea) => {
-    console.log('📦 Tarea detalle - archivos:', JSON.parse(JSON.stringify(tarea.archivos)));
-    console.log('📦 Tarea detalle - asignaciones:', JSON.parse(JSON.stringify(tarea.asignaciones?.map(a => ({ id: a.id, usuario_nombre: a.usuario_nombre, archivos_respuesta: a.archivos_respuesta })))));
+    console.log('📦 Tarea detalle - archivos completo:', JSON.parse(JSON.stringify(tarea.archivos)));
+    if (tarea.archivos?.length > 0) {
+      console.log('📦 Archivo[0] KEYS:', Object.keys(tarea.archivos[0]));
+      console.log('📦 Archivo[0] FULL:', JSON.parse(JSON.stringify(tarea.archivos[0])));
+    }
+    console.log('📦 Tarea detalle - asignaciones:', JSON.parse(JSON.stringify(tarea.asignaciones?.map(a => ({ ...a, archivos_respuesta: a.archivos_respuesta })))));
     setSelectedTarea(tarea);
   };
 
