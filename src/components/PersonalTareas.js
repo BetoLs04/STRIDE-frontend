@@ -39,6 +39,14 @@ const PersonalTareas = ({ user }) => {
     cargarTareas();
   }, [user.id]);
 
+  useEffect(() => {
+    if (tareas.length > 0) {
+      console.log('📦 PersonalTareas - primera tarea archivos:', JSON.parse(JSON.stringify(tareas[0].archivos)));
+      console.log('📦 PersonalTareas - primera tarea archivos_respuesta:', JSON.parse(JSON.stringify(tareas[0].archivos_respuesta)));
+      console.log('📦 PersonalTareas - primera tarea keys:', Object.keys(tareas[0]));
+    }
+  }, [tareas]);
+
   const cargarTareas = async () => {
     try {
       setLoading(true);

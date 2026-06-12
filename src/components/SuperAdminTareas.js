@@ -336,7 +336,11 @@ const SuperAdminTareas = ({ admin }) => {
     }
   };
 
-  const verDetalleTarea = (tarea) => setSelectedTarea(tarea);
+  const verDetalleTarea = (tarea) => {
+    console.log('📦 Tarea detalle - archivos:', JSON.parse(JSON.stringify(tarea.archivos)));
+    console.log('📦 Tarea detalle - asignaciones:', JSON.parse(JSON.stringify(tarea.asignaciones?.map(a => ({ id: a.id, usuario_nombre: a.usuario_nombre, archivos_respuesta: a.archivos_respuesta })))));
+    setSelectedTarea(tarea);
+  };
 
   const getDiasRestantes = (fechaEntrega) => {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
