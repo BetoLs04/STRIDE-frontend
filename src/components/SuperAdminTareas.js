@@ -447,7 +447,7 @@ const SuperAdminTareas = ({ admin }) => {
             </div>
           ) : (
             tareasFiltradas.map(tarea => {
-              const todasCompletadas = tarea.completadas > 0 && tarea.completadas === tarea.total_asignaciones;
+              const todasCompletadas = tarea.total_asignaciones > 0 && !tarea.asignaciones?.some(a => a.estado !== 'completada');
               const diasRestantes = todasCompletadas ? 999 : getDiasRestantes(tarea.fecha_entrega);
               const estadoClase = todasCompletadas ? 'completada' : getEstadoColor(diasRestantes);
               const progreso = tarea.progreso || 0;
