@@ -745,36 +745,44 @@ const SuperAdminTareas = ({ admin }) => {
                   </div>
                 )}
 
-                {selectedTarea.archivos?.length > 0 && (
-                  <div className="detalle-archivos">
-                    <h4>Contenido</h4>
-                    <div className="archivos-lista">
-                      {selectedTarea.archivos.map(arch => (
-                        <div key={arch.id} className="archivo-item-con-boton">
-                          <div className="archivo-info">
-                            <span className="archivo-icon">
-                              {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
-                            </span>
-                            <span className="archivo-nombre">{arch.nombre_original}</span>
-                            <span className="archivo-tamano">({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                {(() => {
+                  const responseFileIds = new Set();
+                  selectedTarea.asignaciones?.forEach(asig => {
+                    asig.archivos_respuesta?.forEach(arch => responseFileIds.add(arch.id));
+                  });
+                  const contentFiles = selectedTarea.archivos?.filter(arch => !responseFileIds.has(arch.id));
+                  if (!contentFiles?.length) return null;
+                  return (
+                    <div className="detalle-archivos">
+                      <h4>Contenido</h4>
+                      <div className="archivos-lista">
+                        {contentFiles.map(arch => (
+                          <div key={arch.id} className="archivo-item-con-boton">
+                            <div className="archivo-info">
+                              <span className="archivo-icon">
+                                {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
+                              </span>
+                              <span className="archivo-nombre">{arch.nombre_original}</span>
+                              <span className="archivo-tamano">({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              <DownloadButton
+                                onClick={() => window.open(getFileUrl(arch.url), '_blank')}
+                              />
+                              <button 
+                                onClick={(e) => handleDeleteArchivo(arch.id, e)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}
+                                title="Eliminar archivo"
+                              >
+                                🗑️
+                              </button>
+                            </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <DownloadButton
-                              onClick={() => window.open(getFileUrl(arch.url), '_blank')}
-                            />
-                            <button 
-                              onClick={(e) => handleDeleteArchivo(arch.id, e)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}
-                              title="Eliminar archivo"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 <div className="detalle-asignaciones">
                   <h4>Respuestas del Personal</h4>
