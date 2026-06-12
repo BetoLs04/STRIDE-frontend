@@ -187,7 +187,11 @@ const fetchComunicados = async () => {
                     padding: '1rem',
                     background: '#e8f4fd',
                     borderRadius: '8px',
-                    borderLeft: '4px solid #0055a4'
+                    borderLeft: '4px solid #0055a4',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    flexWrap: 'wrap'
                   }}>
                     <strong>Enlace relacionado: </strong>
                     <a 
@@ -206,6 +210,23 @@ const fetchComunicados = async () => {
                     >
                       {comunicado.link_externo}
                     </a>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigator.clipboard.writeText(comunicado.link_externo);
+                        toast.success('Enlace copiado al portapapeles');
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '1.1rem',
+                        padding: '2px'
+                      }}
+                      title="Copiar enlace"
+                    >
+                      📋
+                    </button>
                   </div>
                 )}
 

@@ -183,7 +183,7 @@ const Home = () => {
                         />
 
                         {comunicado.link_externo && (
-                          <div className="comunicado-link-admin">
+                          <div className="comunicado-link-admin" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                             <strong>Enlace relacionado: </strong>
                             <a
                               href={comunicado.link_externo}
@@ -193,6 +193,23 @@ const Home = () => {
                             >
                               {comunicado.link_externo}
                             </a>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigator.clipboard.writeText(comunicado.link_externo);
+                                toast.success('Enlace copiado al portapapeles');
+                              }}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '1.1rem',
+                                padding: '2px'
+                              }}
+                              title="Copiar enlace"
+                            >
+                              📋
+                            </button>
                           </div>
                         )}
                       </div>
