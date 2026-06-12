@@ -306,30 +306,35 @@ const PersonalTareas = ({ user }) => {
                   {/* Archivos adjuntos */}
                   {(tarea.archivos?.length > 0 || tarea.archivos_respuesta?.length > 0) && (
                     <div className="tarea-archivos-container">
-                      {tarea.archivos?.length > 0 && (
-                        <div className="archivos-seccion">
-                          <div className="archivos-seccion-header">
-                            <span className="archivos-titulo">📎 Contenido de la Tarea</span>
-                            <span className="archivos-badge">{tarea.archivos.length}</span>
+                      {(() => {
+                        const responseFileIds = new Set();
+                        tarea.archivos_respuesta?.forEach(arch => responseFileIds.add(arch.id));
+                        const contentFiles = tarea.archivos?.filter(arch => !responseFileIds.has(arch.id));
+                        return contentFiles?.length > 0 ? (
+                          <div className="archivos-seccion">
+                            <div className="archivos-seccion-header">
+                              <span className="archivos-titulo">📎 Contenido de la Tarea</span>
+                              <span className="archivos-badge">{contentFiles.length}</span>
+                            </div>
+                            <div className="archivos-lista-completa">
+                              {contentFiles.map(arch => (
+                                <div key={arch.id}>
+                                  {tarea.creado_por_nombre && (
+                                    <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600, marginBottom: '4px', paddingLeft: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      👤 {tarea.creado_por_nombre}
+                                    </div>
+                                  )}
+                                  <a href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
+                                    <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                                    <span className="archivo-nombre-completo">{arch.nombre_original}</span>
+                                    <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
+                                  </a>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <div className="archivos-lista-completa">
-                            {tarea.archivos.map(arch => (
-                              <div key={arch.id}>
-                                {tarea.creado_por_nombre && (
-                                  <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600, marginBottom: '4px', paddingLeft: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    👤 {tarea.creado_por_nombre}
-                                  </div>
-                                )}
-                                <a href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
-                                  <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                                  <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                                  <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
-                                </a>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        ) : null;
+                      })()}
                       {tarea.archivos_respuesta?.length > 0 && (
                         <div className="archivos-seccion respuesta">
                           <div className="archivos-seccion-header">
@@ -339,11 +344,18 @@ const PersonalTareas = ({ user }) => {
                           <div className="archivos-lista-completa">
                             {tarea.archivos_respuesta.map(arch => (
                               <div key={arch.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '8px', background: '#fff' }}>
-                                <a href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" style={{ flex: 1, border: 'none', margin: 0, padding: 0, background: 'transparent' }} title={`Descargar ${arch.nombre_original}`}>
-                                  <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                                  <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                                  <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
-                                </a>
+                                <div style={{ flex: 1 }}>
+                                  {user?.nombre && (
+                                    <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      👤 {user.nombre}
+                                    </div>
+                                  )}
+                                  <a href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }} title={`Descargar ${arch.nombre_original}`}>
+                                    <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                                    <span className="archivo-nombre-completo">{arch.nombre_original}</span>
+                                    <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
+                                  </a>
+                                </div>
                                 {diasRestantes >= 0 && (
                                   <button onClick={(e) => handleDeleteArchivo(arch.id, e)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ef4444', marginLeft: '10px' }} title="Eliminar archivo">
                                     🗑️
