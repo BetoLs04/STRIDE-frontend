@@ -121,6 +121,16 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      <style>{`
+        .comunicado-contenido-admin * {
+          word-break: normal !important;
+          overflow-wrap: normal !important;
+          word-wrap: normal !important;
+        }
+        .comunicado-contenido-admin p {
+          text-align: justify !important;
+        }
+      `}</style>
       {/* Hero Section */}
 
       {/* Carrusel Horizontal de Comunicados */}
@@ -175,7 +185,8 @@ const Home = () => {
                           style={{
                             textAlign: 'justify',
                             wordBreak: 'normal',
-                            overflowWrap: 'break-word',
+                            overflowWrap: 'normal',
+                            wordWrap: 'normal',
                             fontSize: '0.95rem'
                           }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
