@@ -3,6 +3,7 @@ import ReactQuill from 'react-quill-new';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-quill-new/dist/quill.snow.css';
+import '../styles/DownloadButton.css';
 import '../styles/App.css';
 
 // Componente principal PanelComunicadosAdmin
@@ -486,20 +487,48 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                               {comunicado.archivos.map(arch => (
                                 <div key={arch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
                                   <span>{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                                  <a href={arch.url} download style={{ flex: 1, color: 'var(--primary-blue)', textDecoration: 'none', cursor: 'pointer' }}>
+                                  <a href={arch.url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, color: 'var(--primary-blue)', textDecoration: 'none', cursor: 'pointer' }}
+                                    title="Abrir archivo">
                                     {arch.nombre_original}
                                   </a>
                                   <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>({(arch.tamano / 1024).toFixed(1)} KB)</span>
-                                  <a href={arch.url} download style={{
-                                    background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem',
-                                    padding: '2px 6px', color: 'var(--primary-blue)', textDecoration: 'none', borderRadius: '4px',
-                                    display: 'flex', alignItems: 'center'
-                                  }} title="Descargar">
-                                    ⬇️
-                                  </a>
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        const res = await fetch(arch.url);
+                                        const blob = await res.blob();
+                                        const blobUrl = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = blobUrl;
+                                        a.download = arch.nombre_original;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                        URL.revokeObjectURL(blobUrl);
+                                      } catch (e) {
+                                        console.error('Error al descargar:', e);
+                                      }
+                                    }}
+                                    className="download-btn-icon"
+                                    title="Descargar archivo"
+                                    style={{
+                                      background: 'var(--primary-blue)', border: 'none', cursor: 'pointer', width: '32px', height: '32px',
+                                      borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                      color: '#fff', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 6px rgba(37,99,235,0.3)',
+                                      flexShrink: 0
+                                    }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(37,99,235,0.4)' }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 6px rgba(37,99,235,0.3)' }}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                      <polyline points="7 10 12 15 17 10"></polyline>
+                                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                  </button>
                                   <button
                                     onClick={() => handleDeleteArchivo(comunicado.id, arch.id)}
-                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#ef4444', padding: '2px' }}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#ef4444', padding: '2px', flexShrink: 0 }}
                                     title="Eliminar archivo"
                                   >
                                     🗑️
