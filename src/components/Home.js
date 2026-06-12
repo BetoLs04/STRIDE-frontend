@@ -328,6 +328,15 @@ const Home = () => {
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1OsH2fEAE6-3gwiM3w6Lf6q2U2AO3ngharO1lmLCJVHM/edit?gid=1961082688#gid=1961082688')}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📑' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>SEPLADE</h3>
+        </div>
+
+        <div
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
           onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1sQp7fI2Fhe8qWpz22XR3yXbZRy2-Q774MHmlra0RrM8/edit?gid=1451121733#gid=1451121733')}
         >
           <div className="feature-icon">{isLoggedIn ? '📋' : '🔒'}</div>
