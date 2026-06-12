@@ -251,11 +251,8 @@ const fetchComunicados = async () => {
                     <strong style={{ display: 'block', marginBottom: '0.75rem', color: '#166534' }}>📎 Archivos adjuntos:</strong>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {comunicado.archivos.map(arch => (
-                        <a 
+                        <div
                           key={arch.id}
-                          href={arch.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -264,17 +261,25 @@ const fetchComunicados = async () => {
                             background: 'white',
                             border: '1px solid #dcfce7',
                             borderRadius: '6px',
-                            color: '#166534',
-                            textDecoration: 'none',
                             transition: 'background 0.2s'
                           }}
                           onMouseEnter={(e) => e.currentTarget.style.background = '#dcfce7'}
                           onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
                         >
                           <span>{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                          <span style={{ flex: 1 }}>{arch.nombre_original}</span>
+                          <a href={arch.url} download style={{ flex: 1, color: '#166534', textDecoration: 'none', cursor: 'pointer' }}
+                            title="Descargar archivo">
+                            {arch.nombre_original}
+                          </a>
                           <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>({(arch.tamano / 1024).toFixed(1)} KB)</span>
-                        </a>
+                          <a href={arch.url} download style={{
+                            background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem',
+                            padding: '2px 6px', color: '#166534', textDecoration: 'none', borderRadius: '4px',
+                            display: 'flex', alignItems: 'center'
+                          }} title="Descargar">
+                            ⬇️
+                          </a>
+                        </div>
                       ))}
                     </div>
                   </div>

@@ -486,10 +486,17 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                               {comunicado.archivos.map(arch => (
                                 <div key={arch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
                                   <span>{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                                  <a href={arch.url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, color: 'var(--primary-blue)', textDecoration: 'none' }}>
+                                  <a href={arch.url} download style={{ flex: 1, color: 'var(--primary-blue)', textDecoration: 'none', cursor: 'pointer' }}>
                                     {arch.nombre_original}
                                   </a>
                                   <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                                  <a href={arch.url} download style={{
+                                    background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem',
+                                    padding: '2px 6px', color: 'var(--primary-blue)', textDecoration: 'none', borderRadius: '4px',
+                                    display: 'flex', alignItems: 'center'
+                                  }} title="Descargar">
+                                    ⬇️
+                                  </a>
                                   <button
                                     onClick={() => handleDeleteArchivo(comunicado.id, arch.id)}
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#ef4444', padding: '2px' }}
