@@ -220,6 +220,25 @@ const Home = () => {
                             </button>
                           </div>
                         )}
+
+                        {comunicado.archivos?.length > 0 && (
+                          <div style={{ margin: '1rem 0', padding: '0.75rem', background: '#f0fdf4', borderRadius: '8px', borderLeft: '4px solid #16a34a' }}>
+                            <strong style={{ display: 'block', marginBottom: '0.5rem', color: '#166534', fontSize: '0.9rem' }}>📎 Archivos adjuntos:</strong>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                              {comunicado.archivos.map(arch => (
+                                <a key={arch.id} href={arch.url} target="_blank" rel="noopener noreferrer" style={{
+                                  display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.6rem',
+                                  background: 'white', border: '1px solid #dcfce7', borderRadius: '6px',
+                                  color: '#166534', textDecoration: 'none', fontSize: '0.85rem'
+                                }}>
+                                  <span>{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                                  <span style={{ flex: 1 }}>{arch.nombre_original}</span>
+                                  <span style={{ color: '#6b7280' }}>({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
