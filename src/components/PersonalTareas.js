@@ -5,6 +5,12 @@ import '../styles/PersonalTareas.css';
 
 const API_URL = 'https://api1.strideutmat.com';
 
+// ✅ Función para limpiar HTML de la descripción
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '');
+};
+
 // ✅ Función para parsear fecha sin desfase de timezone
 const parseLocalDate = (dateStr) => {
   if (!dateStr) return new Date();
@@ -111,7 +117,7 @@ const PersonalTareas = ({ user }) => {
     setSubiendo(true);
     try {
       const formData = new FormData();
-      formData.append('comentarios', responderForm.comentarios);
+      formData.append('comentarios', stripHtml(responderForm.comentarios));
       archivos.forEach(file => formData.append('archivos', file));
       const response = await axios.post(
         `${API_URL}/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,

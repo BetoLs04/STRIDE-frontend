@@ -24,6 +24,12 @@ const getFileUrl = (url) => {
   return `${API_URL}${url}`;
 };
 
+// ✅ Función para limpiar HTML de la descripción
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '');
+};
+
 // ✅ Función para parsear fecha sin desfase de timezone
 const parseLocalDate = (dateStr) => {
   if (!dateStr) return new Date();
@@ -194,7 +200,7 @@ const SuperAdminTareas = ({ admin }) => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('titulo', formData.titulo);
-      formDataToSend.append('descripcion', formData.descripcion || '');
+      formDataToSend.append('descripcion', stripHtml(formData.descripcion) || '');
       formDataToSend.append('fecha_entrega', formData.fecha_entrega);
       formDataToSend.append('creado_por_id', admin.id);
       formDataToSend.append('creado_por_tipo', admin.tipo || 'superadmin');
@@ -260,7 +266,7 @@ const SuperAdminTareas = ({ admin }) => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('titulo', formData.titulo);
-      formDataToSend.append('descripcion', formData.descripcion || '');
+      formDataToSend.append('descripcion', stripHtml(formData.descripcion) || '');
       formDataToSend.append('fecha_entrega', formData.fecha_entrega);
       const asignacionesArray = Object.values(usuariosSeleccionados).map(u => ({
         usuario_id: u.usuario_id, usuario_tipo: 'personal'

@@ -13,10 +13,11 @@
   text-align: center;
   border-radius: 0.45em;
   font-family: "Arial", sans-serif;
-  transition: background 0.3s;
   border: none;
   cursor: pointer;
   overflow: visible;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(17, 99, 255, 0.3);
 }
 
 .button::before {
@@ -35,6 +36,9 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   pointer-events: none;
   z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
 }
 
 .button::after {
@@ -48,65 +52,47 @@
   bottom: calc(100% + var(--gap-between-tooltip-to-button) - 10px);
   pointer-events: none;
   z-index: 10;
-}
-
-.button::after,
-.button::before {
   opacity: 0;
   visibility: hidden;
-  transition: all 0.5s;
+  transition: opacity 0.2s, visibility 0.2s;
 }
 
 .button-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-}
-
-.text {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
+  gap: 6px;
+}
+
+.text {
   color: #fff;
   font-size: 0.95rem;
   font-weight: 500;
-  transition: top 0.5s;
 }
 
 .icon {
   color: #fff;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: top 0.5s;
 }
 
 .icon svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .button:hover {
   background: #6c18ff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(108, 24, 255, 0.4);
 }
 
-.button:hover .text {
-  top: -100%;
-}
-
-.button:hover .icon {
-  top: 0;
+.button:active {
+  transform: scale(0.97);
 }
 
 .button:hover::before,
