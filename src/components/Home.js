@@ -5,6 +5,7 @@ import Slider from 'react-slick';
 import { toast } from 'react-toastify';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import 'react-quill-new/dist/quill.snow.css';
 import '../styles/App.css';
 
 const Home = () => {
@@ -121,16 +122,6 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <style>{`
-        .comunicado-contenido-admin * {
-          word-break: normal !important;
-          overflow-wrap: normal !important;
-          word-wrap: normal !important;
-        }
-        .comunicado-contenido-admin p {
-          text-align: justify !important;
-        }
-      `}</style>
       {/* Hero Section */}
 
       {/* Carrusel Horizontal de Comunicados */}
@@ -180,13 +171,10 @@ const Home = () => {
 
                       <div className="comunicado-content-admin">
                         <div
-                          className="comunicado-contenido-admin"
+                          className="comunicado-contenido-admin ql-editor"
                           lang="es"
                           style={{
-                            textAlign: 'justify',
-                            wordBreak: 'normal',
-                            overflowWrap: 'normal',
-                            wordWrap: 'normal',
+                            padding: 0,
                             fontSize: '0.95rem'
                           }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}

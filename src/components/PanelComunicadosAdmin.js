@@ -373,8 +373,9 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                     {expandedComunicado === comunicado.id && (
                       <div className="comunicado-content-admin">
                         <div 
-                          className="comunicado-contenido-admin"
+                          className="comunicado-contenido-admin ql-editor"
                           lang="es"
+                          style={{ padding: 0 }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
                         />
                         
