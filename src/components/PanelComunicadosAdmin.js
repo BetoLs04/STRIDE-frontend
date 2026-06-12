@@ -375,7 +375,7 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                         <div 
                           className="comunicado-contenido-admin"
                           lang="es"
-                          dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
+                          dangerouslySetInnerHTML={{ __html: comunicado.contenido ? comunicado.contenido.replace(/&nbsp;/g, ' ') : '' }}
                         />
                         
                         {comunicado.link_externo && (

@@ -121,17 +121,6 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <style>{`
-        .comunicado-contenido-admin * {
-          word-break: normal !important;
-          overflow-wrap: normal !important;
-          word-wrap: normal !important;
-          hyphens: none !important;
-        }
-        .comunicado-contenido-admin p {
-          text-align: justify !important;
-        }
-      `}</style>
       {/* Hero Section */}
 
       {/* Carrusel Horizontal de Comunicados */}
@@ -183,7 +172,14 @@ const Home = () => {
                         <div
                           className="comunicado-contenido-admin"
                           lang="es"
-                          dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
+                          style={{
+                            textAlign: 'justify',
+                            whiteSpace: 'normal',
+                            wordBreak: 'normal',
+                            overflowWrap: 'break-word',
+                            fontSize: '0.95rem'
+                          }}
+                          dangerouslySetInnerHTML={{ __html: comunicado.contenido ? comunicado.contenido.replace(/&nbsp;/g, ' ') : '' }}
                         />
 
                         {comunicado.link_externo && (
