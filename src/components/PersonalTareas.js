@@ -132,6 +132,25 @@ const PersonalTareas = ({ user }) => {
     }
   };
 
+  const handleDeleteArchivo = async (archivoId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!window.confirm('¿Estás seguro de eliminar este archivo?')) return;
+    
+    try {
+      const response = await axios.delete(`${API_URL}/api/university/tareas/archivo/${archivoId}`);
+      if (response.data.success) {
+        toast.success('Archivo eliminado correctamente');
+        cargarTareas();
+      }
+    } catch (error) {
+      console.error('Error eliminando archivo:', error);
+      toast.error('Error al eliminar el archivo');
+    }
+  };
+
   const getDiasRestantes = (fechaEntrega) => {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -284,7 +303,7 @@ const PersonalTareas = ({ user }) => {
                       {tarea.archivos?.length > 0 && (
                         <div className="archivos-seccion">
                           <div className="archivos-seccion-header">
-                            <span className="archivos-titulo">📎 Adjuntados</span>
+                            <span className="archivos-titulo">📎 Contenido de la Tarea</span>
                             <span className="archivos-badge">{tarea.archivos.length}</span>
                           </div>
                           <div className="archivos-lista-completa">
@@ -301,16 +320,23 @@ const PersonalTareas = ({ user }) => {
                       {tarea.archivos_respuesta?.length > 0 && (
                         <div className="archivos-seccion respuesta">
                           <div className="archivos-seccion-header">
-                            <span className="archivos-titulo">📤 Enviados</span>
+                            <span className="archivos-titulo">📤 Mis Archivos Enviados</span>
                             <span className="archivos-badge">{tarea.archivos_respuesta.length}</span>
                           </div>
                           <div className="archivos-lista-completa">
                             {tarea.archivos_respuesta.map(arch => (
-                              <a key={arch.id} href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" title={`Haz clic para descargar ${arch.nombre_original}`}>
-                                <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
-                                <span className="archivo-nombre-completo">{arch.nombre_original}</span>
-                                <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
-                              </a>
+                              <div key={arch.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '8px', background: '#fff' }}>
+                                <a href={`${API_URL}${arch.url}`} target="_blank" rel="noopener noreferrer" className="archivo-link-completo" style={{ flex: 1, border: 'none', margin: 0, padding: 0, background: 'transparent' }} title={`Descargar ${arch.nombre_original}`}>
+                                  <span className="archivo-icono">{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                                  <span className="archivo-nombre-completo">{arch.nombre_original}</span>
+                                  <span className="archivo-tamano">{(arch.tamano / 1024).toFixed(1)} KB</span>
+                                </a>
+                                {diasRestantes >= 0 && (
+                                  <button onClick={(e) => handleDeleteArchivo(arch.id, e)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ef4444', marginLeft: '10px' }} title="Eliminar archivo">
+                                    🗑️
+                                  </button>
+                                )}
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -319,16 +345,18 @@ const PersonalTareas = ({ user }) => {
                   )}
 
                   {/* Botones de acción */}
-                  {puedeResponder ? (
-                    <button className="btn-responder" onClick={() => handleResponderClick(tarea)}>
-                      <span className="btn-icon">📝</span>
-                      {tarea.asignacion_estado === 'pendiente' ? 'Enviar Respuesta' : 'Actualizar Respuesta'}
-                    </button>
-                  ) : (
-                    <button className="btn-editar-respuesta" onClick={() => handleEditarRespuesta(tarea)} title="Editar respuesta">
-                      <span className="btn-icon">✏️</span>
-                      Editar Respuesta
-                    </button>
+                  {diasRestantes >= 0 && (
+                    puedeResponder ? (
+                      <button className="btn-responder" onClick={() => handleResponderClick(tarea)}>
+                        <span className="btn-icon">📝</span>
+                        {tarea.asignacion_estado === 'pendiente' ? 'Enviar Respuesta' : 'Actualizar Respuesta'}
+                      </button>
+                    ) : (
+                      <button className="btn-editar-respuesta" onClick={() => handleEditarRespuesta(tarea)} title="Editar respuesta">
+                        <span className="btn-icon">✏️</span>
+                        Editar Respuesta
+                      </button>
+                    )
                   )}
 
                 </div>

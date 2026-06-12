@@ -302,6 +302,34 @@ const SuperAdminTareas = ({ admin }) => {
     }
   };
 
+  const handleDeleteArchivo = async (archivoId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!window.confirm('¿Estás seguro de eliminar este archivo? Esta acción no se puede deshacer.')) return;
+    
+    try {
+      const response = await axios.delete(`https://api1.strideutmat.com/api/university/tareas/archivo/${archivoId}`);
+      if (response.data.success) {
+        toast.success('Archivo eliminado correctamente');
+        cargarTareas();
+        setSelectedTarea(prev => {
+           if (!prev) return prev;
+           const newArchivos = prev.archivos?.filter(a => a.id !== archivoId);
+           const newAsignaciones = prev.asignaciones?.map(asig => ({
+             ...asig,
+             archivos_respuesta: asig.archivos_respuesta?.filter(a => a.id !== archivoId)
+           }));
+           return { ...prev, archivos: newArchivos, asignaciones: newAsignaciones };
+        });
+      }
+    } catch (error) {
+      console.error('Error eliminando archivo:', error);
+      toast.error('Error al eliminar el archivo');
+    }
+  };
+
   const verDetalleTarea = (tarea) => setSelectedTarea(tarea);
 
   const getDiasRestantes = (fechaEntrega) => {
@@ -713,7 +741,7 @@ const SuperAdminTareas = ({ admin }) => {
 
                 {selectedTarea.archivos?.length > 0 && (
                   <div className="detalle-archivos">
-                    <h4>Archivos de la tarea</h4>
+                    <h4>Contenido</h4>
                     <div className="archivos-lista">
                       {selectedTarea.archivos.map(arch => (
                         <div key={arch.id} className="archivo-item-con-boton">
@@ -724,10 +752,19 @@ const SuperAdminTareas = ({ admin }) => {
                             <span className="archivo-nombre">{arch.nombre_original}</span>
                             <span className="archivo-tamano">({(arch.tamano / 1024).toFixed(1)} KB)</span>
                           </div>
-                          <DownloadButton
-                            onClick={() => window.open(getFileUrl(arch.url), '_blank')}
-                            tooltip={`Descargar ${arch.nombre_original}`}
-                          />
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <DownloadButton
+                              onClick={() => window.open(getFileUrl(arch.url), '_blank')}
+                              tooltip={`Descargar ${arch.nombre_original}`}
+                            />
+                            <button 
+                              onClick={(e) => handleDeleteArchivo(arch.id, e)}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}
+                              title="Eliminar archivo"
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -765,24 +802,31 @@ const SuperAdminTareas = ({ admin }) => {
                           )}
                           {asig.archivos_respuesta?.length > 0 && (
                             <div className="respuesta-archivos">
-                              <strong>Archivos enviados:</strong>
+                              <strong style={{ display: 'block', marginBottom: '8px', color: 'var(--primary-blue)' }}>Archivos de {asig.usuario_nombre}:</strong>
                               <div className="archivos-lista">
                                 {asig.archivos_respuesta.map(arch => (
-                                  <a
-                                    key={arch.id}
-                                    href={getFileUrl(arch.url)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="archivo-link"
-                                    download
-                                  >
-                                    <span className="archivo-icon">
-                                      {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
-                                    </span>
-                                    <span className="archivo-nombre">{arch.nombre_original}</span>
-                                    <span className="archivo-tamaño">({(arch.tamano / 1024).toFixed(1)} KB)</span>
-                                    <span className="descargar-icon">⬇️</span>
-                                  </a>
+                                  <div key={arch.id} className="archivo-item-con-boton" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                    <div className="archivo-info">
+                                      <span className="archivo-icon">
+                                        {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
+                                      </span>
+                                      <span className="archivo-nombre">{arch.nombre_original}</span>
+                                      <span className="archivo-tamano">({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                      <DownloadButton
+                                        onClick={() => window.open(getFileUrl(arch.url), '_blank')}
+                                        tooltip={`Descargar ${arch.nombre_original}`}
+                                      />
+                                      <button 
+                                        onClick={(e) => handleDeleteArchivo(arch.id, e)}
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}
+                                        title="Eliminar archivo"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             </div>
