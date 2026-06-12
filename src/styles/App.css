@@ -4369,6 +4369,7 @@ body {
   margin-bottom: 1.5rem;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  hyphens: auto;
 }
 
 .comunicado-contenido-admin p {
@@ -5681,6 +5682,7 @@ body {
   white-space: pre-wrap;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  hyphens: auto;
 }
 
 .comunicado-contenido-admin h1,
@@ -5707,7 +5709,7 @@ body {
   margin: 0 0 1em 0;
   padding: 0;
   line-height: 1.5;
-  text-align: justify;
+  text-align: left;
   font-size: 0.95rem;
 }
 
