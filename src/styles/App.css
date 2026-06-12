@@ -4367,6 +4367,7 @@ body {
   line-height: 1.8;
   color: var(--dark-text);
   margin-bottom: 1.5rem;
+  word-break: keep-all;
 }
 
 .comunicado-contenido-admin p {
@@ -5677,6 +5678,7 @@ body {
   line-height: 1.42;
   font-size: 16px;
   white-space: pre-wrap;
+  word-break: keep-all;
 }
 
 .comunicado-contenido-admin h1,
