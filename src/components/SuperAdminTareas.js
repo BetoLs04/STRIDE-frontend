@@ -761,7 +761,6 @@ const SuperAdminTareas = ({ admin }) => {
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <DownloadButton
                               onClick={() => window.open(getFileUrl(arch.url), '_blank')}
-                              tooltip={`Descargar ${arch.nombre_original}`}
                             />
                             <button 
                               onClick={(e) => handleDeleteArchivo(arch.id, e)}
@@ -808,13 +807,9 @@ const SuperAdminTareas = ({ admin }) => {
                           )}
                           {asig.archivos_respuesta?.length > 0 && (
                             <div className="respuesta-archivos">
-                              <strong style={{ display: 'block', marginBottom: '8px', color: 'var(--primary-blue)' }}>Archivos de {asig.usuario_nombre}:</strong>
                               <div className="archivos-lista">
                                   {asig.archivos_respuesta.map(arch => (
                                   <div key={arch.id} className="archivo-item-con-boton" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                                    <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                      👤 {asig.usuario_nombre}
-                                    </div>
                                     <div className="archivo-info">
                                       <span className="archivo-icon">
                                         {arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}
@@ -825,7 +820,6 @@ const SuperAdminTareas = ({ admin }) => {
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                       <DownloadButton
                                         onClick={() => window.open(getFileUrl(arch.url), '_blank')}
-                                        tooltip={`Descargar ${arch.nombre_original}`}
                                       />
                                       <button 
                                         onClick={(e) => handleDeleteArchivo(arch.id, e)}
