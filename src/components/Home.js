@@ -273,14 +273,14 @@ const Home = () => {
                         className="btn btn-primary btn-small"
                         style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
                       >
-                        ← Anterior
+                        ← Siguiente
                       </button>
                       <button
                         onClick={goToNext}
                         className="btn btn-primary btn-small"
                         style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
                       >
-                        Siguiente →
+                        Anterior →
                       </button>
                     </div>
                   </div>
