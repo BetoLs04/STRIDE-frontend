@@ -176,11 +176,6 @@ const Home = () => {
                             textAlign: 'justify',
                             wordBreak: 'normal',
                             overflowWrap: 'break-word',
-                            hyphens: 'none',
-                            overflow: 'hidden',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 8,
-                            WebkitBoxOrient: 'vertical',
                             fontSize: '0.95rem'
                           }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
