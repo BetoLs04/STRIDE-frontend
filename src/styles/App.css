@@ -4367,6 +4367,8 @@ body {
   line-height: 1.8;
   color: var(--dark-text);
   margin-bottom: 1.5rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
   overflow: hidden;
 }
 
@@ -5678,6 +5680,8 @@ body {
   line-height: 1.42;
   font-size: 16px;
   white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
   overflow: hidden;
 }
 
