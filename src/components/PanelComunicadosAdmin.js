@@ -375,6 +375,12 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                         <div 
                           className="comunicado-contenido-admin"
                           lang="es"
+                          style={{
+                            textAlign: 'justify',
+                            wordBreak: 'normal',
+                            overflowWrap: 'break-word',
+                            hyphens: 'none'
+                          }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}
                         />
                         

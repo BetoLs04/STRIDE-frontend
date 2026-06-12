@@ -173,9 +173,14 @@ const Home = () => {
                           className="comunicado-contenido-admin"
                           lang="es"
                           style={{
+                            textAlign: 'justify',
+                            wordBreak: 'normal',
                             overflowWrap: 'break-word',
-                            wordWrap: 'break-word',
+                            hyphens: 'none',
                             overflow: 'hidden',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 8,
+                            WebkitBoxOrient: 'vertical',
                             fontSize: '0.95rem'
                           }}
                           dangerouslySetInnerHTML={{ __html: comunicado.contenido }}

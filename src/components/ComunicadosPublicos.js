@@ -177,7 +177,7 @@ const fetchComunicados = async () => {
               }}>
                 <div style={{ lineHeight: '1.8', color: '#343a40', marginBottom: '1.5rem', fontSize: '1.1rem', padding: '1rem' }}>
                   {comunicado.contenido.split('\n').map((paragraph, index) => (
-                    <p key={index} style={{ marginBottom: '1rem' }}>{paragraph}</p>
+                    <p key={index} style={{ marginBottom: '1rem', textAlign: 'justify', wordBreak: 'normal', overflowWrap: 'break-word', hyphens: 'none' }}>{paragraph}</p>
                   ))}
                 </div>
                 
