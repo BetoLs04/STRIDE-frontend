@@ -447,8 +447,9 @@ const SuperAdminTareas = ({ admin }) => {
             </div>
           ) : (
             tareasFiltradas.map(tarea => {
-              const diasRestantes = getDiasRestantes(tarea.fecha_entrega);
-              const estadoClase = getEstadoColor(diasRestantes);
+              const todasCompletadas = tarea.completadas > 0 && tarea.completadas === tarea.total_asignaciones;
+              const diasRestantes = todasCompletadas ? 999 : getDiasRestantes(tarea.fecha_entrega);
+              const estadoClase = todasCompletadas ? 'completada' : getEstadoColor(diasRestantes);
               const progreso = tarea.progreso || 0;
               return (
                 <div key={tarea.id} className={`tarea-card ${estadoClase}`} onClick={() => verDetalleTarea(tarea)}>
@@ -474,11 +475,16 @@ const SuperAdminTareas = ({ admin }) => {
                     <div className={`fecha-entrega ${estadoClase}`}>
                       <span className="meta-icon"></span>
                       <span>
-                        {/* ✅ CORREGIDO: usar parseLocalDate para mostrar fecha correcta */}
-                        {parseLocalDate(tarea.fecha_entrega).toLocaleDateString()}
-                        {diasRestantes < 0 && ` (Vencida)`}
-                        {diasRestantes === 0 && ' (Hoy)'}
-                        {diasRestantes > 0 && ` (${diasRestantes} días)`}
+                        {todasCompletadas ? (
+                          <>✅ Completada</>
+                        ) : (
+                          <>
+                            {parseLocalDate(tarea.fecha_entrega).toLocaleDateString()}
+                            {diasRestantes < 0 && ` (Vencida)`}
+                            {diasRestantes === 0 && ' (Hoy)'}
+                            {diasRestantes > 0 && ` (${diasRestantes} días)`}
+                          </>
+                        )}
                       </span>
                     </div>
                     <div className="progreso-info">
