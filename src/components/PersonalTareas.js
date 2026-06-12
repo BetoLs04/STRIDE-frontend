@@ -152,7 +152,7 @@ const PersonalTareas = ({ user }) => {
       e.stopPropagation();
     }
     if (!window.confirm('¿Estás seguro de eliminar este archivo?')) return;
-    
+
     try {
       const response = await axios.delete(`${API_URL}/api/university/tareas/archivo/${archivoId}`);
       if (response.data.success) {
@@ -253,7 +253,7 @@ const PersonalTareas = ({ user }) => {
               const puedeResponder = tarea.asignacion_estado !== 'completada';
               return (
                 <div key={tarea.id} className={`tarea-item ${estadoClase} ${tarea.asignacion_estado}`}>
-                  
+
                   {/* Encabezado: título y estado */}
                   <div className="tarea-item-header">
                     <div className="tarea-titulo">
