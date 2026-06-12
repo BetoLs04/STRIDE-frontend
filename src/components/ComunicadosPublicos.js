@@ -240,6 +240,46 @@ const fetchComunicados = async () => {
                   </div>
                 )}
 
+                {comunicado.archivos?.length > 0 && (
+                  <div style={{
+                    margin: '1.5rem 0',
+                    padding: '1rem',
+                    background: '#f0fdf4',
+                    borderRadius: '8px',
+                    borderLeft: '4px solid #16a34a'
+                  }}>
+                    <strong style={{ display: 'block', marginBottom: '0.75rem', color: '#166534' }}>📎 Archivos adjuntos:</strong>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {comunicado.archivos.map(arch => (
+                        <a 
+                          key={arch.id}
+                          href={arch.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem 0.75rem',
+                            background: 'white',
+                            border: '1px solid #dcfce7',
+                            borderRadius: '6px',
+                            color: '#166534',
+                            textDecoration: 'none',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#dcfce7'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                        >
+                          <span>{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                          <span style={{ flex: 1 }}>{arch.nombre_original}</span>
+                          <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',

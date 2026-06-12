@@ -19,6 +19,8 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
   });
   const [editId, setEditId] = useState(null);
   const [expandedComunicado, setExpandedComunicado] = useState(null);
+  const [archivos, setArchivos] = useState([]);
+  const [subiendo, setSubiendo] = useState(false);
 
   useEffect(() => {
     fetchComunicadosAdmin();
@@ -58,6 +60,25 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
     });
   };
 
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + archivos.length > 5) {
+      toast.error('Máximo 5 archivos');
+      return;
+    }
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`El archivo ${file.name} excede los 10MB`);
+        return;
+      }
+    }
+    setArchivos(prev => [...prev, ...files]);
+  };
+
+  const removeArchivo = (index) => {
+    setArchivos(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -66,26 +87,28 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
       return;
     }
 
+    setSubiendo(true);
     try {
-      const comunicadoData = {
-        titulo: formData.titulo,
-        contenido: formData.contenidoHtml, // Usar HTML formateado
-        link_externo: formData.link_externo,
-        estado: formData.estado,
-        publicado_por_id: admin.id
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append('titulo', formData.titulo);
+      formDataToSend.append('contenido', formData.contenidoHtml);
+      formDataToSend.append('link_externo', formData.link_externo);
+      formDataToSend.append('estado', formData.estado);
+      formDataToSend.append('publicado_por_id', admin.id);
+      archivos.forEach(file => formDataToSend.append('archivos', file));
 
       if (editId) {
-        // Actualizar comunicado existente
-        await axios.put(`https://api1.strideutmat.com/api/university/comunicados/${editId}`, comunicadoData);
+        await axios.put(`https://api1.strideutmat.com/api/university/comunicados/${editId}`, formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         toast.success('Comunicado actualizado exitosamente');
       } else {
-        // Crear nuevo comunicado
-        await axios.post('https://api1.strideutmat.com/api/university/comunicados', comunicadoData);
+        await axios.post('https://api1.strideutmat.com/api/university/comunicados', formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         toast.success('Comunicado publicado exitosamente');
       }
 
-      // Limpiar formulario y recargar lista
       resetForm();
       fetchComunicadosAdmin();
       setShowForm(false);
@@ -93,19 +116,33 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
     } catch (error) {
       console.error('Error guardando comunicado:', error);
       toast.error(error.response?.data?.error || 'Error al guardar el comunicado');
+    } finally {
+      setSubiendo(false);
     }
   };
 
   const handleEdit = (comunicado) => {
     setFormData({
       titulo: comunicado.titulo,
-      contenido: comunicado.contenido.replace(/<[^>]*>/g, ''), // Texto plano
-      contenidoHtml: comunicado.contenido, // HTML original
+      contenido: comunicado.contenido.replace(/<[^>]*>/g, ''),
+      contenidoHtml: comunicado.contenido,
       link_externo: comunicado.link_externo || '',
       estado: comunicado.estado
     });
     setEditId(comunicado.id);
+    setArchivos([]);
     setShowForm(true);
+  };
+
+  const handleDeleteArchivo = async (comunicadoId, archivoId) => {
+    if (!window.confirm('¿Eliminar este archivo?')) return;
+    try {
+      await axios.delete(`https://api1.strideutmat.com/api/university/comunicados/${comunicadoId}/archivo/${archivoId}`);
+      toast.success('Archivo eliminado');
+      fetchComunicadosAdmin();
+    } catch (error) {
+      toast.error('Error al eliminar archivo');
+    }
   };
 
   const handleDelete = async (id, titulo) => {
@@ -132,6 +169,7 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
       estado: 'publicado'
     });
     setEditId(null);
+    setArchivos([]);
   };
 
   const formatDate = (dateString) => {
@@ -271,6 +309,30 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
             </div>
 
             <div className="form-group">
+              <label>Archivos adjuntos (opcional, máx. 5)</label>
+              <div className="file-upload-area">
+                <input type="file" id="archivos-comunicado" multiple onChange={handleFileChange} className="file-input" />
+                <label htmlFor="archivos-comunicado" className="file-upload-label">
+                  <span className="upload-icon"></span>
+                  <span>Seleccionar archivos</span>
+                  <span className="upload-hint">Máx. 10MB c/u</span>
+                </label>
+              </div>
+              {archivos.length > 0 && (
+                <div className="archivos-preview">
+                  {archivos.map((file, index) => (
+                    <div key={index} className="archivo-preview-item">
+                      <span className="archivo-icon">{file.type?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                      <span className="archivo-nombre">{file.name}</span>
+                      <span className="archivo-tamaño">{(file.size / 1024).toFixed(1)} KB</span>
+                      <button type="button" className="archivo-remove" onClick={() => removeArchivo(index)}>×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="form-group">
               <label htmlFor="estado">Estado</label>
               <select
                 id="estado"
@@ -288,8 +350,8 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
               <button type="button" className="btn btn-secondary" onClick={() => { resetForm(); setShowForm(false); }}>
                 Cancelar
               </button>
-              <button type="submit" className="btn btn-primary">
-                {editId ? '💾 Actualizar Comunicado' : '📢 Publicar Comunicado'}
+              <button type="submit" className="btn btn-primary" disabled={subiendo}>
+                {subiendo ? '⏳ Guardando...' : (editId ? '💾 Actualizar Comunicado' : '📢 Publicar Comunicado')}
               </button>
             </div>
 
@@ -414,6 +476,30 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                               </svg>
                             </button>
+                          </div>
+                        )}
+
+                        {comunicado.archivos?.length > 0 && (
+                          <div className="comunicado-archivos" style={{ marginTop: '1rem' }}>
+                            <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--primary-blue)' }}>📎 Archivos adjuntos:</strong>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              {comunicado.archivos.map(arch => (
+                                <div key={arch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+                                  <span>{arch.tipo_mime?.startsWith('image/') ? '🖼️' : '📄'}</span>
+                                  <a href={arch.url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, color: 'var(--primary-blue)', textDecoration: 'none' }}>
+                                    {arch.nombre_original}
+                                  </a>
+                                  <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>({(arch.tamano / 1024).toFixed(1)} KB)</span>
+                                  <button
+                                    onClick={() => handleDeleteArchivo(comunicado.id, arch.id)}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#ef4444', padding: '2px' }}
+                                    title="Eliminar archivo"
+                                  >
+                                    🗑️
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
 
