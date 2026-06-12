@@ -191,9 +191,11 @@ const fetchComunicados = async () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    flexWrap: 'wrap'
+                    flexWrap: 'nowrap',
+                    width: '100%',
+                    overflow: 'hidden'
                   }}>
-                    <strong>Enlace relacionado: </strong>
+                    <strong style={{ whiteSpace: 'nowrap' }}>Enlace relacionado: </strong>
                     <a 
                       href={comunicado.link_externo} 
                       target="_blank" 
@@ -201,9 +203,10 @@ const fetchComunicados = async () => {
                       style={{
                         color: '#0055a4',
                         textDecoration: 'none',
-                        wordBreak: 'break-all',
-                        display: 'inline-block',
-                        marginTop: '0.5rem'
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: 1
                       }}
                       onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
                       onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
@@ -221,11 +224,18 @@ const fetchComunicados = async () => {
                         border: 'none',
                         cursor: 'pointer',
                         fontSize: '1.1rem',
-                        padding: '2px'
+                        padding: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#0055a4'
                       }}
                       title="Copiar enlace"
                     >
-                      📋
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
                     </button>
                   </div>
                 )}
