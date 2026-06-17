@@ -6,6 +6,7 @@ import FormNuevaDireccion from './FormNuevaDireccion';
 import FormNuevoDirectivo from './FormNuevoDirectivo';
 import FormNuevoPersonal from './FormNuevoPersonal';
 import PanelComunicadosAdmin from './PanelComunicadosAdmin';
+import SuperAdminMatrizIndicadores from './SuperAdminMatrizIndicadores';
 
 const API_URL = 'https://api1.strideutmat.com';
 
@@ -557,6 +558,7 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'directivos' ? 'active' : ''}`} onClick={() => setActiveTab('directivos')}>👔 Directivos</button>
         <button className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => setActiveTab('personal')}>👤 Personal</button>
         <button className={`tab-btn ${activeTab === 'comunicados' ? 'active' : ''}`} onClick={() => setActiveTab('comunicados')}>📢 Comunicados</button>
+        <button className={`tab-btn ${activeTab === 'matriz' ? 'active' : ''}`} onClick={() => setActiveTab('matriz')}>📊 Matriz de Indicadores</button>
       </div>
 
       <div className="dashboard-main">
@@ -566,6 +568,7 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'directivos' && renderDirectivos()}
         {activeTab === 'personal' && renderPersonal()}
         {activeTab === 'comunicados' && <PanelComunicadosAdmin admin={admin} onClose={() => setActiveTab('dashboard')} />}
+        {activeTab === 'matriz' && <SuperAdminMatrizIndicadores onClose={() => setActiveTab('dashboard')} />}
       </div>
 
       {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}

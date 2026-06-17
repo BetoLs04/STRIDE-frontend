@@ -1,0 +1,142 @@
+.matriz-indicadores .loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-text);
+  font-size: 1.1rem;
+}
+
+.matriz-indicadores .no-data {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-text);
+}
+
+.matriz-indicadores .no-data p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.secciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.seccion-card {
+  background: var(--white);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.seccion-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.seccion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.seccion-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.seccion-info h3 {
+  margin: 0;
+  color: var(--primary-blue);
+  font-size: 1.15rem;
+}
+
+.seccion-badge {
+  background: var(--light-bg);
+  color: var(--gray-text);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+}
+
+.seccion-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.asignar-direccion-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--light-bg);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.asignar-direccion-form select {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  color: var(--dark-text);
+}
+
+.seccion-direcciones {
+  margin-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 0.75rem;
+}
+
+.direcciones-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.direccion-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(31, 111, 214, 0.08) 0%, rgba(34, 193, 195, 0.08) 100%);
+  border: 1px solid rgba(31, 111, 214, 0.2);
+  color: var(--primary-blue);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--danger-red);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.tag-remove:hover {
+  opacity: 1;
+}
+
+.text-muted {
+  color: var(--gray-text);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0;
+}
