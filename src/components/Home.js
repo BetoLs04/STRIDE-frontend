@@ -41,6 +41,14 @@ const Home = () => {
     }
   }, []);
 
+  const handleLinkClick = (url) => {
+    if (isLoggedIn) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+    }
+  };
+
   const handleMatrizClick = async () => {
     if (!isLoggedIn) {
       toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
