@@ -254,7 +254,7 @@ const MatrizIndicadoresPage = ({ user }) => {
       <div className="matriz-page-toolbar">
         <button className="btn btn-secondary" onClick={goBack}>← Volver al Dashboard</button>
         <span className="matriz-page-seccion">{seccion.nombre}</span>
-        {isSuperAdmin && (
+        {isSuperAdmin && !encabezado?.bloqueo_filas && (
           <button className="btn btn-primary" onClick={handleAddFila} disabled={adding}>+ Agregar fila</button>
         )}
       </div>
@@ -297,14 +297,14 @@ const MatrizIndicadoresPage = ({ user }) => {
                 {COLUMNAS_RESULTADO.map((col, i) => (
                   <th key={i} className={col === 'Anual' ? 'anual' : 'resultado'}>{col}</th>
                 ))}
-                {isSuperAdmin && <th className="th-acciones">Acciones</th>}
+                {isSuperAdmin && !encabezado?.bloqueo_filas && <th className="th-acciones">Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {filas.length === 0 ? (
                 <tr>
-                  <td colSpan={totalColumnas + (isSuperAdmin ? 1 : 0)} className="td-empty">
-                    Sin filas registradas. {isSuperAdmin ? 'Haz clic en "+ Agregar fila"' : ''}
+                  <td colSpan={totalColumnas + (isSuperAdmin && !encabezado?.bloqueo_filas ? 1 : 0)} className="td-empty">
+                    Sin filas registradas. {isSuperAdmin && !encabezado?.bloqueo_filas ? 'Haz clic en "+ Agregar fila"' : ''}
                   </td>
                 </tr>
               ) : (
@@ -349,8 +349,8 @@ const MatrizIndicadoresPage = ({ user }) => {
                       const displayVal = isAnual
                         ? getValor(fila, key)
                         : formatNumero(getValor(fila, key), unidad);
-                      const campoBloqueo = `bloqueo_${['1er_cuatrimestre', '2do_cuatrimestre', '3er_cuatrimestre', 'anual'][i]}`;
-                      const bloqueadoCuatri = encabezado?.[campoBloqueo];
+                      const campoBloqueo = `bloqueo_${['1er_cuatrimestre', '2do_cuatrimestre', '3er_cuatrimestre'][i]}`;
+                      const bloqueadoCuatri = isAnual ? false : encabezado?.[campoBloqueo];
                       const puedeEditarCuatri = isSuperAdmin && !bloqueadoCuatri;
 
                       if (isAnual) {
@@ -377,7 +377,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                         </td>
                       );
                     })}
-                    {isSuperAdmin && (
+                    {isSuperAdmin && !encabezado?.bloqueo_filas && (
                       <td>
                         <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>
                       </td>

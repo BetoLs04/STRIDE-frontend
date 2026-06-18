@@ -37,7 +37,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [bloqueo1er, setBloqueo1er] = useState(false);
   const [bloqueo2do, setBloqueo2do] = useState(false);
   const [bloqueo3er, setBloqueo3er] = useState(false);
-  const [bloqueoAnual, setBloqueoAnual] = useState(false);
+  const [bloqueoFilas, setBloqueoFilas] = useState(false);
   const [bloqueoToggling, setBloqueoToggling] = useState(null);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
         setBloqueo1er(!!res.data.data.bloqueo_1er_cuatrimestre);
         setBloqueo2do(!!res.data.data.bloqueo_2do_cuatrimestre);
         setBloqueo3er(!!res.data.data.bloqueo_3er_cuatrimestre);
-        setBloqueoAnual(!!res.data.data.bloqueo_anual);
+        setBloqueoFilas(!!res.data.data.bloqueo_filas);
       }
     } catch (error) {
       toast.error('Error al cargar datos de encabezado');
@@ -562,15 +562,19 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
             </div>
             <div className="bloqueo-item">
               <span className="bloqueo-label">Anual</span>
+              <span className="bloqueo-nota">Solo superadmin puede editar</span>
+            </div>
+            <div className="bloqueo-item">
+              <span className="bloqueo-label">Agregar / Eliminar filas</span>
               <button
-                className={`btn ${bloqueoAnual ? 'btn-danger' : 'btn-success'} btn-small`}
-                onClick={() => handleToggleBloqueo('bloqueo_anual', setBloqueoAnual)}
-                disabled={bloqueoToggling === 'bloqueo_anual'}
+                className={`btn ${bloqueoFilas ? 'btn-danger' : 'btn-success'} btn-small`}
+                onClick={() => handleToggleBloqueo('bloqueo_filas', setBloqueoFilas)}
+                disabled={bloqueoToggling === 'bloqueo_filas'}
               >
-                {bloqueoToggling === 'bloqueo_anual' ? '...' : bloqueoAnual ? '🔓 Desbloquear' : '🔒 Bloquear'}
+                {bloqueoToggling === 'bloqueo_filas' ? '...' : bloqueoFilas ? '🔓 Desbloquear' : '🔒 Bloquear'}
               </button>
-              <span className={`bloqueo-estado ${bloqueoAnual ? 'bloqueado' : 'desbloqueado'}`}>
-                {bloqueoAnual ? 'Bloqueado' : 'Libre'}
+              <span className={`bloqueo-estado ${bloqueoFilas ? 'bloqueado' : 'desbloqueado'}`}>
+                {bloqueoFilas ? 'Bloqueado' : 'Libre'}
               </span>
             </div>
           </div>

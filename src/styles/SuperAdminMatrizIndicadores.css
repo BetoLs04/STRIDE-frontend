@@ -500,6 +500,13 @@
   color: var(--dark-text);
 }
 
+.bloqueo-nota {
+  font-size: 0.75rem;
+  color: var(--gray-text);
+  font-style: italic;
+  margin-right: 0.5rem;
+}
+
 .bloqueo-estado {
   font-size: 0.75rem;
   font-weight: 600;
