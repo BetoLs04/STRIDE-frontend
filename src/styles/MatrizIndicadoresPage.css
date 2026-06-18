@@ -180,6 +180,42 @@
   background: #eef2ff !important;
 }
 
+.cell-td-readonly {
+  cursor: default !important;
+}
+
+.cell-td-readonly:hover {
+  background: inherit !important;
+}
+
+.cell-td-anual {
+  background: #fff8e1 !important;
+  font-weight: 600;
+}
+
+.cell-select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 3px 2px;
+  font-size: 8.5px;
+  background: white;
+  color: #000;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.cell-select:focus {
+  border-color: var(--primary-blue);
+}
+
+.cell-select:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
 .cell-text {
   display: block;
   font-size: 8.5px;

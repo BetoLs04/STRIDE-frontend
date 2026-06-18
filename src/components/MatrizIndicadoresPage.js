@@ -13,9 +13,13 @@ const COLUMNAS_RESULTADO = [
   'Anual'
 ];
 
-const MatrizIndicadoresPage = () => {
+const OPCIONES_UNIDAD = ['Numero Absoluto', 'Porcentaje', 'Moneda'];
+
+const MatrizIndicadoresPage = ({ user }) => {
   const { seccionId } = useParams();
   const navigate = useNavigate();
+
+  const isSuperAdmin = user?.tipo === 'superadmin';
 
   const [seccion, setSeccion] = useState(null);
   const [encabezado, setEncabezado] = useState(null);
@@ -32,6 +36,71 @@ const MatrizIndicadoresPage = () => {
 
   const columnasActivas = columnas.filter(c => c.activa !== 0);
   const totalColumnas = columnasActivas.length + COLUMNAS_RESULTADO.length;
+
+  const colUnidadIndex = columnasActivas.findIndex(
+    c => c.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === 'unidad de medida'
+  );
+  const colUnidad = colUnidadIndex >= 0 ? columnasActivas[colUnidadIndex] : null;
+
+  const getUnidadMedida = (fila) => {
+    if (!colUnidad) return null;
+    return getValor(fila, `d_${colUnidad.id}`);
+  };
+
+  const getValor = (fila, key) => {
+    try {
+      const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
+      return valores[key] || '';
+    } catch {
+      return '';
+    }
+  };
+
+  const formatNumero = (raw, unidad) => {
+    if (!raw || raw === '') return '';
+    if (unidad === 'Porcentaje') return `${raw}%`;
+    if (unidad === 'Moneda') return `$${raw}`;
+    return raw;
+  };
+
+  const parseNumero = (str) => {
+    if (!str) return NaN;
+    const cleaned = str.replace(/[$%]/g, '').trim();
+    return parseFloat(cleaned);
+  };
+
+  const calcularAnual = (fila) => {
+    const unidad = getUnidadMedida(fila);
+    if (!unidad) return '';
+
+    const v0 = parseNumero(getValor(fila, 'f_0'));
+    const v1 = parseNumero(getValor(fila, 'f_1'));
+    const v2 = parseNumero(getValor(fila, 'f_2'));
+
+    const valores = [v0, v1, v2].filter(v => !isNaN(v));
+    if (valores.length === 0) return '';
+
+    let resultado;
+    if (unidad === 'Moneda') {
+      resultado = valores.reduce((a, b) => a + b, 0);
+    } else {
+      resultado = valores.reduce((a, b) => a + b, 0) / valores.length;
+    }
+
+    return resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
+  };
+
+  const setValorEnFila = (fila, key, value) => {
+    const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
+    valores[key] = value;
+    return valores;
+  };
+
+  const saveFila = async (fila, valores) => {
+    const res = await axios.put(`${API_URL}/api/university/matriz-filas/${fila.id}`, { valores });
+    setFilas(prev => prev.map(f => f.id === fila.id ? res.data.data : f));
+    return res.data.data;
+  };
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -59,19 +128,30 @@ const MatrizIndicadoresPage = () => {
     fetchAll();
   }, [fetchAll]);
 
-  const getValor = (fila, key) => {
+  const handleUnidadChange = async (fila, value) => {
+    const valores = setValorEnFila(fila, `d_${colUnidad.id}`, value);
     try {
-      const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
-      return valores[key] || '';
-    } catch {
-      return '';
+      const updated = await saveFila(fila, valores);
+      const anual = calcularAnual(updated);
+      if (anual !== '') {
+        const valsConAnual = setValorEnFila(updated, 'f_3', anual);
+        await saveFila(updated, valsConAnual);
+      }
+      toast.success('Unidad de medida actualizada');
+    } catch (error) {
+      toast.error('Error al guardar unidad de medida');
     }
   };
 
   const openModal = (fila, key) => {
+    let valor = getValor(fila, key);
+    if (key.startsWith('f_') && key !== 'f_3') {
+      const raw = parseNumero(valor);
+      valor = isNaN(raw) ? '' : raw.toString();
+    }
     setModalFila(fila);
     setModalKey(key);
-    setModalValue(getValor(fila, key));
+    setModalValue(valor);
     setModalOpen(true);
   };
 
@@ -85,11 +165,18 @@ const MatrizIndicadoresPage = () => {
   const handleSaveModal = async () => {
     if (!modalFila) return;
     setModalSaving(true);
-    const valores = typeof modalFila.valores === 'string' ? JSON.parse(modalFila.valores) : (modalFila.valores || {});
-    valores[modalKey] = modalValue;
     try {
-      const res = await axios.put(`${API_URL}/api/university/matriz-filas/${modalFila.id}`, { valores });
-      setFilas(prev => prev.map(f => f.id === modalFila.id ? res.data.data : f));
+      const valores = setValorEnFila(modalFila, modalKey, modalValue);
+      const updated = await saveFila(modalFila, valores);
+
+      if (modalKey === 'f_0' || modalKey === 'f_1' || modalKey === 'f_2') {
+        const anual = calcularAnual(updated);
+        if (anual !== '') {
+          const valsConAnual = setValorEnFila(updated, 'f_3', anual);
+          await saveFila(updated, valsConAnual);
+        }
+      }
+
       closeModal();
       toast.success('Celda guardada');
     } catch (error) {
@@ -126,6 +213,12 @@ const MatrizIndicadoresPage = () => {
     }
   };
 
+  const goBack = () => {
+    if (user?.tipo === 'superadmin') navigate('/admin/dashboard');
+    else if (user?.tipo === 'directivo') navigate('/directivo/dashboard');
+    else navigate('/personal/dashboard');
+  };
+
   if (loading) {
     return (
       <div className="matriz-page-container">
@@ -139,7 +232,7 @@ const MatrizIndicadoresPage = () => {
       <div className="matriz-page-container">
         <div className="no-data">
           <p>Sección no encontrada</p>
-          <button className="btn btn-secondary" onClick={() => navigate('/admin/dashboard')}>← Volver</button>
+          <button className="btn btn-secondary" onClick={goBack}>← Volver</button>
         </div>
       </div>
     );
@@ -148,9 +241,11 @@ const MatrizIndicadoresPage = () => {
   return (
     <div className="matriz-page-container">
       <div className="matriz-page-toolbar">
-        <button className="btn btn-secondary" onClick={() => navigate('/admin/dashboard')}>← Volver al Dashboard</button>
+        <button className="btn btn-secondary" onClick={goBack}>← Volver al Dashboard</button>
         <span className="matriz-page-seccion">{seccion.nombre}</span>
-        <button className="btn btn-primary" onClick={handleAddFila} disabled={adding}>+ Agregar fila</button>
+        {isSuperAdmin && (
+          <button className="btn btn-primary" onClick={handleAddFila} disabled={adding}>+ Agregar fila</button>
+        )}
       </div>
 
       <div className="wrapper">
@@ -191,30 +286,79 @@ const MatrizIndicadoresPage = () => {
                 {COLUMNAS_RESULTADO.map((col, i) => (
                   <th key={i} className={col === 'Anual' ? 'anual' : 'resultado'}>{col}</th>
                 ))}
-                <th className="th-acciones">Acciones</th>
+                {isSuperAdmin && <th className="th-acciones">Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {filas.length === 0 ? (
                 <tr>
-                  <td colSpan={totalColumnas + 1} className="td-empty">Sin filas registradas. Haz clic en "+ Agregar fila"</td>
+                  <td colSpan={totalColumnas + (isSuperAdmin ? 1 : 0)} className="td-empty">
+                    Sin filas registradas. {isSuperAdmin ? 'Haz clic en "+ Agregar fila"' : ''}
+                  </td>
                 </tr>
               ) : (
                 filas.map((fila) => (
                   <tr key={fila.id}>
-                    {columnasActivas.map((col) => (
-                      <td key={col.id} className="cell-td" onClick={() => openModal(fila, `d_${col.id}`)}>
-                        <span className="cell-text">{getValor(fila, `d_${col.id}`) || <span className="cell-placeholder">Escribir...</span>}</span>
+                    {columnasActivas.map((col, idx) => {
+                      const key = `d_${col.id}`;
+                      if (colUnidad && idx === colUnidadIndex) {
+                        return (
+                          <td key={col.id} className="cell-td">
+                            <select
+                              className="cell-select"
+                              value={getValor(fila, key)}
+                              onChange={e => handleUnidadChange(fila, e.target.value)}
+                              disabled={!isSuperAdmin}
+                            >
+                              <option value="">Seleccionar...</option>
+                              {OPCIONES_UNIDAD.map(op => (
+                                <option key={op} value={op}>{op}</option>
+                              ))}
+                            </select>
+                          </td>
+                        );
+                      }
+                      return (
+                        <td
+                          key={col.id}
+                          className={`cell-td${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                          onClick={() => isSuperAdmin && openModal(fila, key)}
+                        >
+                          <span className="cell-text">{getValor(fila, key) || (isSuperAdmin ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
+                        </td>
+                      );
+                    })}
+                    {COLUMNAS_RESULTADO.map((_, i) => {
+                      const key = `f_${i}`;
+                      const unidad = getUnidadMedida(fila);
+                      const isAnual = i === 3;
+                      const displayVal = isAnual
+                        ? getValor(fila, key)
+                        : formatNumero(getValor(fila, key), unidad);
+
+                      if (isAnual) {
+                        return (
+                          <td key={i} className="cell-td cell-td-anual">
+                            <span className="cell-text">{displayVal || ''}</span>
+                          </td>
+                        );
+                      }
+
+                      return (
+                        <td
+                          key={i}
+                          className={`cell-td${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                          onClick={() => isSuperAdmin && openModal(fila, key)}
+                        >
+                          <span className="cell-text">{displayVal || (isSuperAdmin ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
+                        </td>
+                      );
+                    })}
+                    {isSuperAdmin && (
+                      <td>
+                        <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>
                       </td>
-                    ))}
-                    {COLUMNAS_RESULTADO.map((_, i) => (
-                      <td key={i} className="cell-td" onClick={() => openModal(fila, `f_${i}`)}>
-                        <span className="cell-text">{getValor(fila, `f_${i}`) || <span className="cell-placeholder">Escribir...</span>}</span>
-                      </td>
-                    ))}
-                    <td>
-                      <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>
-                    </td>
+                    )}
                   </tr>
                 ))
               )}

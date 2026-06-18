@@ -134,8 +134,20 @@ function App() {
           } />
 
           <Route path="/admin/matriz-indicadores/:seccionId" element={
-            user && user.tipo === 'superadmin' ? 
-            <MatrizIndicadoresPage /> : 
+            user ? 
+            <MatrizIndicadoresPage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/directivo/matriz-indicadores/:seccionId" element={
+            user && (user.tipo === 'directivo' || user.tipo === 'superadmin') ? 
+            <MatrizIndicadoresPage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/personal/matriz-indicadores/:seccionId" element={
+            user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
+            <MatrizIndicadoresPage user={user} /> : 
             <Navigate to="/login" />
           } />
 
