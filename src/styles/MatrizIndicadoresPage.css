@@ -156,9 +156,13 @@
   color: #000;
 }
 
+.matriz-page-container .table-wrapper {
+  overflow-x: auto;
+}
+
 .matriz-page-container tbody tr td {
   border: 1px solid #ccc;
-  padding: 5px 4px;
+  padding: 2px;
   font-size: 8.5px;
   text-align: center;
   vertical-align: middle;
@@ -168,6 +172,44 @@
   background: #f9f9f9;
 }
 
-.matriz-page-container tbody tr.empty td {
-  height: 22px;
+.cell-input {
+  width: 100%;
+  min-width: 70px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 8.5px;
+  padding: 4px 2px;
+  color: #000;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.cell-input:focus {
+  background: #fffbe6;
+  border: 1px solid #f5a623;
+  border-radius: 2px;
+}
+
+.th-acciones {
+  background: #1a1a2e;
+  color: #fff;
+  font-size: 8px;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 4px;
+  border: 1px solid #ccc;
+  text-transform: uppercase;
+  width: 50px;
+}
+
+.td-empty {
+  padding: 2rem;
+  color: var(--gray-text);
+  font-style: italic;
+  font-size: 12px !important;
+}
+
+.matriz-page-toolbar .btn-primary {
+  margin-left: auto;
 }
