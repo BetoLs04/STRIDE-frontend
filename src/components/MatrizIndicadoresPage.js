@@ -6,15 +6,11 @@ import '../styles/MatrizIndicadoresPage.css';
 
 const API_URL = 'https://api1.strideutmat.com';
 
-const COLUMNAS_FIJAS = [
-  'Nombre del Indicador',
-  'Objetivo de Calidad',
-  'Descripción del Indicador',
-  'Fórmula',
-  'Unidad de Medida',
-  'Frecuencia de Medición',
-  'Meta',
-  'Sentido del Indicador'
+const COLUMNAS_RESULTADO = [
+  '1er Cuatrimestre',
+  '2do Cuatrimestre',
+  '3er Cuatrimestre',
+  'Anual'
 ];
 
 const MatrizIndicadoresPage = () => {
@@ -109,26 +105,26 @@ const MatrizIndicadoresPage = () => {
         <table>
           <thead>
             <tr>
-              {COLUMNAS_FIJAS.map((col, i) => (
-                <th key={i}>{col}</th>
-              ))}
               {columnasActivas.map((col) => (
-                <th key={col.id} className={col.nombre.toLowerCase() === 'anual' ? 'anual' : 'resultado'}>{col.nombre}</th>
+                <th key={col.id}>{col.nombre}</th>
+              ))}
+              {COLUMNAS_RESULTADO.map((col, i) => (
+                <th key={i} className={col === 'Anual' ? 'anual' : 'resultado'}>{col}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             <tr className="empty">
-              {COLUMNAS_FIJAS.map((_, i) => <td key={i}></td>)}
               {columnasActivas.map((col) => <td key={col.id}></td>)}
+              {COLUMNAS_RESULTADO.map((_, i) => <td key={i}></td>)}
             </tr>
             <tr className="empty">
-              {COLUMNAS_FIJAS.map((_, i) => <td key={i}></td>)}
               {columnasActivas.map((col) => <td key={col.id}></td>)}
+              {COLUMNAS_RESULTADO.map((_, i) => <td key={i}></td>)}
             </tr>
             <tr className="empty">
-              {COLUMNAS_FIJAS.map((_, i) => <td key={i}></td>)}
               {columnasActivas.map((col) => <td key={col.id}></td>)}
+              {COLUMNAS_RESULTADO.map((_, i) => <td key={i}></td>)}
             </tr>
           </tbody>
         </table>
