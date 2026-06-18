@@ -34,6 +34,11 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [editColumnaId, setEditColumnaId] = useState(null);
   const [editColumnaNombre, setEditColumnaNombre] = useState('');
   const [columnaSaving, setColumnaSaving] = useState(false);
+  const [bloqueo1er, setBloqueo1er] = useState(false);
+  const [bloqueo2do, setBloqueo2do] = useState(false);
+  const [bloqueo3er, setBloqueo3er] = useState(false);
+  const [bloqueoAnual, setBloqueoAnual] = useState(false);
+  const [bloqueoToggling, setBloqueoToggling] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -63,6 +68,10 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
       const res = await axios.get(`${API_URL}/api/university/matriz-encabezado`);
       if (res.data.success && res.data.data) {
         setEncabezado(res.data.data);
+        setBloqueo1er(!!res.data.data.bloqueo_1er_cuatrimestre);
+        setBloqueo2do(!!res.data.data.bloqueo_2do_cuatrimestre);
+        setBloqueo3er(!!res.data.data.bloqueo_3er_cuatrimestre);
+        setBloqueoAnual(!!res.data.data.bloqueo_anual);
       }
     } catch (error) {
       toast.error('Error al cargar datos de encabezado');
@@ -165,10 +174,23 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const handleToggleColumna = async (columna) => {
     try {
       const res = await axios.put(`${API_URL}/api/university/matriz-columnas/${columna.id}/toggle`);
+      setColumnas(prev => prev.map(c => c.id === columna.id ? { ...c, bloqueada: res.data.bloqueada } : c));
       toast.success(res.data.message);
-      fetchColumnas();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al cambiar estado');
+    }
+  };
+
+  const handleToggleBloqueo = async (campo, setter) => {
+    setBloqueoToggling(campo);
+    try {
+      const res = await axios.put(`${API_URL}/api/university/matriz-encabezado/toggle-bloqueo/${campo}`);
+      setter(!!res.data[campo]);
+      toast.success(res.data.message);
+    } catch (error) {
+      toast.error('Error al cambiar bloqueo');
+    } finally {
+      setBloqueoToggling(null);
     }
   };
 
@@ -440,7 +462,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
             ) : (
               <div className="columnas-list">
                 {columnas.map((columna, index) => (
-                  <div key={columna.id} className={`columna-item ${columna.activa === 0 ? 'columna-inactiva' : ''}`}>
+                  <div key={columna.id} className={`columna-item ${columna.bloqueada ? 'columna-bloqueada' : ''}`}>
                     <span className="columna-index">{index + 1}.</span>
                     {editColumnaId === columna.id ? (
                       <div className="columna-edit-inline">
@@ -457,7 +479,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                     ) : (
                       <>
                         <span className="columna-nombre">{columna.nombre}</span>
-                        {columna.activa === 0 && <span className="columna-badge-inactiva">Inactiva</span>}
+                        {columna.bloqueada && <span className="columna-badge-bloqueada">Bloqueada</span>}
                         <div className="columna-alineacion">
                           <button
                             className={`btn-alineacion${columna.alineacion === 'left' ? ' active' : ''}`}
@@ -477,7 +499,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                         </div>
                         <div className="columna-actions">
                           <button className="btn btn-warning btn-small" onClick={() => handleToggleColumna(columna)}>
-                            {columna.activa === 0 ? '✅ Habilitar' : '🚫 Inhabilitar'}
+                            {columna.bloqueada ? '🔓 Desbloquear' : '🔒 Bloquear'}
                           </button>
                           <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>✏️</button>
                           <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>🗑️</button>
@@ -490,6 +512,69 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
             )}
           </div>
         )}
+      </div>
+
+      <div className="bloqueo-cuatrimestres-section">
+        <div className="bloqueo-cuatrimestres-header">
+          <h3>🔒 Bloqueo de Columnas Cuatrimestrales</h3>
+        </div>
+        <div className="bloqueo-cuatrimestres-content">
+          <p className="bloqueo-descripcion">Bloquea la edición individual de cada columna cuatrimestral para todos los usuarios.</p>
+          <div className="bloqueo-individuales">
+            <div className="bloqueo-item">
+              <span className="bloqueo-label">1er Cuatrimestre</span>
+              <button
+                className={`btn ${bloqueo1er ? 'btn-danger' : 'btn-success'} btn-small`}
+                onClick={() => handleToggleBloqueo('bloqueo_1er_cuatrimestre', setBloqueo1er)}
+                disabled={bloqueoToggling === 'bloqueo_1er_cuatrimestre'}
+              >
+                {bloqueoToggling === 'bloqueo_1er_cuatrimestre' ? '...' : bloqueo1er ? '🔓 Desbloquear' : '🔒 Bloquear'}
+              </button>
+              <span className={`bloqueo-estado ${bloqueo1er ? 'bloqueado' : 'desbloqueado'}`}>
+                {bloqueo1er ? 'Bloqueado' : 'Libre'}
+              </span>
+            </div>
+            <div className="bloqueo-item">
+              <span className="bloqueo-label">2do Cuatrimestre</span>
+              <button
+                className={`btn ${bloqueo2do ? 'btn-danger' : 'btn-success'} btn-small`}
+                onClick={() => handleToggleBloqueo('bloqueo_2do_cuatrimestre', setBloqueo2do)}
+                disabled={bloqueoToggling === 'bloqueo_2do_cuatrimestre'}
+              >
+                {bloqueoToggling === 'bloqueo_2do_cuatrimestre' ? '...' : bloqueo2do ? '🔓 Desbloquear' : '🔒 Bloquear'}
+              </button>
+              <span className={`bloqueo-estado ${bloqueo2do ? 'bloqueado' : 'desbloqueado'}`}>
+                {bloqueo2do ? 'Bloqueado' : 'Libre'}
+              </span>
+            </div>
+            <div className="bloqueo-item">
+              <span className="bloqueo-label">3er Cuatrimestre</span>
+              <button
+                className={`btn ${bloqueo3er ? 'btn-danger' : 'btn-success'} btn-small`}
+                onClick={() => handleToggleBloqueo('bloqueo_3er_cuatrimestre', setBloqueo3er)}
+                disabled={bloqueoToggling === 'bloqueo_3er_cuatrimestre'}
+              >
+                {bloqueoToggling === 'bloqueo_3er_cuatrimestre' ? '...' : bloqueo3er ? '🔓 Desbloquear' : '🔒 Bloquear'}
+              </button>
+              <span className={`bloqueo-estado ${bloqueo3er ? 'bloqueado' : 'desbloqueado'}`}>
+                {bloqueo3er ? 'Bloqueado' : 'Libre'}
+              </span>
+            </div>
+            <div className="bloqueo-item">
+              <span className="bloqueo-label">Anual</span>
+              <button
+                className={`btn ${bloqueoAnual ? 'btn-danger' : 'btn-success'} btn-small`}
+                onClick={() => handleToggleBloqueo('bloqueo_anual', setBloqueoAnual)}
+                disabled={bloqueoToggling === 'bloqueo_anual'}
+              >
+                {bloqueoToggling === 'bloqueo_anual' ? '...' : bloqueoAnual ? '🔓 Desbloquear' : '🔒 Bloquear'}
+              </button>
+              <span className={`bloqueo-estado ${bloqueoAnual ? 'bloqueado' : 'desbloqueado'}`}>
+                {bloqueoAnual ? 'Bloqueado' : 'Libre'}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {showForm && (

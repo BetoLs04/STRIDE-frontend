@@ -312,6 +312,8 @@ const MatrizIndicadoresPage = ({ user }) => {
                   <tr key={fila.id}>
                     {columnasActivas.map((col, idx) => {
                       const key = `d_${col.id}`;
+                      const colBloqueada = col.bloqueada;
+                      const puedeEditarCol = isSuperAdmin && !colBloqueada;
                       if (colUnidad && idx === colUnidadIndex) {
                         return (
                           <td key={col.id} className="cell-td">
@@ -319,7 +321,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                               className="cell-select"
                               value={getValor(fila, key)}
                               onChange={e => handleUnidadChange(fila, e.target.value)}
-                              disabled={!isSuperAdmin}
+                              disabled={!puedeEditarCol}
                             >
                               <option value="">Seleccionar...</option>
                               {OPCIONES_UNIDAD.map(op => (
@@ -332,11 +334,11 @@ const MatrizIndicadoresPage = ({ user }) => {
                       return (
                         <td
                           key={col.id}
-                          className={`cell-td${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                          className={`cell-td${!puedeEditarCol ? ' cell-td-readonly' : ''}`}
                           style={{ textAlign: col.alineacion || 'center' }}
-                          onClick={() => isSuperAdmin && openModal(fila, key)}
+                          onClick={() => puedeEditarCol && openModal(fila, key)}
                         >
-                          <span className="cell-text">{getValor(fila, key) || (isSuperAdmin ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
+                          <span className="cell-text">{getValor(fila, key) || (puedeEditarCol ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
                         </td>
                       );
                     })}
@@ -347,16 +349,19 @@ const MatrizIndicadoresPage = ({ user }) => {
                       const displayVal = isAnual
                         ? getValor(fila, key)
                         : formatNumero(getValor(fila, key), unidad);
+                      const campoBloqueo = `bloqueo_${['1er_cuatrimestre', '2do_cuatrimestre', '3er_cuatrimestre', 'anual'][i]}`;
+                      const bloqueadoCuatri = encabezado?.[campoBloqueo];
+                      const puedeEditarCuatri = isSuperAdmin && !bloqueadoCuatri;
 
                       if (isAnual) {
                         return (
                           <td
                             key={i}
-                            className={`cell-td cell-td-anual${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                            className={`cell-td cell-td-anual${!puedeEditarCuatri ? ' cell-td-readonly' : ''}`}
                             style={{ textAlign: 'center' }}
-                            onClick={() => isSuperAdmin && openModal(fila, key)}
+                            onClick={() => puedeEditarCuatri && openModal(fila, key)}
                           >
-                            <span className="cell-text">{displayVal || (isSuperAdmin ? <span className="cell-placeholder">Editar...</span> : '')}</span>
+                            <span className="cell-text">{displayVal || (puedeEditarCuatri ? <span className="cell-placeholder">Editar...</span> : '')}</span>
                           </td>
                         );
                       }
@@ -364,11 +369,11 @@ const MatrizIndicadoresPage = ({ user }) => {
                       return (
                         <td
                           key={i}
-                          className={`cell-td${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                          className={`cell-td${!puedeEditarCuatri ? ' cell-td-readonly' : ''}`}
                           style={{ textAlign: 'center' }}
-                          onClick={() => isSuperAdmin && openModal(fila, key)}
+                          onClick={() => puedeEditarCuatri && openModal(fila, key)}
                         >
-                          <span className="cell-text">{displayVal || (isSuperAdmin ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
+                          <span className="cell-text">{displayVal || (puedeEditarCuatri ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
                         </td>
                       );
                     })}
