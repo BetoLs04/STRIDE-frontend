@@ -13,6 +13,7 @@ import StrideWelcome from './components/StrideWelcome';
 import SuperAdminActividades from './components/SuperAdminActividades';
 import SuperAdminTareas from './components/SuperAdminTareas';
 import PersonalTareas from './components/PersonalTareas';
+import MatrizIndicadoresPage from './components/MatrizIndicadoresPage';
 import Footer from './components/Footer';
 import './styles/App.css';
 
@@ -129,6 +130,12 @@ function App() {
           <Route path="/personal/tareas" element={
             user && user.tipo === 'personal' ? 
             <PersonalTareas user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/admin/matriz-indicadores/:seccionId" element={
+            user && user.tipo === 'superadmin' ? 
+            <MatrizIndicadoresPage /> : 
             <Navigate to="/login" />
           } />
 

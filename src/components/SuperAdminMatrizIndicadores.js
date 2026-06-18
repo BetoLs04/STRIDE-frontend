@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../styles/SuperAdminMatrizIndicadores.css';
@@ -6,6 +7,7 @@ import '../styles/SuperAdminMatrizIndicadores.css';
 const API_URL = 'https://api1.strideutmat.com';
 
 const SuperAdminMatrizIndicadores = ({ onClose }) => {
+  const navigate = useNavigate();
   const [secciones, setSecciones] = useState([]);
   const [direcciones, setDirecciones] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -286,7 +288,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                       <span className="seccion-badge">{seccion.total_direcciones || 0} dirección(es)</span>
                     </div>
                     <div className="seccion-actions">
-                      <button className="btn btn-info btn-small" onClick={() => toast.info('Redirigiendo a la hoja...')}>📄 Visitar hoja</button>
+                      <button className="btn btn-info btn-small" onClick={() => navigate(`/admin/matriz-indicadores/${seccion.id}`)}>📄 Visitar hoja</button>
                       <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Dirección</button>
                       <button className="btn btn-secondary btn-small" onClick={() => handleOpenEdit(seccion)}>✏️ Editar</button>
                       <button className="btn btn-danger btn-small" onClick={() => handleDelete(seccion)}>🗑️ Eliminar</button>
