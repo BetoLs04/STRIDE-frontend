@@ -55,6 +55,10 @@ const Home = () => {
       return;
     }
     const userData = JSON.parse(localStorage.getItem('stride_user'));
+    if (userData?.tipo === 'superadmin') {
+      navigate('/admin/dashboard', { state: { tab: 'matriz' } });
+      return;
+    }
     if (!userData?.direccion_id) {
       toast.info('No tienes una dirección asignada');
       return;
