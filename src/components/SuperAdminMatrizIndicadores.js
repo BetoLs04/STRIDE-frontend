@@ -154,7 +154,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
 
   const handleAlineacionColumna = async (columna, alineacion) => {
     try {
-      const res = await axios.patch(`${API_URL}/api/university/matriz-columnas/${columna.id}/alineacion`, { alineacion });
+      const res = await axios.put(`${API_URL}/api/university/matriz-columnas/${columna.id}/alineacion`, { alineacion });
       setColumnas(prev => prev.map(c => c.id === columna.id ? res.data.data : c));
       toast.success(`Alineación: ${alineacion === 'left' ? 'Izquierda' : alineacion === 'right' ? 'Derecha' : 'Centro'}`);
     } catch (error) {

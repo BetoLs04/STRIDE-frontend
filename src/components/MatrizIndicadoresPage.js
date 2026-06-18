@@ -350,7 +350,7 @@ const MatrizIndicadoresPage = ({ user }) => {
 
                       if (isAnual) {
                         return (
-                          <td key={i} className="cell-td cell-td-anual">
+                          <td key={i} className="cell-td cell-td-anual" style={{ textAlign: 'center' }}>
                             <span className="cell-text">{displayVal || ''}</span>
                           </td>
                         );
@@ -360,6 +360,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                         <td
                           key={i}
                           className={`cell-td${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                          style={{ textAlign: 'center' }}
                           onClick={() => isSuperAdmin && openModal(fila, key)}
                         >
                           <span className="cell-text">{displayVal || (isSuperAdmin ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
