@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { io } from 'socket.io-client';
 import '../styles/MatrizIndicadoresPage.css';
 
 const API_URL = 'https://api1.strideutmat.com';
@@ -129,6 +130,14 @@ const MatrizIndicadoresPage = ({ user }) => {
 
   useEffect(() => {
     fetchAll();
+  }, [fetchAll]);
+
+  useEffect(() => {
+    const socket = io(API_URL);
+    socket.on('matriz-update', () => {
+      fetchAll();
+    });
+    return () => { socket.disconnect(); };
   }, [fetchAll]);
 
   const handleUnidadChange = async (fila, value) => {
