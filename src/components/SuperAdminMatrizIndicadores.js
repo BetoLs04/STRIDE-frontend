@@ -18,8 +18,17 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [showAsignar, setShowAsignar] = useState(null);
   const [direccionAsignar, setDireccionAsignar] = useState('');
 
+  const [encabezado, setEncabezado] = useState({
+    codigo: '', revision: '', fecha_actualizacion: '',
+    fecha_revision_indicadores: '', responsable: '', anio: ''
+  });
+  const [encabezadoLoading, setEncabezadoLoading] = useState(true);
+  const [encabezadoSaving, setEncabezadoSaving] = useState(false);
+  const [editingEncabezado, setEditingEncabezado] = useState(false);
+
   useEffect(() => {
     fetchData();
+    fetchEncabezado();
   }, []);
 
   const fetchData = async () => {
@@ -36,6 +45,42 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchEncabezado = async () => {
+    setEncabezadoLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/university/matriz-encabezado`);
+      if (res.data.success && res.data.data) {
+        setEncabezado(res.data.data);
+      }
+    } catch (error) {
+      toast.error('Error al cargar datos de encabezado');
+    } finally {
+      setEncabezadoLoading(false);
+    }
+  };
+
+  const handleEncabezadoChange = (campo, valor) => {
+    setEncabezado(prev => ({ ...prev, [campo]: valor }));
+  };
+
+  const handleSaveEncabezado = async () => {
+    setEncabezadoSaving(true);
+    try {
+      await axios.put(`${API_URL}/api/university/matriz-encabezado`, encabezado);
+      toast.success('Encabezado guardado correctamente');
+      setEditingEncabezado(false);
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al guardar encabezado');
+    } finally {
+      setEncabezadoSaving(false);
+    }
+  };
+
+  const handleCancelEncabezado = () => {
+    fetchEncabezado();
+    setEditingEncabezado(false);
   };
 
   const handleOpenNew = () => {
@@ -134,60 +179,140 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading">Cargando secciones...</div>
-      ) : secciones.length === 0 ? (
-        <div className="no-data">
-          <p>No hay secciones registradas</p>
-          <button className="btn btn-primary" onClick={handleOpenNew}>Crear Primera Sección</button>
-        </div>
-      ) : (
-        <div className="secciones-list">
-          {secciones.map(seccion => (
-            <div key={seccion.id} className="seccion-card">
-              <div className="seccion-header">
-                <div className="seccion-info">
-                  <h3>{seccion.nombre}</h3>
-                  <span className="seccion-badge">{seccion.total_direcciones || 0} dirección(es)</span>
-                </div>
-                <div className="seccion-actions">
-                  <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Dirección</button>
-                  <button className="btn btn-secondary btn-small" onClick={() => handleOpenEdit(seccion)}>✏️ Editar</button>
-                  <button className="btn btn-danger btn-small" onClick={() => handleDelete(seccion)}>🗑️ Eliminar</button>
-                </div>
-              </div>
-
-              {showAsignar === seccion.id && (
-                <div className="asignar-direccion-form">
-                  <select value={direccionAsignar} onChange={e => setDireccionAsignar(e.target.value)}>
-                    <option value="">Seleccionar dirección...</option>
-                    {getDireccionesDisponibles(seccion).map(d => (
-                      <option key={d.id} value={d.id}>{d.nombre}</option>
-                    ))}
-                  </select>
-                  <button className="btn btn-primary btn-small" onClick={handleAsignarDireccion}>Asignar</button>
-                  <button className="btn btn-secondary btn-small" onClick={() => setShowAsignar(null)}>Cancelar</button>
-                </div>
-              )}
-
-              <div className="seccion-direcciones">
-                {(!seccion.direcciones || seccion.direcciones.length === 0) ? (
-                  <p className="text-muted">Sin direcciones asignadas</p>
-                ) : (
-                  <div className="direcciones-tags">
-                    {seccion.direcciones.map(dir => (
-                      <span key={dir.id} className="direccion-tag">
-                        {dir.nombre}
-                        <button className="tag-remove" onClick={() => handleQuitarDireccion(seccion.id, dir.id, dir.nombre)}>×</button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+      <div className="matriz-main-layout">
+        <div className="matriz-left">
+          {loading ? (
+            <div className="loading">Cargando secciones...</div>
+          ) : secciones.length === 0 ? (
+            <div className="no-data">
+              <p>No hay secciones registradas</p>
+              <button className="btn btn-primary" onClick={handleOpenNew}>Crear Primera Sección</button>
             </div>
-          ))}
+          ) : (
+            <div className="secciones-list">
+              {secciones.map(seccion => (
+                <div key={seccion.id} className="seccion-card">
+                  <div className="seccion-header">
+                    <div className="seccion-info">
+                      <h3>{seccion.nombre}</h3>
+                      <span className="seccion-badge">{seccion.total_direcciones || 0} dirección(es)</span>
+                    </div>
+                    <div className="seccion-actions">
+                      <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Dirección</button>
+                      <button className="btn btn-secondary btn-small" onClick={() => handleOpenEdit(seccion)}>✏️ Editar</button>
+                      <button className="btn btn-danger btn-small" onClick={() => handleDelete(seccion)}>🗑️ Eliminar</button>
+                    </div>
+                  </div>
+
+                  {showAsignar === seccion.id && (
+                    <div className="asignar-direccion-form">
+                      <select value={direccionAsignar} onChange={e => setDireccionAsignar(e.target.value)}>
+                        <option value="">Seleccionar dirección...</option>
+                        {getDireccionesDisponibles(seccion).map(d => (
+                          <option key={d.id} value={d.id}>{d.nombre}</option>
+                        ))}
+                      </select>
+                      <button className="btn btn-primary btn-small" onClick={handleAsignarDireccion}>Asignar</button>
+                      <button className="btn btn-secondary btn-small" onClick={() => setShowAsignar(null)}>Cancelar</button>
+                    </div>
+                  )}
+
+                  <div className="seccion-direcciones">
+                    {(!seccion.direcciones || seccion.direcciones.length === 0) ? (
+                      <p className="text-muted">Sin direcciones asignadas</p>
+                    ) : (
+                      <div className="direcciones-tags">
+                        {seccion.direcciones.map(dir => (
+                          <span key={dir.id} className="direccion-tag">
+                            {dir.nombre}
+                            <button className="tag-remove" onClick={() => handleQuitarDireccion(seccion.id, dir.id, dir.nombre)}>×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="matriz-right">
+          <div className="encabezado-panel">
+            <div className="encabezado-header">
+              <h3>📋 Datos de Encabezado</h3>
+              {!encabezadoLoading && (
+                <button className="encabezado-edit-toggle" onClick={() => setEditingEncabezado(!editingEncabezado)} title={editingEncabezado ? 'Cancelar edición' : 'Editar'}>
+                  {editingEncabezado ? '✕' : '✏️'}
+                </button>
+              )}
+            </div>
+            {encabezadoLoading ? (
+              <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
+            ) : editingEncabezado ? (
+              <div className="encabezado-form">
+                <div className="encabezado-field">
+                  <label>CÓDIGO</label>
+                  <input type="text" value={encabezado.codigo || ''} onChange={e => handleEncabezadoChange('codigo', e.target.value)} placeholder="Código" />
+                </div>
+                <div className="encabezado-field">
+                  <label>REVISIÓN</label>
+                  <input type="text" value={encabezado.revision || ''} onChange={e => handleEncabezadoChange('revision', e.target.value)} placeholder="Revisión" />
+                </div>
+                <div className="encabezado-field">
+                  <label>FECHA DE ACTUALIZACIÓN</label>
+                  <input type="text" value={encabezado.fecha_actualizacion || ''} onChange={e => handleEncabezadoChange('fecha_actualizacion', e.target.value)} placeholder="DD/MM/AAAA" />
+                </div>
+                <div className="encabezado-field">
+                  <label>FECHA DE REVISIÓN DE INDICADORES</label>
+                  <input type="text" value={encabezado.fecha_revision_indicadores || ''} onChange={e => handleEncabezadoChange('fecha_revision_indicadores', e.target.value)} placeholder="DD/MM/AAAA" />
+                </div>
+                <div className="encabezado-field">
+                  <label>RESPONSABLE DE LA MATRIZ</label>
+                  <input type="text" value={encabezado.responsable || ''} onChange={e => handleEncabezadoChange('responsable', e.target.value)} placeholder="Nombre del responsable" />
+                </div>
+                <div className="encabezado-field">
+                  <label>AÑO</label>
+                  <input type="text" value={encabezado.anio || ''} onChange={e => handleEncabezadoChange('anio', e.target.value)} placeholder="AAAA" />
+                </div>
+                <div className="encabezado-form-actions">
+                  <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
+                  <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
+                    {encabezadoSaving ? 'Guardando...' : '💾 Guardar'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="encabezado-view">
+                <div className="encabezado-row">
+                  <span className="encabezado-label">CÓDIGO</span>
+                  <span className="encabezado-value">{encabezado.codigo || '—'}</span>
+                </div>
+                <div className="encabezado-row">
+                  <span className="encabezado-label">REVISIÓN</span>
+                  <span className="encabezado-value">{encabezado.revision || '—'}</span>
+                </div>
+                <div className="encabezado-row">
+                  <span className="encabezado-label">FECHA DE ACTUALIZACIÓN</span>
+                  <span className="encabezado-value">{encabezado.fecha_actualizacion || '—'}</span>
+                </div>
+                <div className="encabezado-row">
+                  <span className="encabezado-label">FECHA DE REVISIÓN DE INDICADORES</span>
+                  <span className="encabezado-value">{encabezado.fecha_revision_indicadores || '—'}</span>
+                </div>
+                <div className="encabezado-row">
+                  <span className="encabezado-label">RESPONSABLE DE LA MATRIZ</span>
+                  <span className="encabezado-value">{encabezado.responsable || '—'}</span>
+                </div>
+                <div className="encabezado-row">
+                  <span className="encabezado-label">AÑO</span>
+                  <span className="encabezado-value">{encabezado.anio || '—'}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {showForm && (
         <div className="form-modal">
