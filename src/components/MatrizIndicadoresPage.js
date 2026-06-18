@@ -24,6 +24,12 @@ const MatrizIndicadoresPage = () => {
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalFila, setModalFila] = useState(null);
+  const [modalKey, setModalKey] = useState('');
+  const [modalValue, setModalValue] = useState('');
+  const [modalSaving, setModalSaving] = useState(false);
+
   const columnasActivas = columnas.filter(c => c.activa !== 0);
   const totalColumnas = columnasActivas.length + COLUMNAS_RESULTADO.length;
 
@@ -62,14 +68,34 @@ const MatrizIndicadoresPage = () => {
     }
   };
 
-  const handleCellChange = async (fila, key, value) => {
-    const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
-    valores[key] = value;
+  const openModal = (fila, key) => {
+    setModalFila(fila);
+    setModalKey(key);
+    setModalValue(getValor(fila, key));
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalFila(null);
+    setModalKey('');
+    setModalValue('');
+  };
+
+  const handleSaveModal = async () => {
+    if (!modalFila) return;
+    setModalSaving(true);
+    const valores = typeof modalFila.valores === 'string' ? JSON.parse(modalFila.valores) : (modalFila.valores || {});
+    valores[modalKey] = modalValue;
     try {
-      const res = await axios.put(`${API_URL}/api/university/matriz-filas/${fila.id}`, { valores });
-      setFilas(prev => prev.map(f => f.id === fila.id ? res.data.data : f));
+      const res = await axios.put(`${API_URL}/api/university/matriz-filas/${modalFila.id}`, { valores });
+      setFilas(prev => prev.map(f => f.id === modalFila.id ? res.data.data : f));
+      closeModal();
+      toast.success('Celda guardada');
     } catch (error) {
       toast.error('Error al guardar celda');
+    } finally {
+      setModalSaving(false);
     }
   };
 
@@ -177,21 +203,13 @@ const MatrizIndicadoresPage = () => {
                 filas.map((fila) => (
                   <tr key={fila.id}>
                     {columnasActivas.map((col) => (
-                      <td key={col.id}>
-                        <input
-                          className="cell-input"
-                          value={getValor(fila, `d_${col.id}`)}
-                          onChange={e => handleCellChange(fila, `d_${col.id}`, e.target.value)}
-                        />
+                      <td key={col.id} className="cell-td" onClick={() => openModal(fila, `d_${col.id}`)}>
+                        <span className="cell-text">{getValor(fila, `d_${col.id}`) || <span className="cell-placeholder">Escribir...</span>}</span>
                       </td>
                     ))}
                     {COLUMNAS_RESULTADO.map((_, i) => (
-                      <td key={i}>
-                        <input
-                          className="cell-input"
-                          value={getValor(fila, `f_${i}`)}
-                          onChange={e => handleCellChange(fila, `f_${i}`, e.target.value)}
-                        />
+                      <td key={i} className="cell-td" onClick={() => openModal(fila, `f_${i}`)}>
+                        <span className="cell-text">{getValor(fila, `f_${i}`) || <span className="cell-placeholder">Escribir...</span>}</span>
                       </td>
                     ))}
                     <td>
@@ -204,6 +222,31 @@ const MatrizIndicadoresPage = () => {
           </table>
         </div>
       </div>
+
+      {modalOpen && (
+        <div className="cell-modal-overlay" onClick={closeModal}>
+          <div className="cell-modal" onClick={e => e.stopPropagation()}>
+            <div className="cell-modal-header">
+              <h3>Editar celda</h3>
+              <button className="close-btn" onClick={closeModal}>×</button>
+            </div>
+            <div className="cell-modal-body">
+              <textarea
+                className="cell-modal-textarea"
+                value={modalValue}
+                onChange={e => setModalValue(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="cell-modal-footer">
+              <button className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
+              <button className="btn btn-primary" onClick={handleSaveModal} disabled={modalSaving}>
+                {modalSaving ? 'Guardando...' : '💾 Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
