@@ -26,9 +26,17 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [encabezadoSaving, setEncabezadoSaving] = useState(false);
   const [editingEncabezado, setEditingEncabezado] = useState(false);
 
+  const [columnas, setColumnas] = useState([]);
+  const [columnasLoading, setColumnasLoading] = useState(true);
+  const [nuevaColumna, setNuevaColumna] = useState('');
+  const [editColumnaId, setEditColumnaId] = useState(null);
+  const [editColumnaNombre, setEditColumnaNombre] = useState('');
+  const [columnaSaving, setColumnaSaving] = useState(false);
+
   useEffect(() => {
     fetchData();
     fetchEncabezado();
+    fetchColumnas();
   }, []);
 
   const fetchData = async () => {
@@ -81,6 +89,76 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const handleCancelEncabezado = () => {
     fetchEncabezado();
     setEditingEncabezado(false);
+  };
+
+  const fetchColumnas = async () => {
+    setColumnasLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/university/matriz-columnas`);
+      setColumnas(res.data.data || []);
+    } catch (error) {
+      toast.error('Error al cargar columnas');
+    } finally {
+      setColumnasLoading(false);
+    }
+  };
+
+  const handleAddColumna = async () => {
+    if (!nuevaColumna.trim()) {
+      toast.error('El nombre es requerido');
+      return;
+    }
+    setColumnaSaving(true);
+    try {
+      await axios.post(`${API_URL}/api/university/matriz-columnas`, { nombre: nuevaColumna.trim() });
+      toast.success('Columna creada');
+      setNuevaColumna('');
+      fetchColumnas();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al crear columna');
+    } finally {
+      setColumnaSaving(false);
+    }
+  };
+
+  const handleStartEditColumna = (columna) => {
+    setEditColumnaId(columna.id);
+    setEditColumnaNombre(columna.nombre);
+  };
+
+  const handleSaveEditColumna = async () => {
+    if (!editColumnaNombre.trim()) {
+      toast.error('El nombre es requerido');
+      return;
+    }
+    setColumnaSaving(true);
+    try {
+      await axios.put(`${API_URL}/api/university/matriz-columnas/${editColumnaId}`, { nombre: editColumnaNombre.trim() });
+      toast.success('Columna actualizada');
+      setEditColumnaId(null);
+      setEditColumnaNombre('');
+      fetchColumnas();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al actualizar columna');
+    } finally {
+      setColumnaSaving(false);
+    }
+  };
+
+  const handleCancelEditColumna = () => {
+    setEditColumnaId(null);
+    setEditColumnaNombre('');
+  };
+
+  const handleDeleteColumna = async (columna) => {
+    if (!window.confirm(`¿Eliminar la columna "${columna.nombre}"?`)) return;
+    try {
+      await axios.delete(`${API_URL}/api/university/matriz-columnas/${columna.id}`);
+      toast.success('Columna eliminada');
+      fetchColumnas();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al eliminar columna');
+    }
   };
 
   const handleOpenNew = () => {
@@ -312,6 +390,62 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="columnas-section">
+        <div className="columnas-header">
+          <h3>📑 Nombre de Columnas</h3>
+        </div>
+        {columnasLoading ? (
+          <div className="loading" style={{ padding: '1rem' }}>Cargando columnas...</div>
+        ) : (
+          <div className="columnas-content">
+            <div className="columnas-add-form">
+              <input
+                type="text"
+                value={nuevaColumna}
+                onChange={e => setNuevaColumna(e.target.value)}
+                placeholder="Nombre de la nueva columna"
+                onKeyDown={e => { if (e.key === 'Enter') handleAddColumna(); }}
+              />
+              <button className="btn btn-primary btn-small" onClick={handleAddColumna} disabled={columnaSaving}>
+                {columnaSaving && !editColumnaId ? '...' : '+ Agregar'}
+              </button>
+            </div>
+            {columnas.length === 0 ? (
+              <p className="text-muted columnas-empty">No hay columnas registradas</p>
+            ) : (
+              <div className="columnas-list">
+                {columnas.map((columna, index) => (
+                  <div key={columna.id} className="columna-item">
+                    <span className="columna-index">{index + 1}.</span>
+                    {editColumnaId === columna.id ? (
+                      <div className="columna-edit-inline">
+                        <input
+                          type="text"
+                          value={editColumnaNombre}
+                          onChange={e => setEditColumnaNombre(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') handleSaveEditColumna(); if (e.key === 'Escape') handleCancelEditColumna(); }}
+                          autoFocus
+                        />
+                        <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>💾</button>
+                        <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>✕</button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="columna-nombre">{columna.nombre}</span>
+                        <div className="columna-actions">
+                          <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>✏️</button>
+                          <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>🗑️</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {showForm && (

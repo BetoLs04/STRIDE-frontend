@@ -286,6 +286,121 @@
   justify-content: center;
 }
 
+.columnas-section {
+  margin-top: 1.5rem;
+  background: var(--white);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.columnas-header {
+  background: linear-gradient(135deg, #2d8a4e, #1e6b38);
+  color: white;
+  padding: 0.85rem 1.25rem;
+}
+
+.columnas-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.columnas-content {
+  padding: 1rem 1.25rem;
+}
+
+.columnas-add-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.columnas-add-form input {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  background: #fafafa;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.columnas-add-form input:focus {
+  outline: none;
+  border-color: #2d8a4e;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(45, 138, 78, 0.1);
+}
+
+.columnas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.columna-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.columna-item:hover {
+  background: #f3f4f6;
+}
+
+.columna-index {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray-text);
+  min-width: 1.5rem;
+}
+
+.columna-nombre {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--dark-text);
+}
+
+.columna-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.columna-edit-inline {
+  flex: 1;
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.columna-edit-inline input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #2d8a4e;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(45, 138, 78, 0.1);
+}
+
+.columna-edit-inline input:focus {
+  outline: none;
+}
+
+.columnas-empty {
+  text-align: center;
+  padding: 1rem 0;
+}
+
 @media (max-width: 900px) {
   .matriz-main-layout {
     flex-direction: column;
