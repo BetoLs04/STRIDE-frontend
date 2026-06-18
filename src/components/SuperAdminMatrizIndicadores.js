@@ -152,7 +152,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
 
   const handleToggleColumna = async (columna) => {
     try {
-      const res = await axios.patch(`${API_URL}/api/university/matriz-columnas/${columna.id}/toggle`);
+      const res = await axios.put(`${API_URL}/api/university/matriz-columnas/${columna.id}/toggle`);
       toast.success(res.data.message);
       fetchColumnas();
     } catch (error) {
