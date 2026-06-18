@@ -150,6 +150,16 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     setEditColumnaNombre('');
   };
 
+  const handleToggleColumna = async (columna) => {
+    try {
+      const res = await axios.patch(`${API_URL}/api/university/matriz-columnas/${columna.id}/toggle`);
+      toast.success(res.data.message);
+      fetchColumnas();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al cambiar estado');
+    }
+  };
+
   const handleDeleteColumna = async (columna) => {
     if (!window.confirm(`¿Eliminar la columna "${columna.nombre}"?`)) return;
     try {
@@ -276,6 +286,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                       <span className="seccion-badge">{seccion.total_direcciones || 0} dirección(es)</span>
                     </div>
                     <div className="seccion-actions">
+                      <button className="btn btn-info btn-small" onClick={() => toast.info('Redirigiendo a la hoja...')}>📄 Visitar hoja</button>
                       <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Dirección</button>
                       <button className="btn btn-secondary btn-small" onClick={() => handleOpenEdit(seccion)}>✏️ Editar</button>
                       <button className="btn btn-danger btn-small" onClick={() => handleDelete(seccion)}>🗑️ Eliminar</button>
@@ -417,7 +428,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
             ) : (
               <div className="columnas-list">
                 {columnas.map((columna, index) => (
-                  <div key={columna.id} className="columna-item">
+                  <div key={columna.id} className={`columna-item ${columna.activa === 0 ? 'columna-inactiva' : ''}`}>
                     <span className="columna-index">{index + 1}.</span>
                     {editColumnaId === columna.id ? (
                       <div className="columna-edit-inline">
@@ -434,7 +445,11 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                     ) : (
                       <>
                         <span className="columna-nombre">{columna.nombre}</span>
+                        {columna.activa === 0 && <span className="columna-badge-inactiva">Inactiva</span>}
                         <div className="columna-actions">
+                          <button className="btn btn-warning btn-small" onClick={() => handleToggleColumna(columna)}>
+                            {columna.activa === 0 ? '✅ Habilitar' : '🚫 Inhabilitar'}
+                          </button>
                           <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>✏️</button>
                           <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>🗑️</button>
                         </div>

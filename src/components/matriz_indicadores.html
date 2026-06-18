@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matriz de Indicadores - RGPLAPI-74</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      background: #fff;
+      padding: 20px;
+      color: #000;
+    }
+
+    .wrapper {
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+
+    /* ── Fila superior: logo + título + ficha técnica ── */
+    .header-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 220px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .logo-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-right: 1px solid #ccc;
+      font-size: 11px;
+      color: #aaa;
+      font-style: italic;
+    }
+
+    .title-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .ficha-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ficha-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid #ccc;
+    }
+    .ficha-row:last-child { border-bottom: none; }
+
+    .ficha-label {
+      background: #f2f2f2;
+      padding: 4px 6px;
+      font-weight: bold;
+      border-right: 1px solid #ccc;
+      font-size: 8px;
+      text-transform: uppercase;
+    }
+
+    .ficha-value {
+      padding: 4px 6px;
+      font-size: 9px;
+    }
+
+    /* ── Fila de metadatos (fecha revisión, responsable, año) ── */
+    .meta-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .meta-cell {
+      padding: 4px 8px;
+      border-right: 1px solid #ccc;
+      font-size: 9px;
+    }
+    .meta-cell:last-child { border-right: none; }
+
+    .meta-cell span {
+      font-weight: bold;
+    }
+
+    /* ── Fila "RESULTADOS" (encabezado naranja) ── */
+    .resultados-banner {
+      background: #F5A623;
+      text-align: right;
+      font-weight: bold;
+      font-size: 10px;
+      padding: 4px 8px;
+      border-bottom: 1px solid #ccc;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Tabla principal de indicadores ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr th {
+      background: #1a1a2e;
+      color: #fff;
+      font-size: 8px;
+      font-weight: bold;
+      text-align: center;
+      padding: 5px 4px;
+      border: 1px solid #ccc;
+      text-transform: uppercase;
+    }
+
+    /* Columnas de resultados en amarillo */
+    thead tr th.resultado {
+      background: #D9EAD3;
+      color: #000;
+    }
+
+    thead tr th.anual {
+      background: #F5C518;
+      color: #000;
+    }
+
+    tbody tr td {
+      border: 1px solid #ccc;
+      padding: 5px 4px;
+      font-size: 8.5px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) { background: #f9f9f9; }
+
+    /* Filas vacías de ejemplo */
+    tbody tr.empty td {
+      height: 22px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ── Encabezado ── -->
+  <div class="header-row">
+
+    <!-- Logo -->
+    <div class="logo-cell">Logo</div>
+
+    <!-- Título -->
+    <div class="title-cell">MATRIZ DE INDICADORES</div>
+
+    <!-- Ficha técnica -->
+    <div class="ficha-cell">
+      <div class="ficha-row">
+        <div class="ficha-label">Código</div>
+        <div class="ficha-value">RGPLAPI-74</div>
+      </div>
+      <div class="ficha-row">
+        <div class="ficha-label">Revisión</div>
+        <div class="ficha-value">3</div>
+      </div>
+      <div class="ficha-row">
+        <div class="ficha-label">Fecha de actualización</div>
+        <div class="ficha-value">8/11/2025</div>
+      </div>
+    </div>
+
+  </div><!-- /header-row -->
+
+  <!-- ── Metadatos ── -->
+  <div class="meta-row">
+    <div class="meta-cell"><span>Fecha de revisión de indicadores:</span> 11 de Agosto 2025</div>
+    <div class="meta-cell"><span>Responsable de la matriz:</span> Jocelynn Gómez</div>
+    <div class="meta-cell"><span>Año:</span> 2025</div>
+  </div>
+
+  <!-- ── Banner RESULTADOS ── -->
+  <div class="resultados-banner">RESULTADOS</div>
+
+  <!-- ── Tabla ── -->
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre del Indicador</th>
+        <th>Objetivo de Calidad</th>
+        <th>Descripción del Indicador</th>
+        <th>Fórmula</th>
+        <th>Unidad de Medida</th>
+        <th>Frecuencia de Medición</th>
+        <th>Meta</th>
+        <th>Sentido del Indicador</th>
+        <th class="resultado">1er Cuatrimestre</th>
+        <th class="resultado">2do Cuatrimestre</th>
+        <th class="resultado">3er Cuatrimestre</th>
+        <th class="anual">Anual</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filas vacías (estructura lista para llenar) -->
+      <tr class="empty">
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr class="empty">
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr class="empty">
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div><!-- /wrapper -->
+
+</body>
+</html>
