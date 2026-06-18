@@ -152,6 +152,16 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     setEditColumnaNombre('');
   };
 
+  const handleAlineacionColumna = async (columna, alineacion) => {
+    try {
+      const res = await axios.patch(`${API_URL}/api/university/matriz-columnas/${columna.id}/alineacion`, { alineacion });
+      setColumnas(prev => prev.map(c => c.id === columna.id ? res.data.data : c));
+      toast.success(`Alineación: ${alineacion === 'left' ? 'Izquierda' : alineacion === 'right' ? 'Derecha' : 'Centro'}`);
+    } catch (error) {
+      toast.error('Error al cambiar alineación');
+    }
+  };
+
   const handleToggleColumna = async (columna) => {
     try {
       const res = await axios.put(`${API_URL}/api/university/matriz-columnas/${columna.id}/toggle`);
@@ -448,6 +458,23 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                       <>
                         <span className="columna-nombre">{columna.nombre}</span>
                         {columna.activa === 0 && <span className="columna-badge-inactiva">Inactiva</span>}
+                        <div className="columna-alineacion">
+                          <button
+                            className={`btn-alineacion${columna.alineacion === 'left' ? ' active' : ''}`}
+                            onClick={() => handleAlineacionColumna(columna, 'left')}
+                            title="Izquierda"
+                          >≡</button>
+                          <button
+                            className={`btn-alineacion${columna.alineacion === 'center' ? ' active' : ''}`}
+                            onClick={() => handleAlineacionColumna(columna, 'center')}
+                            title="Centro"
+                          >≡</button>
+                          <button
+                            className={`btn-alineacion${columna.alineacion === 'right' ? ' active' : ''}`}
+                            onClick={() => handleAlineacionColumna(columna, 'right')}
+                            title="Derecha"
+                          >≡</button>
+                        </div>
                         <div className="columna-actions">
                           <button className="btn btn-warning btn-small" onClick={() => handleToggleColumna(columna)}>
                             {columna.activa === 0 ? '✅ Habilitar' : '🚫 Inhabilitar'}

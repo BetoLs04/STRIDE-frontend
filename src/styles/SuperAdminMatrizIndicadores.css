@@ -369,6 +369,35 @@
   color: var(--dark-text);
 }
 
+.columna-alineacion {
+  display: flex;
+  gap: 2px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  overflow: hidden;
+  background: white;
+}
+
+.btn-alineacion {
+  background: white;
+  border: none;
+  padding: 3px 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #6b7280;
+  line-height: 1;
+  transition: all 0.15s;
+}
+
+.btn-alineacion:hover {
+  background: #f3f4f6;
+}
+
+.btn-alineacion.active {
+  background: var(--primary-blue);
+  color: white;
+}
+
 .columna-actions {
   display: flex;
   gap: 0.35rem;

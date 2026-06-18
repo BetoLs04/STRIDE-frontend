@@ -87,7 +87,10 @@ const MatrizIndicadoresPage = ({ user }) => {
       resultado = valores.reduce((a, b) => a + b, 0) / valores.length;
     }
 
-    return resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
+    const numStr = resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
+    if (unidad === 'Porcentaje') return `${numStr}%`;
+    if (unidad === 'Moneda') return `$${numStr}`;
+    return numStr;
   };
 
   const setValorEnFila = (fila, key, value) => {
@@ -164,6 +167,14 @@ const MatrizIndicadoresPage = ({ user }) => {
 
   const handleSaveModal = async () => {
     if (!modalFila) return;
+    if ((modalKey === 'f_0' || modalKey === 'f_1' || modalKey === 'f_2') && modalValue) {
+      const unidad = getUnidadMedida(modalFila);
+      const num = parseFloat(modalValue);
+      if (unidad === 'Porcentaje' && !isNaN(num) && num > 100) {
+        toast.error('El valor no puede ser mayor a 100 en porcentaje');
+        return;
+      }
+    }
     setModalSaving(true);
     try {
       const valores = setValorEnFila(modalFila, modalKey, modalValue);
@@ -322,6 +333,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                         <td
                           key={col.id}
                           className={`cell-td${isSuperAdmin ? '' : ' cell-td-readonly'}`}
+                          style={{ textAlign: col.alineacion || 'center' }}
                           onClick={() => isSuperAdmin && openModal(fila, key)}
                         >
                           <span className="cell-text">{getValor(fila, key) || (isSuperAdmin ? <span className="cell-placeholder">Escribir...</span> : '')}</span>
