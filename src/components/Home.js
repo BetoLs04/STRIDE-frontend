@@ -41,11 +41,29 @@ const Home = () => {
     }
   }, []);
 
-  const handleLinkClick = (url) => {
-    if (isLoggedIn) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } else {
+  const handleMatrizClick = async () => {
+    if (!isLoggedIn) {
       toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+      return;
+    }
+    const userData = JSON.parse(localStorage.getItem('stride_user'));
+    if (!userData?.direccion_id) {
+      toast.info('No tienes una dirección asignada');
+      return;
+    }
+    try {
+      const res = await axios.get(`https://api1.strideutmat.com/api/university/matriz-secciones`);
+      const secciones = (res.data.data || []).filter(s =>
+        s.direcciones && s.direcciones.some(d => d.id === userData.direccion_id)
+      );
+      if (secciones.length === 0) {
+        toast.info('No hay secciones de matriz para tu dirección');
+        return;
+      }
+      const prefix = userData.tipo === 'superadmin' ? '/admin' : userData.tipo === 'directivo' ? '/directivo' : '/personal';
+      navigate(`${prefix}/matriz-indicadores/${secciones[0].id}`);
+    } catch (error) {
+      toast.error('Error al cargar secciones de la matriz');
     }
   };
 
@@ -394,7 +412,7 @@ const Home = () => {
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
-          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1sQp7fI2Fhe8qWpz22XR3yXbZRy2-Q774MHmlra0RrM8/edit?gid=1451121733#gid=1451121733')}
+          onClick={handleMatrizClick}
         >
           <div className="feature-icon">{isLoggedIn ? '📋' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>MATRIZ DE INDICADORES</h3>

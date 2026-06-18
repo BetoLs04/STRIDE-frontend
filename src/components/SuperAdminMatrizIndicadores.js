@@ -561,10 +561,6 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
               </span>
             </div>
             <div className="bloqueo-item">
-              <span className="bloqueo-label">Anual</span>
-              <span className="bloqueo-nota">Solo superadmin puede editar</span>
-            </div>
-            <div className="bloqueo-item">
               <span className="bloqueo-label">Agregar / Eliminar filas</span>
               <button
                 className={`btn ${bloqueoFilas ? 'btn-danger' : 'btn-success'} btn-small`}

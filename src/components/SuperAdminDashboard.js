@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import FormNuevaDireccion from './FormNuevaDireccion';
@@ -12,6 +12,7 @@ const API_URL = 'https://api1.strideutmat.com';
 
 const SuperAdminDashboard = ({ admin }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [showFormDireccion, setShowFormDireccion] = useState(false);
   const [showFormDirectivo, setShowFormDirectivo] = useState(false);
@@ -37,8 +38,12 @@ const SuperAdminDashboard = ({ admin }) => {
 
   useEffect(() => {
     if (!admin) { navigate('/login'); return; }
+    if (location.state?.tab === 'matriz') {
+      setActiveTab('matriz');
+      window.history.replaceState({}, document.title);
+    }
     fetchData();
-  }, [admin, navigate]);
+  }, [admin, navigate, location.state]);
 
   const fetchData = async () => {
     setLoading(true);

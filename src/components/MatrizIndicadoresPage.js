@@ -225,7 +225,7 @@ const MatrizIndicadoresPage = ({ user }) => {
   };
 
   const goBack = () => {
-    if (user?.tipo === 'superadmin') navigate('/admin/dashboard');
+    if (user?.tipo === 'superadmin') navigate('/admin/dashboard', { state: { tab: 'matriz' } });
     else if (user?.tipo === 'directivo') navigate('/directivo/dashboard');
     else navigate('/personal/dashboard');
   };
@@ -252,7 +252,7 @@ const MatrizIndicadoresPage = ({ user }) => {
   return (
     <div className="matriz-page-container">
       <div className="matriz-page-toolbar">
-        <button className="btn btn-secondary" onClick={goBack}>← Volver al Dashboard</button>
+        <button className="btn btn-secondary" onClick={goBack}>← Volver</button>
         <span className="matriz-page-seccion">{seccion.nombre}</span>
         {isSuperAdmin && !encabezado?.bloqueo_filas && (
           <button className="btn btn-primary" onClick={handleAddFila} disabled={adding}>+ Agregar fila</button>
