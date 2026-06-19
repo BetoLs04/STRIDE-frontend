@@ -67,8 +67,9 @@ const MatrizIndicadoresPage = ({ user }) => {
 
   const formatNumero = (raw, unidad) => {
     if (!raw || raw === '') return '';
-    if (unidad === 'Porcentaje') return `${raw}%`;
-    if (unidad === 'Moneda') return `$${formatConComas(raw)}`;
+    const limpio = raw.replace(/[$%]/g, '').trim();
+    if (unidad === 'Porcentaje') return `${limpio}%`;
+    if (unidad === 'Moneda') return `$${formatConComas(limpio)}`;
     return raw;
   };
 
@@ -96,10 +97,7 @@ const MatrizIndicadoresPage = ({ user }) => {
       resultado = valores.reduce((a, b) => a + b, 0) / valores.length;
     }
 
-    const numStr = resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
-    if (unidad === 'Porcentaje') return `${numStr}%`;
-    if (unidad === 'Moneda') return `$${formatConComas(numStr)}`;
-    return numStr;
+    return resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
   };
 
   const setValorEnFila = (fila, key, value) => {
@@ -194,7 +192,8 @@ const MatrizIndicadoresPage = ({ user }) => {
     }
     setModalSaving(true);
     try {
-      const valores = setValorEnFila(modalFila, modalKey, modalValue);
+      const valorLimpio = modalKey.startsWith('f_') ? modalValue.replace(/[$%,]/g, '').trim() : modalValue;
+      const valores = setValorEnFila(modalFila, modalKey, valorLimpio);
       const updated = await saveFila(modalFila, valores);
 
       if (modalKey === 'f_0' || modalKey === 'f_1' || modalKey === 'f_2') {
@@ -363,9 +362,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                       const key = `f_${i}`;
                       const unidad = getUnidadMedida(fila);
                       const isAnual = i === 3;
-                      const displayVal = isAnual
-                        ? getValor(fila, key)
-                        : formatNumero(getValor(fila, key), unidad);
+                      const displayVal = formatNumero(getValor(fila, key), unidad);
                       const campoBloqueo = `bloqueo_${['1er_cuatrimestre', '2do_cuatrimestre', '3er_cuatrimestre'][i]}`;
                       const bloqueadoCuatri = isAnual ? false : encabezado?.[campoBloqueo];
                       const puedeEditarCuatri = puedeEditar && (esSuperAdmin || !bloqueadoCuatri);
