@@ -7788,7 +7788,7 @@ body {
 /* Para el enlace de tareas (opcional, para darle un color diferente) */
 .tareas-link {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
   color: white !important;
   padding: 6px 15px !important;
   border-radius: 30px !important;
@@ -7798,12 +7798,12 @@ body {
 
 .tareas-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 6px rgba(56, 189, 248, 0.4);
 }
 
-/* Badge de tareas (ya lo teníamos, pero lo refinamos) */
+/* Badge de tareas */
 .tareas-badge {
-  background: #ef4444;
+  background: #0ea5e9;
   color: white;
   font-size: 0.7rem;
   font-weight: bold;
@@ -7820,15 +7820,15 @@ body {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
   }
 
   70% {
-    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0);
   }
 
   100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
   }
 }
 

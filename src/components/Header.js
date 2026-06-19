@@ -528,7 +528,7 @@ const Header = ({ user, onLogout }) => {
               
               {/* Tareas - SOLO PARA PERSONAL con badge */}
               {user.tipo === 'personal' && (
-                <Link to="/personal/tareas" className="nav-link tareas-link">
+                <Link to="/personal/tareas" className="nav-link tareas-link" onClick={() => setTareasPendientes(0)}>
                   <span className="tareas-icon"></span>
                   Tareas
                   {tareasPendientes > 0 && (
@@ -626,7 +626,7 @@ const Header = ({ user, onLogout }) => {
       <style jsx>{`
         .tareas-link {
           position: relative;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
           color: white !important;
           padding: 6px 15px !important;
           border-radius: 30px !important;
@@ -636,7 +636,7 @@ const Header = ({ user, onLogout }) => {
         
         .tareas-link:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 4px 6px rgba(56, 189, 248, 0.4);
         }
         
         .tareas-icon {
@@ -645,7 +645,7 @@ const Header = ({ user, onLogout }) => {
         }
         
         .tareas-badge {
-          background: #ef4444;
+          background: #0ea5e9;
           color: white;
           font-size: 0.7rem;
           font-weight: bold;
@@ -662,13 +662,13 @@ const Header = ({ user, onLogout }) => {
         
         @keyframes pulse {
           0% {
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
           }
           70% {
-            box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 6px rgba(14, 165, 233, 0);
           }
           100% {
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
           }
         }
         
