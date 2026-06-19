@@ -21,6 +21,7 @@ const MatrizIndicadoresPage = ({ user }) => {
   const navigate = useNavigate();
 
   const puedeEditar = ['superadmin', 'directivo', 'personal'].includes(user?.tipo);
+  const esSuperAdmin = user?.tipo === 'superadmin';
 
   const [seccion, setSeccion] = useState(null);
   const [encabezado, setEncabezado] = useState(null);
@@ -57,16 +58,23 @@ const MatrizIndicadoresPage = ({ user }) => {
     }
   };
 
+  const formatConComas = (num) => {
+    if (num === '' || num === null || num === undefined) return '';
+    const partes = num.toString().split('.');
+    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return partes.join('.');
+  };
+
   const formatNumero = (raw, unidad) => {
     if (!raw || raw === '') return '';
     if (unidad === 'Porcentaje') return `${raw}%`;
-    if (unidad === 'Moneda') return `$${raw}`;
+    if (unidad === 'Moneda') return `$${formatConComas(raw)}`;
     return raw;
   };
 
   const parseNumero = (str) => {
     if (!str) return NaN;
-    const cleaned = str.replace(/[$%]/g, '').trim();
+    const cleaned = str.replace(/[$%,]/g, '').trim();
     return parseFloat(cleaned);
   };
 
@@ -90,7 +98,7 @@ const MatrizIndicadoresPage = ({ user }) => {
 
     const numStr = resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
     if (unidad === 'Porcentaje') return `${numStr}%`;
-    if (unidad === 'Moneda') return `$${numStr}`;
+    if (unidad === 'Moneda') return `$${formatConComas(numStr)}`;
     return numStr;
   };
 
@@ -263,7 +271,7 @@ const MatrizIndicadoresPage = ({ user }) => {
       <div className="matriz-page-toolbar">
         <button className="btn btn-secondary" onClick={goBack}>← Volver</button>
         <span className="matriz-page-seccion">{seccion.nombre}</span>
-        {puedeEditar && !encabezado?.bloqueo_filas && (
+        {(esSuperAdmin || !encabezado?.bloqueo_filas) && puedeEditar && (
           <button className="btn btn-primary" onClick={handleAddFila} disabled={adding}>+ Agregar fila</button>
         )}
       </div>
@@ -306,14 +314,14 @@ const MatrizIndicadoresPage = ({ user }) => {
                 {COLUMNAS_RESULTADO.map((col, i) => (
                   <th key={i} className={col === 'Anual' ? 'anual' : 'resultado'}>{col}</th>
                 ))}
-                {puedeEditar && !encabezado?.bloqueo_filas && <th className="th-acciones">Acciones</th>}
+                {(esSuperAdmin || !encabezado?.bloqueo_filas) && puedeEditar && <th className="th-acciones">Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {filas.length === 0 ? (
                 <tr>
-                  <td colSpan={totalColumnas + (puedeEditar && !encabezado?.bloqueo_filas ? 1 : 0)} className="td-empty">
-                    Sin filas registradas. {puedeEditar && !encabezado?.bloqueo_filas ? 'Haz clic en "+ Agregar fila"' : ''}
+                  <td colSpan={totalColumnas + ((esSuperAdmin || !encabezado?.bloqueo_filas) && puedeEditar ? 1 : 0)} className="td-empty">
+                    Sin filas registradas. {(esSuperAdmin || !encabezado?.bloqueo_filas) && puedeEditar ? 'Haz clic en "+ Agregar fila"' : ''}
                   </td>
                 </tr>
               ) : (
@@ -322,7 +330,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                     {columnasActivas.map((col, idx) => {
                       const key = `d_${col.id}`;
                       const colBloqueada = col.bloqueada;
-                      const puedeEditarCol = puedeEditar && !colBloqueada;
+                      const puedeEditarCol = puedeEditar && (esSuperAdmin || !colBloqueada);
                       if (colUnidad && idx === colUnidadIndex) {
                         return (
                           <td key={col.id} className="cell-td">
@@ -360,7 +368,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                         : formatNumero(getValor(fila, key), unidad);
                       const campoBloqueo = `bloqueo_${['1er_cuatrimestre', '2do_cuatrimestre', '3er_cuatrimestre'][i]}`;
                       const bloqueadoCuatri = isAnual ? false : encabezado?.[campoBloqueo];
-                      const puedeEditarCuatri = puedeEditar && !bloqueadoCuatri;
+                      const puedeEditarCuatri = puedeEditar && (esSuperAdmin || !bloqueadoCuatri);
 
                       if (isAnual) {
                         return (
@@ -386,7 +394,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                         </td>
                       );
                     })}
-                    {puedeEditar && !encabezado?.bloqueo_filas && (
+                    {(esSuperAdmin || !encabezado?.bloqueo_filas) && puedeEditar && (
                       <td>
                         <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>
                       </td>
