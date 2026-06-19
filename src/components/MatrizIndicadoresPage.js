@@ -388,7 +388,7 @@ const MatrizIndicadoresPage = ({ user }) => {
                       const displayVal = formatNumero(getValor(fila, key), unidad);
                       const campoBloqueo = `bloqueo_${['1er_cuatrimestre', '2do_cuatrimestre', '3er_cuatrimestre'][i]}`;
                       const bloqueadoCuatri = isAnual ? false : encabezado?.[campoBloqueo];
-                      const puedeEditarCuatri = puedeEditar && (esSuperAdmin || !bloqueadoCuatri);
+                      const puedeEditarCuatri = isAnual ? esSuperAdmin : (puedeEditar && (esSuperAdmin || !bloqueadoCuatri));
 
                       if (isAnual) {
                         return (
