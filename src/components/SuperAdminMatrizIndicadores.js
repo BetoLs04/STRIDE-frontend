@@ -9,7 +9,7 @@ const API_URL = 'https://api1.strideutmat.com';
 const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const navigate = useNavigate();
   const [secciones, setSecciones] = useState([]);
-  const [direcciones, setDirecciones] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [showForm, setShowForm] = useState(false);
@@ -18,7 +18,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [saving, setSaving] = useState(false);
 
   const [showAsignar, setShowAsignar] = useState(null);
-  const [direccionAsignar, setDireccionAsignar] = useState('');
+  const [usuarioAsignar, setUsuarioAsignar] = useState('');
 
   const [encabezado, setEncabezado] = useState({
     codigo: '', revision: '', fecha_actualizacion: '',
@@ -49,12 +49,12 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [secRes, dirRes] = await Promise.all([
+      const [secRes, usuRes] = await Promise.all([
         axios.get(`${API_URL}/api/university/matriz-secciones`),
-        axios.get(`${API_URL}/api/university/direcciones`)
+        axios.get(`${API_URL}/api/university/matriz-usuarios`)
       ]);
       setSecciones(secRes.data.data || []);
-      setDirecciones(dirRes.data.data || []);
+      setUsuarios(usuRes.data.data || []);
     } catch (error) {
       toast.error('Error al cargar datos');
     } finally {
@@ -244,7 +244,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   };
 
   const handleDelete = async (seccion) => {
-    if (!window.confirm(`¿Eliminar la sección "${seccion.nombre}"?\nTambién se eliminarán las asignaciones de direcciones.`)) return;
+    if (!window.confirm(`¿Eliminar la sección "${seccion.nombre}"?\nTambién se eliminarán las asignaciones de usuarios.`)) return;
     try {
       await axios.delete(`${API_URL}/api/university/matriz-secciones/${seccion.id}`);
       toast.success('Sección eliminada');
@@ -256,39 +256,44 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
 
   const handleOpenAsignar = (seccion) => {
     setShowAsignar(seccion.id);
-    setDireccionAsignar('');
+    setUsuarioAsignar('');
   };
 
-  const handleAsignarDireccion = async () => {
-    if (!direccionAsignar) {
-      toast.error('Selecciona una dirección');
+  const handleAsignarUsuario = async () => {
+    if (!usuarioAsignar) {
+      toast.error('Selecciona un usuario');
       return;
     }
+    const [usuarioId, usuarioTipo] = usuarioAsignar.split('_');
     try {
-      await axios.post(`${API_URL}/api/university/matriz-secciones/${showAsignar}/direcciones`, { direccion_id: parseInt(direccionAsignar) });
-      toast.success('Dirección asignada');
+      await axios.post(`${API_URL}/api/university/matriz-secciones/${showAsignar}/usuarios`, {
+        usuario_id: parseInt(usuarioId),
+        usuario_tipo: usuarioTipo
+      });
+      toast.success('Usuario asignado');
       setShowAsignar(null);
-      setDireccionAsignar('');
+      setUsuarioAsignar('');
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al asignar');
     }
   };
 
-  const handleQuitarDireccion = async (seccionId, direccionId, nombreDir) => {
-    if (!window.confirm(`¿Quitar la dirección "${nombreDir}" de esta sección?`)) return;
+  const handleQuitarUsuario = async (seccionId, usuario) => {
+    if (!window.confirm(`¿Quitar a "${usuario.nombre}" de esta sección?`)) return;
     try {
-      await axios.delete(`${API_URL}/api/university/matriz-secciones/${seccionId}/direcciones/${direccionId}`);
-      toast.success('Dirección quitada');
+      await axios.delete(`${API_URL}/api/university/matriz-secciones/${seccionId}/usuarios/${usuario.usuario_id}/${usuario.usuario_tipo}`);
+      toast.success('Usuario quitado');
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Error al quitar dirección');
+      toast.error(error.response?.data?.error || 'Error al quitar usuario');
     }
   };
 
-  const getDireccionesDisponibles = (seccion) => {
-    const asignadasIds = new Set((seccion.direcciones || []).map(d => d.id));
-    return direcciones.filter(d => !asignadasIds.has(d.id));
+  const getUsuariosDisponibles = (seccion) => {
+    const asignados = seccion.usuarios || [];
+    const asignadosKey = new Set(asignados.map(u => `${u.usuario_id}_${u.usuario_tipo}`));
+    return usuarios.filter(u => !asignadosKey.has(`${u.id}_${u.tipo}`));
   };
 
   return (
@@ -317,11 +322,11 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                   <div className="seccion-header">
                     <div className="seccion-info">
                       <h3>{seccion.nombre}</h3>
-                      <span className="seccion-badge">{seccion.total_direcciones || 0} dirección(es)</span>
+                      <span className="seccion-badge">{seccion.total_usuarios || 0} usuario(s)</span>
                     </div>
                     <div className="seccion-actions">
                       <button className="btn btn-info btn-small" onClick={() => navigate(`/admin/matriz-indicadores/${seccion.id}`)}>📄 Visitar hoja</button>
-                      <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Dirección</button>
+                      <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Usuario</button>
                       <button className="btn btn-secondary btn-small" onClick={() => handleOpenEdit(seccion)}>✏️ Editar</button>
                       <button className="btn btn-danger btn-small" onClick={() => handleDelete(seccion)}>🗑️ Eliminar</button>
                     </div>
@@ -329,26 +334,26 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
 
                   {showAsignar === seccion.id && (
                     <div className="asignar-direccion-form">
-                      <select value={direccionAsignar} onChange={e => setDireccionAsignar(e.target.value)}>
-                        <option value="">Seleccionar dirección...</option>
-                        {getDireccionesDisponibles(seccion).map(d => (
-                          <option key={d.id} value={d.id}>{d.nombre}</option>
+                      <select value={usuarioAsignar} onChange={e => setUsuarioAsignar(e.target.value)}>
+                        <option value="">Seleccionar usuario...</option>
+                        {getUsuariosDisponibles(seccion).map(u => (
+                          <option key={`${u.id}_${u.tipo}`} value={`${u.id}_${u.tipo}`}>{u.nombre} ({u.tipo === 'directivo' ? 'Directivo' : 'Personal'})</option>
                         ))}
                       </select>
-                      <button className="btn btn-primary btn-small" onClick={handleAsignarDireccion}>Asignar</button>
+                      <button className="btn btn-primary btn-small" onClick={handleAsignarUsuario}>Asignar</button>
                       <button className="btn btn-secondary btn-small" onClick={() => setShowAsignar(null)}>Cancelar</button>
                     </div>
                   )}
 
                   <div className="seccion-direcciones">
-                    {(!seccion.direcciones || seccion.direcciones.length === 0) ? (
-                      <p className="text-muted">Sin direcciones asignadas</p>
+                    {(!seccion.usuarios || seccion.usuarios.length === 0) ? (
+                      <p className="text-muted">Sin usuarios asignados</p>
                     ) : (
                       <div className="direcciones-tags">
-                        {seccion.direcciones.map(dir => (
-                          <span key={dir.id} className="direccion-tag">
-                            {dir.nombre}
-                            <button className="tag-remove" onClick={() => handleQuitarDireccion(seccion.id, dir.id, dir.nombre)}>×</button>
+                        {seccion.usuarios.map(u => (
+                          <span key={u.asignacion_id} className="direccion-tag">
+                            {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
+                            <button className="tag-remove" onClick={() => handleQuitarUsuario(seccion.id, u)}>×</button>
                           </span>
                         ))}
                       </div>

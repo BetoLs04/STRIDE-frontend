@@ -59,17 +59,13 @@ const Home = () => {
       navigate('/admin/dashboard', { state: { tab: 'matriz' } });
       return;
     }
-    if (!userData?.direccion_id) {
-      toast.info('No tienes una dirección asignada');
-      return;
-    }
     try {
       const res = await axios.get(`https://api1.strideutmat.com/api/university/matriz-secciones`);
       const secciones = (res.data.data || []).filter(s =>
-        s.direcciones && s.direcciones.some(d => d.id === userData.direccion_id)
+        s.usuarios && s.usuarios.some(u => u.usuario_id === userData.id && u.usuario_tipo === userData.tipo)
       );
       if (secciones.length === 0) {
-        toast.info('No hay secciones de matriz para tu dirección');
+        toast.info('No tienes secciones de matriz asignadas');
         return;
       }
       const prefix = userData.tipo === 'superadmin' ? '/admin' : userData.tipo === 'directivo' ? '/directivo' : '/personal';
