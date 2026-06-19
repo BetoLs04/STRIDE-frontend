@@ -20,6 +20,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [showAsignar, setShowAsignar] = useState(null);
   const [showAsignarSeccion, setShowAsignarSeccion] = useState(null);
   const [busquedaPersonal, setBusquedaPersonal] = useState('');
+  const [selectedUsuarios, setSelectedUsuarios] = useState(new Set());
 
   const [encabezado, setEncabezado] = useState({
     codigo: '', revision: '', fecha_actualizacion: '',
@@ -258,18 +259,44 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const handleOpenAsignar = (seccion) => {
     setShowAsignarSeccion(seccion);
     setBusquedaPersonal('');
+    setSelectedUsuarios(new Set());
   };
 
-  const handleAsignarUsuario = async (usuario) => {
+  const toggleUsuario = (usuario) => {
+    const key = `${usuario.id}_${usuario.tipo}`;
+    setSelectedUsuarios(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const handleConfirmarAsignacion = async () => {
+    if (selectedUsuarios.size === 0) {
+      toast.error('Selecciona al menos un usuario');
+      return;
+    }
     try {
-      await axios.post(`${API_URL}/api/university/matriz-secciones/${showAsignarSeccion.id}/usuarios`, {
-        usuario_id: usuario.id,
-        usuario_tipo: usuario.tipo
-      });
-      toast.success(`${usuario.nombre} asignado a "${showAsignarSeccion.nombre}"`);
+      const promises = [];
+      for (const key of selectedUsuarios) {
+        const [id, tipo] = key.split('_');
+        promises.push(
+          axios.post(`${API_URL}/api/university/matriz-secciones/${showAsignarSeccion.id}/usuarios`, {
+            usuario_id: parseInt(id),
+            usuario_tipo: tipo
+          })
+        );
+      }
+      await Promise.all(promises);
+      toast.success(`${selectedUsuarios.size} usuario(s) asignado(s) a "${showAsignarSeccion.nombre}"`);
+      setShowAsignarSeccion(null);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Error al asignar');
+      toast.error(error.response?.data?.error || 'Error al asignar usuarios');
     }
   };
 
@@ -608,12 +635,16 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                     {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').length === 0 ? (
                       <p className="text-muted">No hay directivos disponibles</p>
                     ) : (
-                      getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').map(u => (
-                        <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
-                          <span className="asignar-usuario-nombre">{u.nombre}</span>
-                          <span className="asignar-usuario-tipo">Directivo</span>
-                        </button>
-                      ))
+                      getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedUsuarios.has(key) ? ' selected' : ''}`} onClick={() => toggleUsuario(u)}>
+                            <span className="asignar-check">{selectedUsuarios.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Directivo</span>
+                          </button>
+                        );
+                      })
                     )}
                   </div>
                 </div>
@@ -634,14 +665,27 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                     {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).length === 0 ? (
                       <p className="text-muted">{busquedaPersonal ? 'Sin resultados' : 'No hay personal disponible'}</p>
                     ) : (
-                      getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).map(u => (
-                        <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
-                          <span className="asignar-usuario-nombre">{u.nombre}</span>
-                          <span className="asignar-usuario-tipo">Personal</span>
-                        </button>
-                      ))
+                      getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedUsuarios.has(key) ? ' selected' : ''}`} onClick={() => toggleUsuario(u)}>
+                            <span className="asignar-check">{selectedUsuarios.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Personal</span>
+                          </button>
+                        );
+                      })
                     )}
                   </div>
+                </div>
+              </div>
+              <div className="asignar-footer">
+                <span className="asignar-seleccionados">{selectedUsuarios.size} seleccionado(s)</span>
+                <div className="asignar-footer-actions">
+                  <button className="btn btn-secondary" onClick={() => setShowAsignarSeccion(null)}>Cancelar</button>
+                  <button className="btn btn-primary" onClick={handleConfirmarAsignacion} disabled={selectedUsuarios.size === 0}>
+                    Confirmar asignación
+                  </button>
                 </div>
               </div>
             </div>
