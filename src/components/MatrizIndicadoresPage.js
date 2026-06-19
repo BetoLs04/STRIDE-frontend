@@ -30,6 +30,7 @@ const MatrizIndicadoresPage = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
+  const [denied, setDenied] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalFila, setModalFila] = useState(null);
   const [modalKey, setModalKey] = useState('');
@@ -123,6 +124,15 @@ const MatrizIndicadoresPage = ({ user }) => {
       ]);
 
       const found = (secRes.data.data || []).find(s => s.id === parseInt(seccionId));
+      if (found && !esSuperAdmin) {
+        const tieneAcceso = (found.usuarios || []).some(u => u.usuario_id === user?.id && u.usuario_tipo === user?.tipo);
+        if (!tieneAcceso) {
+          setDenied(true);
+          setSeccion(null);
+          setLoading(false);
+          return;
+        }
+      }
       setSeccion(found || null);
       setEncabezado(encRes.data.data || null);
       setColumnas(colRes.data.data || []);
@@ -250,6 +260,19 @@ const MatrizIndicadoresPage = ({ user }) => {
     return (
       <div className="matriz-page-container">
         <div className="loading">Cargando matriz de indicadores...</div>
+      </div>
+    );
+  }
+
+  if (denied) {
+    return (
+      <div className="matriz-page-container">
+        <div className="no-data" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚫</div>
+          <h2>Permiso denegado</h2>
+          <p style={{ marginBottom: '2rem', color: '#6b7280' }}>No tienes acceso a esta sección de la Matriz de Indicadores.</p>
+          <button className="btn btn-secondary" onClick={goBack}>← Volver</button>
+        </div>
       </div>
     );
   }

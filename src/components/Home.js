@@ -65,7 +65,7 @@ const Home = () => {
         s.usuarios && s.usuarios.some(u => u.usuario_id === userData.id && u.usuario_tipo === userData.tipo)
       );
       if (secciones.length === 0) {
-        toast.info('No tienes secciones de matriz asignadas');
+        toast.error('🚫 Permiso denegado. No tienes acceso a la Matriz de Indicadores.');
         return;
       }
       const prefix = userData.tipo === 'superadmin' ? '/admin' : userData.tipo === 'directivo' ? '/directivo' : '/personal';
