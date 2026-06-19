@@ -18,7 +18,8 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [saving, setSaving] = useState(false);
 
   const [showAsignar, setShowAsignar] = useState(null);
-  const [usuarioAsignar, setUsuarioAsignar] = useState('');
+  const [showAsignarSeccion, setShowAsignarSeccion] = useState(null);
+  const [busquedaPersonal, setBusquedaPersonal] = useState('');
 
   const [encabezado, setEncabezado] = useState({
     codigo: '', revision: '', fecha_actualizacion: '',
@@ -255,24 +256,17 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   };
 
   const handleOpenAsignar = (seccion) => {
-    setShowAsignar(seccion.id);
-    setUsuarioAsignar('');
+    setShowAsignarSeccion(seccion);
+    setBusquedaPersonal('');
   };
 
-  const handleAsignarUsuario = async () => {
-    if (!usuarioAsignar) {
-      toast.error('Selecciona un usuario');
-      return;
-    }
-    const [usuarioId, usuarioTipo] = usuarioAsignar.split('_');
+  const handleAsignarUsuario = async (usuario) => {
     try {
-      await axios.post(`${API_URL}/api/university/matriz-secciones/${showAsignar}/usuarios`, {
-        usuario_id: parseInt(usuarioId),
-        usuario_tipo: usuarioTipo
+      await axios.post(`${API_URL}/api/university/matriz-secciones/${showAsignarSeccion.id}/usuarios`, {
+        usuario_id: usuario.id,
+        usuario_tipo: usuario.tipo
       });
-      toast.success('Usuario asignado');
-      setShowAsignar(null);
-      setUsuarioAsignar('');
+      toast.success(`${usuario.nombre} asignado a "${showAsignarSeccion.nombre}"`);
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al asignar');
@@ -323,27 +317,14 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                     <div className="seccion-info">
                       <h3>{seccion.nombre}</h3>
                       <span className="seccion-badge">{seccion.total_usuarios || 0} usuario(s)</span>
+                      <button className="btn btn-outline btn-small" onClick={() => handleOpenAsignar(seccion)} style={{ marginLeft: '8px' }}>👥 Asignar</button>
                     </div>
                     <div className="seccion-actions">
                       <button className="btn btn-info btn-small" onClick={() => navigate(`/admin/matriz-indicadores/${seccion.id}`)}>📄 Visitar hoja</button>
-                      <button className="btn btn-primary btn-small" onClick={() => handleOpenAsignar(seccion)}>+ Asignar Usuario</button>
                       <button className="btn btn-secondary btn-small" onClick={() => handleOpenEdit(seccion)}>✏️ Editar</button>
                       <button className="btn btn-danger btn-small" onClick={() => handleDelete(seccion)}>🗑️ Eliminar</button>
                     </div>
                   </div>
-
-                  {showAsignar === seccion.id && (
-                    <div className="asignar-direccion-form">
-                      <select value={usuarioAsignar} onChange={e => setUsuarioAsignar(e.target.value)}>
-                        <option value="">Seleccionar usuario...</option>
-                        {getUsuariosDisponibles(seccion).map(u => (
-                          <option key={`${u.id}_${u.tipo}`} value={`${u.id}_${u.tipo}`}>{u.nombre} ({u.tipo === 'directivo' ? 'Directivo' : 'Personal'})</option>
-                        ))}
-                      </select>
-                      <button className="btn btn-primary btn-small" onClick={handleAsignarUsuario}>Asignar</button>
-                      <button className="btn btn-secondary btn-small" onClick={() => setShowAsignar(null)}>Cancelar</button>
-                    </div>
-                  )}
 
                   <div className="seccion-direcciones">
                     {(!seccion.usuarios || seccion.usuarios.length === 0) ? (
@@ -608,6 +589,60 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showAsignarSeccion && (
+        <div className="form-modal" onClick={() => setShowAsignarSeccion(null)}>
+          <div className="form-modal-content asignar-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
+            <div className="form-header">
+              <h2>👥 Asignar usuarios a: <em>{showAsignarSeccion.nombre}</em></h2>
+              <button className="close-btn" onClick={() => setShowAsignarSeccion(null)}>×</button>
+            </div>
+            <div className="asignar-modal-body">
+              <div className="asignar-seccion">
+                <h4>Directivos</h4>
+                <div className="asignar-lista">
+                  {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').length === 0 ? (
+                    <p className="text-muted">No hay directivos disponibles</p>
+                  ) : (
+                    getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').map(u => (
+                      <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
+                        <span className="asignar-usuario-nombre">{u.nombre}</span>
+                        <span className="asignar-usuario-tipo">Directivo</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div className="asignar-divider"></div>
+              <div className="asignar-seccion">
+                <h4>Personal {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 0 && <span className="asignar-count">{getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length}</span>}</h4>
+                {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 5 && (
+                  <input
+                    type="text"
+                    className="asignar-buscar"
+                    placeholder="Buscar personal..."
+                    value={busquedaPersonal}
+                    onChange={e => setBusquedaPersonal(e.target.value)}
+                    autoFocus
+                  />
+                )}
+                <div className="asignar-lista">
+                  {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).length === 0 ? (
+                    <p className="text-muted">{busquedaPersonal ? 'Sin resultados' : 'No hay personal disponible'}</p>
+                  ) : (
+                    getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).map(u => (
+                      <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
+                        <span className="asignar-usuario-nombre">{u.nombre}</span>
+                        <span className="asignar-usuario-tipo">Personal</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

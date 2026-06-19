@@ -556,6 +556,119 @@
   background: #0284c7;
 }
 
+.asignar-modal .form-header h2 {
+  font-size: 1rem;
+}
+
+.asignar-modal-body {
+  padding: 1.25rem 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.asignar-seccion h4 {
+  margin: 0 0 0.6rem 0;
+  color: var(--primary-blue);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.asignar-count {
+  background: var(--primary-blue);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.asignar-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 1rem 0;
+}
+
+.asignar-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.asignar-seccion:last-child .asignar-lista {
+  max-height: 250px;
+}
+
+.asignar-btn-usuario {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: var(--white);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.asignar-btn-usuario:hover {
+  background: #eff6ff;
+  border-color: var(--primary-blue);
+  transform: translateX(2px);
+}
+
+.asignar-usuario-nombre {
+  font-weight: 500;
+  color: var(--dark-text);
+  font-size: 0.9rem;
+}
+
+.asignar-usuario-tipo {
+  font-size: 0.75rem;
+  color: var(--gray-text);
+  background: var(--light-bg);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.asignar-buscar {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.asignar-buscar:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+}
+
+.btn-outline:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
 @media (max-width: 900px) {
   .matriz-main-layout {
     flex-direction: column;
