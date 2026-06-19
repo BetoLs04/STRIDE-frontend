@@ -562,8 +562,16 @@
 
 .asignar-modal-body {
   padding: 1.25rem 1.5rem;
-  max-height: 70vh;
-  overflow-y: auto;
+}
+
+.asignar-columnas {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.asignar-seccion {
+  flex: 1;
+  min-width: 0;
 }
 
 .asignar-seccion h4 {
@@ -589,22 +597,18 @@
   padding: 0 5px;
 }
 
-.asignar-divider {
-  height: 1px;
+.asignar-divider-vertical {
+  width: 1px;
   background: #e5e7eb;
-  margin: 1rem 0;
+  align-self: stretch;
 }
 
 .asignar-lista {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  max-height: 200px;
+  max-height: 280px;
   overflow-y: auto;
-}
-
-.asignar-seccion:last-child .asignar-lista {
-  max-height: 250px;
 }
 
 .asignar-btn-usuario {

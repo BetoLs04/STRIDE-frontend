@@ -601,45 +601,47 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
               <button className="close-btn" onClick={() => setShowAsignarSeccion(null)}>×</button>
             </div>
             <div className="asignar-modal-body">
-              <div className="asignar-seccion">
-                <h4>Directivos</h4>
-                <div className="asignar-lista">
-                  {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').length === 0 ? (
-                    <p className="text-muted">No hay directivos disponibles</p>
-                  ) : (
-                    getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').map(u => (
-                      <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
-                        <span className="asignar-usuario-nombre">{u.nombre}</span>
-                        <span className="asignar-usuario-tipo">Directivo</span>
-                      </button>
-                    ))
-                  )}
+              <div className="asignar-columnas">
+                <div className="asignar-seccion">
+                  <h4>Directivos</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').length === 0 ? (
+                      <p className="text-muted">No hay directivos disponibles</p>
+                    ) : (
+                      getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').map(u => (
+                        <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
+                          <span className="asignar-usuario-nombre">{u.nombre}</span>
+                          <span className="asignar-usuario-tipo">Directivo</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="asignar-divider"></div>
-              <div className="asignar-seccion">
-                <h4>Personal {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 0 && <span className="asignar-count">{getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length}</span>}</h4>
-                {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 5 && (
-                  <input
-                    type="text"
-                    className="asignar-buscar"
-                    placeholder="Buscar personal..."
-                    value={busquedaPersonal}
-                    onChange={e => setBusquedaPersonal(e.target.value)}
-                    autoFocus
-                  />
-                )}
-                <div className="asignar-lista">
-                  {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).length === 0 ? (
-                    <p className="text-muted">{busquedaPersonal ? 'Sin resultados' : 'No hay personal disponible'}</p>
-                  ) : (
-                    getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).map(u => (
-                      <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
-                        <span className="asignar-usuario-nombre">{u.nombre}</span>
-                        <span className="asignar-usuario-tipo">Personal</span>
-                      </button>
-                    ))
+                <div className="asignar-divider-vertical"></div>
+                <div className="asignar-seccion">
+                  <h4>Personal {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 0 && <span className="asignar-count">{getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length}</span>}</h4>
+                  {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 5 && (
+                    <input
+                      type="text"
+                      className="asignar-buscar"
+                      placeholder="Buscar personal..."
+                      value={busquedaPersonal}
+                      onChange={e => setBusquedaPersonal(e.target.value)}
+                      autoFocus
+                    />
                   )}
+                  <div className="asignar-lista">
+                    {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).length === 0 ? (
+                      <p className="text-muted">{busquedaPersonal ? 'Sin resultados' : 'No hay personal disponible'}</p>
+                    ) : (
+                      getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).map(u => (
+                        <button key={`${u.id}_${u.tipo}`} className="asignar-btn-usuario" onClick={() => handleAsignarUsuario(u)}>
+                          <span className="asignar-usuario-nombre">{u.nombre}</span>
+                          <span className="asignar-usuario-tipo">Personal</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
