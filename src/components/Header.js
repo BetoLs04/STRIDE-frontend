@@ -15,6 +15,8 @@ const Header = ({ user, onLogout }) => {
   const [userFullData, setUserFullData] = useState(null);
   const [tareasPendientes, setTareasPendientes] = useState(0);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [superAdminExists, setSuperAdminExists] = useState(false);
+  const [checkingSuperAdmin, setCheckingSuperAdmin] = useState(true);
   const userMenuRef = useRef(null);
 
   useEffect(() => {
@@ -25,8 +27,24 @@ const Header = ({ user, onLogout }) => {
       if (user.tipo === 'personal') {
         cargarTareasPendientes();
       }
+      setCheckingSuperAdmin(false);
+    } else {
+      checkSuperAdminExistence();
     }
   }, [user]);
+
+  const checkSuperAdminExistence = async () => {
+    try {
+      const response = await axios.get('https://api1.strideutmat.com/api/university/superusers');
+      const hasSuperAdmin = response.data.data && response.data.data.length > 0;
+      setSuperAdminExists(hasSuperAdmin);
+    } catch (error) {
+      console.error('Error verificando super admin:', error);
+      setSuperAdminExists(false);
+    } finally {
+      setCheckingSuperAdmin(false);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -614,9 +632,11 @@ const Header = ({ user, onLogout }) => {
               <Link to="/login" className="nav-link active">
                 Iniciar Sesión
               </Link>
-              <Link to="/create-superadmin" className="nav-link">
-                Crear Super Admin
-              </Link>
+              {!checkingSuperAdmin && !superAdminExists && (
+                <Link to="/create-superadmin" className="nav-link">
+                  Crear Super Admin
+                </Link>
+              )}
             </>
           )}
         </nav>
