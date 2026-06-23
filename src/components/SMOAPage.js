@@ -153,7 +153,7 @@ const SMOAPage = ({ user }) => {
   };
 
   const handleFileSelect = (fila) => {
-    if (!puedeEditar) return;
+    if (!puedeEditar && !puedeSubirPptx) return;
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.pptx';
