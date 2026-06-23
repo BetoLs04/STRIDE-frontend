@@ -11,6 +11,8 @@ const API_URL = 'https://api1.strideutmat.com';
 const SuperAdminSMOA = ({ onClose }) => {
   const navigate = useNavigate();
 
+  const quillRef = useRef(null);
+
   const [encabezado, setEncabezado] = useState({ contenido: '' });
   const [encabezadoLoading, setEncabezadoLoading] = useState(true);
   const [encabezadoSaving, setEncabezadoSaving] = useState(false);
@@ -147,6 +149,33 @@ const SuperAdminSMOA = ({ onClose }) => {
   const handleCancelEncabezado = () => {
     fetchEncabezado();
     setEditingEncabezado(false);
+  };
+
+  const handleImageUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('imagen', file);
+      try {
+        const res = await axios.post(`${API_URL}/api/university/smoa-upload-image`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        const url = res.data.url;
+        const quill = quillRef.current?.getEditor();
+        if (quill) {
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, 'image', url);
+          quill.setSelection(range.index + 1);
+        }
+      } catch (error) {
+        toast.error('Error al subir imagen');
+      }
+    };
+    input.click();
   };
 
   const fetchColumnas = async () => {
@@ -448,20 +477,26 @@ const SuperAdminSMOA = ({ onClose }) => {
             ) : editingEncabezado ? (
               <div className="smoa-encabezado-editor">
                 <ReactQuill
+                  ref={quillRef}
                   value={encabezado.contenido || ''}
                   onChange={valor => setEncabezado(prev => ({ ...prev, contenido: valor }))}
                   placeholder="Escribe el contenido del encabezado SMOA..."
                   theme="snow"
                   modules={{
-                    toolbar: [
-                      [{ header: [1, 2, 3, false] }],
-                      ['bold', 'italic', 'underline', 'strike'],
-                      [{ list: 'ordered' }, { list: 'bullet' }],
-                      [{ align: [] }],
-                      [{ color: [] }, { background: [] }],
-                      ['link'],
-                      ['clean']
-                    ]
+                    toolbar: {
+                      container: [
+                        [{ header: [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        [{ align: [] }],
+                        [{ color: [] }, { background: [] }],
+                        ['link', 'image'],
+                        ['clean']
+                      ],
+                      handlers: {
+                        image: handleImageUpload
+                      }
+                    }
                   }}
                   style={{ minHeight: '200px' }}
                 />

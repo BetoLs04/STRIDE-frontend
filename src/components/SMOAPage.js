@@ -17,6 +17,7 @@ const SMOAPage = ({ user }) => {
 
   const esSuperAdmin = user?.tipo === 'superadmin';
   const puedeEditar = esSuperAdmin;
+  const puedeSubirPptx = !esSuperAdmin;
 
   const [encabezado, setEncabezado] = useState(null);
   const [columnas, setColumnas] = useState([]);
@@ -290,15 +291,15 @@ const SMOAPage = ({ user }) => {
                         >
                           📥 Descargar
                         </a>
+                        {(puedeEditar || puedeSubirPptx) && (
+                          <button className="btn btn-secondary btn-small" onClick={() => handleFileSelect(fila)} title="Reemplazar presentación">🔄</button>
+                        )}
                         {puedeEditar && (
-                          <>
-                            <button className="btn btn-secondary btn-small" onClick={() => handleFileSelect(fila)}>🔄</button>
-                            <button className="btn btn-danger btn-small" onClick={() => handleEliminarPptx(fila)}>🗑️</button>
-                          </>
+                          <button className="btn btn-danger btn-small" onClick={() => handleEliminarPptx(fila)} title="Eliminar presentación">🗑️</button>
                         )}
                       </div>
                     ) : (
-                      puedeEditar ? (
+                      (puedeEditar || puedeSubirPptx) ? (
                         <button
                           className="smoa-pptx-upload-btn"
                           onClick={() => handleFileSelect(fila)}

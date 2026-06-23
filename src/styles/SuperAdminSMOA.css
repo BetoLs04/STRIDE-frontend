@@ -202,6 +202,8 @@
   color: #e2e8f0;
   line-height: 1.7;
   font-size: 0.9rem;
+  overflow-x: auto;
+  word-break: break-word;
 }
 
 .smoa-encabezado-contenido h1,
@@ -218,12 +220,19 @@
 .smoa-encabezado-contenido table {
   border-collapse: collapse;
   width: 100%;
+  max-width: 100%;
 }
 
 .smoa-encabezado-contenido table td,
 .smoa-encabezado-contenido table th {
   border: 1px solid #3b2f5c;
   padding: 4px 8px;
+}
+
+.smoa-encabezado-contenido img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
 }
 
 .smoa-filas-pptx-list {
