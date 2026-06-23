@@ -6,11 +6,6 @@ import '../styles/SMOAPage.css';
 
 const API_URL = 'https://api1.strideutmat.com';
 
-const MESES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-];
-
 const COLUMNAS_FIJAS = [
   { id: 'dir_nombre', nombre: 'Nombre de la Dirección' },
   { id: 'pres_archivo', nombre: 'Presentación' }
@@ -39,7 +34,7 @@ const SMOAPage = ({ user }) => {
   const [modalSaving, setModalSaving] = useState(false);
 
   const columnasActivas = columnas.filter(c => c.activa !== 0);
-  const totalColumnas = COLUMNAS_FIJAS.length + columnasActivas.length + MESES.length + 1;
+  const totalColumnas = COLUMNAS_FIJAS.length + columnasActivas.length;
 
   const getValor = (fila, key) => {
     try {
@@ -55,24 +50,6 @@ const SMOAPage = ({ user }) => {
     const partes = num.toString().split('.');
     partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return partes.join('.');
-  };
-
-  const parseNumero = (str) => {
-    if (!str) return NaN;
-    const cleaned = str.replace(/[$%,]/g, '').trim();
-    return parseFloat(cleaned);
-  };
-
-  const calcularAnual = (fila) => {
-    const valores = [];
-    for (let i = 0; i < 12; i++) {
-      const v = parseNumero(getValor(fila, `f_${i}`));
-      if (!isNaN(v)) valores.push(v);
-    }
-    if (valores.length === 0) return '';
-    const suma = valores.reduce((a, b) => a + b, 0);
-    const resultado = suma / valores.length;
-    return resultado % 1 === 0 ? resultado.toString() : resultado.toFixed(2);
   };
 
   const setValorEnFila = (fila, key, value) => {
@@ -204,14 +181,9 @@ const SMOAPage = ({ user }) => {
   const openModal = (fila, key) => {
     if (!puedeEditar) return;
     if (key === 'pres_archivo') return;
-    let valor = getValor(fila, key);
-    if (key.startsWith('f_') && key !== 'f_12') {
-      const raw = parseNumero(valor);
-      valor = isNaN(raw) ? '' : raw.toString();
-    }
     setModalFila(fila);
     setModalKey(key);
-    setModalValue(valor);
+    setModalValue(getValor(fila, key));
     setModalOpen(true);
   };
 
@@ -226,18 +198,8 @@ const SMOAPage = ({ user }) => {
     if (!modalFila) return;
     setModalSaving(true);
     try {
-      const valorLimpio = modalKey.startsWith('f_') ? modalValue.replace(/[$%,]/g, '').trim() : modalValue;
-      const valores = setValorEnFila(modalFila, modalKey, valorLimpio);
-      const updated = await saveFila(modalFila, valores);
-
-      if (modalKey.startsWith('f_') && modalKey !== 'f_12') {
-        const anual = calcularAnual(updated);
-        if (anual !== '') {
-          const valsConAnual = setValorEnFila(updated, 'f_12', anual);
-          await saveFila(updated, valsConAnual);
-        }
-      }
-
+      const valores = setValorEnFila(modalFila, modalKey, modalValue);
+      await saveFila(modalFila, valores);
       closeModal();
       toast.success('Celda guardada');
     } catch (error) {
@@ -305,10 +267,6 @@ const SMOAPage = ({ user }) => {
               {columnasActivas.map((col) => (
                 <th key={col.id}>{col.nombre}</th>
               ))}
-              {MESES.map((mes, i) => (
-                <th key={`mes-${i}`} className="smoa-th-mes">{mes}</th>
-              ))}
-              <th className="smoa-th-anual">Anual</th>
               {puedeEditar && <th className="smoa-th-acciones">Acciones</th>}
             </tr>
           </thead>
@@ -371,22 +329,6 @@ const SMOAPage = ({ user }) => {
                       </td>
                     );
                   })}
-                  {MESES.map((_, i) => {
-                    const key = `f_${i}`;
-                    const displayVal = getValor(fila, key);
-                    return (
-                      <td
-                        key={key}
-                        className={`smoa-cell smoa-cell-mes${!puedeEditar ? ' smoa-cell-readonly' : ''}`}
-                        onClick={() => openModal(fila, key)}
-                      >
-                        <span className="smoa-cell-text">{displayVal || (puedeEditar ? <span className="smoa-cell-placeholder">0</span> : '')}</span>
-                      </td>
-                    );
-                  })}
-                  <td className="smoa-cell smoa-cell-anual smoa-cell-readonly">
-                    <span className="smoa-cell-text">{getValor(fila, 'f_12') || ''}</span>
-                  </td>
                   {puedeEditar && (
                     <td>
                       <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>

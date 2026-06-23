@@ -39,8 +39,9 @@
   margin-bottom: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: #f9fafb;
+  background: #ffffff;
   line-height: 1.7;
+  color: #111827;
 }
 
 .smoa-encabezado-contenido h1,
@@ -48,10 +49,12 @@
 .smoa-encabezado-contenido h3 {
   margin-top: 0;
   margin-bottom: 0.5rem;
+  color: #111827;
 }
 
 .smoa-encabezado-contenido p {
   margin: 0 0 0.5rem;
+  color: #111827;
 }
 
 .smoa-encabezado-contenido table {
@@ -113,19 +116,6 @@
   min-width: 180px;
 }
 
-.smoa-table thead th.smoa-th-mes {
-  background: #e0e7ff;
-  color: #4338ca;
-  font-size: 0.7rem;
-  min-width: 65px;
-}
-
-.smoa-table thead th.smoa-th-anual {
-  background: #fef3c7;
-  color: #92400e;
-  min-width: 70px;
-}
-
 .smoa-table thead th.smoa-th-acciones {
   min-width: 60px;
   background: #f3f4f6;
@@ -160,18 +150,6 @@
 
 .smoa-cell-readonly:hover {
   background: #f9fafb;
-}
-
-.smoa-cell-mes {
-  text-align: center;
-  min-width: 65px;
-}
-
-.smoa-cell-anual {
-  background: #fffbeb;
-  font-weight: 700;
-  text-align: center;
-  min-width: 70px;
 }
 
 .smoa-cell-fija {
