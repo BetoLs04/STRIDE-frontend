@@ -319,10 +319,10 @@ const SuperAdminSMOA = ({ onClose }) => {
   return (
     <div className="tab-content smo-indicadores">
       <div className="tab-header">
-        <h2>📈 SMOA - Seguimiento Mensual de Objetivos Anuales</h2>
+        <h2>SMOA - Seguimiento Mensual de Objetivos Anuales</h2>
         <div className="tab-actions">
           <button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
-          <button style={{ marginLeft: '2rem' }} className="btn btn-primary" onClick={() => navigate('/admin/smoa')}>📄 Ver hoja SMOA</button>
+          <button style={{ marginLeft: '2rem' }} className="btn btn-primary" onClick={() => navigate('/admin/smoa')}>Ver hoja SMOA</button>
         </div>
       </div>
 
@@ -330,7 +330,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         <div className="smoa-left">
           <div className="smoa-panel">
             <div className="smoa-panel-header">
-              <h3>👥 Usuarios con acceso</h3>
+              <h3>Usuarios con acceso</h3>
               <button className="btn btn-outline btn-small" onClick={() => setShowAsignar(true)}>+ Asignar</button>
             </div>
             {usuariosLoading ? (
@@ -351,7 +351,7 @@ const SuperAdminSMOA = ({ onClose }) => {
 
           <div className="smoa-panel">
             <div className="smoa-panel-header">
-              <h3>📁 Presentaciones por dirección</h3>
+              <h3>Presentaciones por dirección</h3>
             </div>
             {filasLoading ? (
               <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
@@ -372,14 +372,14 @@ const SuperAdminSMOA = ({ onClose }) => {
                             className="smoa-pptx-link"
                             download
                           >
-                            📥 Descargar
+                            Descargar
                           </a>
                           <button
                             className="btn btn-danger btn-small"
                             onClick={() => handleEliminarPptxFila(fila)}
                             disabled={uploadingFilaPptx === fila.id}
                           >
-                            🗑️
+                            Eliminar
                           </button>
                         </div>
                       ) : (
@@ -388,7 +388,7 @@ const SuperAdminSMOA = ({ onClose }) => {
                           onClick={() => handleFileSelectFila(fila)}
                           disabled={uploadingFilaPptx === fila.id}
                         >
-                          {uploadingFilaPptx === fila.id ? '...' : '📤 Subir .pptx'}
+                          {uploadingFilaPptx === fila.id ? '...' : 'Subir .pptx'}
                         </button>
                       )}
                     </div>
@@ -407,7 +407,7 @@ const SuperAdminSMOA = ({ onClose }) => {
 
           <div className="smoa-panel">
             <div className="smoa-panel-header">
-              <h3>📑 Columnas</h3>
+              <h3>Columnas</h3>
             </div>
             {columnasLoading ? (
               <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
@@ -441,15 +441,15 @@ const SuperAdminSMOA = ({ onClose }) => {
                               onKeyDown={e => { if (e.key === 'Enter') handleSaveEditColumna(); if (e.key === 'Escape') handleCancelEditColumna(); }}
                               autoFocus
                             />
-                            <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>💾</button>
-                            <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>✕</button>
+                            <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>Guardar</button>
+                            <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>Cancelar</button>
                           </div>
                         ) : (
                           <>
                             <span className="smoa-columna-nombre">{columna.nombre}</span>
                             <div className="smoa-columna-actions">
-                              <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>✏️</button>
-                              <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>🗑️</button>
+                              <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>Editar</button>
+                              <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>Eliminar</button>
                             </div>
                           </>
                         )}
@@ -465,10 +465,10 @@ const SuperAdminSMOA = ({ onClose }) => {
         <div className="smoa-right">
           <div className="smoa-panel">
             <div className="smoa-panel-header">
-              <h3>📋 Encabezado SMOA</h3>
+              <h3>Encabezado SMOA</h3>
               {!encabezadoLoading && (
                 <button className="smoa-edit-toggle" onClick={() => setEditingEncabezado(!editingEncabezado)} title={editingEncabezado ? 'Cancelar edición' : 'Editar'}>
-                  {editingEncabezado ? '✕' : '✏️'}
+                  {editingEncabezado ? 'Cancelar' : 'Editar'}
                 </button>
               )}
             </div>
@@ -503,7 +503,7 @@ const SuperAdminSMOA = ({ onClose }) => {
                 <div className="smoa-encabezado-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
-                    {encabezadoSaving ? 'Publicando...' : '📝 Publicar encabezado'}
+                    {encabezadoSaving ? 'Publicando...' : 'Publicar encabezado'}
                   </button>
                 </div>
               </div>
@@ -512,7 +512,7 @@ const SuperAdminSMOA = ({ onClose }) => {
                 {encabezado.contenido ? (
                   <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
                 ) : (
-                  <p className="text-muted" style={{ padding: '1rem' }}>Sin contenido. Haz clic en ✏️ para escribir el encabezado.</p>
+                  <p className="text-muted" style={{ padding: '1rem' }}>Sin contenido. Haz clic en Editar para escribir el encabezado.</p>
                 )}
               </div>
             )}
@@ -524,7 +524,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         <div className="form-modal" onClick={() => setShowAsignar(false)}>
           <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
             <div className="form-header">
-              <h2>👥 Asignar usuarios a SMOA</h2>
+              <h2>Asignar usuarios a SMOA</h2>
               <button className="close-btn" onClick={() => setShowAsignar(false)}>×</button>
             </div>
             <div className="asignar-modal-body">

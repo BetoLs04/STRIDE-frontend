@@ -224,7 +224,7 @@ const SMOAPage = ({ user }) => {
     return (
       <div className="smoa-page-container">
         <div className="no-data" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚫</div>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⛔</div>
           <h2>Permiso denegado</h2>
           <p style={{ marginBottom: '2rem', color: '#6b7280' }}>No tienes acceso al SMOA.</p>
           <button className="btn btn-secondary" onClick={goBack}>← Volver</button>
@@ -289,13 +289,13 @@ const SMOAPage = ({ user }) => {
                           className="smoa-pptx-link"
                           download
                         >
-                          📥 Descargar
+                          Descargar
                         </a>
                         {(puedeEditar || puedeSubirPptx) && (
-                          <button className="btn btn-secondary btn-small" onClick={() => handleFileSelect(fila)} title="Reemplazar presentación">🔄</button>
+                          <button className="btn btn-secondary btn-small" onClick={() => handleFileSelect(fila)}>Reemplazar</button>
                         )}
                         {puedeEditar && (
-                          <button className="btn btn-danger btn-small" onClick={() => handleEliminarPptx(fila)} title="Eliminar presentación">🗑️</button>
+                          <button className="btn btn-danger btn-small" onClick={() => handleEliminarPptx(fila)}>Eliminar</button>
                         )}
                       </div>
                     ) : (
@@ -305,7 +305,7 @@ const SMOAPage = ({ user }) => {
                           onClick={() => handleFileSelect(fila)}
                           disabled={uploadingFila === fila.id}
                         >
-                          {uploadingFila === fila.id ? '...' : '📤 Subir .pptx'}
+                          {uploadingFila === fila.id ? '...' : 'Subir .pptx'}
                         </button>
                       ) : (
                         <span className="smoa-cell-placeholder">—</span>
@@ -326,7 +326,7 @@ const SMOAPage = ({ user }) => {
                   })}
                   {puedeEditar && (
                     <td className="smoa-cell-acciones">
-                      <button className="smoa-btn-delete" onClick={() => handleDeleteFila(fila)} title="Eliminar fila">🗑️</button>
+                      <button className="smoa-btn-delete" onClick={() => handleDeleteFila(fila)} title="Eliminar fila">Eliminar</button>
                     </td>
                   )}
                 </tr>
@@ -354,7 +354,7 @@ const SMOAPage = ({ user }) => {
             <div className="cell-modal-footer">
               <button className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
               <button className="btn btn-primary" onClick={handleSaveModal} disabled={modalSaving}>
-                {modalSaving ? 'Guardando...' : '💾 Guardar'}
+                {modalSaving ? 'Guardando...' : 'Guardar'}
               </button>
             </div>
           </div>
