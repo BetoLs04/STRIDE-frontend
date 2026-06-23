@@ -7,6 +7,7 @@ import FormNuevoDirectivo from './FormNuevoDirectivo';
 import FormNuevoPersonal from './FormNuevoPersonal';
 import PanelComunicadosAdmin from './PanelComunicadosAdmin';
 import SuperAdminMatrizIndicadores from './SuperAdminMatrizIndicadores';
+import SuperAdminSMOA from './SuperAdminSMOA';
 
 const API_URL = 'https://api1.strideutmat.com';
 
@@ -40,6 +41,10 @@ const SuperAdminDashboard = ({ admin }) => {
     if (!admin) { navigate('/login'); return; }
     if (location.state?.tab === 'matriz') {
       setActiveTab('matriz');
+      window.history.replaceState({}, document.title);
+    }
+    if (location.state?.tab === 'smoa') {
+      setActiveTab('smoa');
       window.history.replaceState({}, document.title);
     }
     fetchData();
@@ -564,6 +569,7 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => setActiveTab('personal')}>👤 Personal</button>
         <button className={`tab-btn ${activeTab === 'comunicados' ? 'active' : ''}`} onClick={() => setActiveTab('comunicados')}>📢 Comunicados</button>
         <button className={`tab-btn ${activeTab === 'matriz' ? 'active' : ''}`} onClick={() => setActiveTab('matriz')}>📊 Matriz de Indicadores</button>
+        <button className={`tab-btn ${activeTab === 'smoa' ? 'active' : ''}`} onClick={() => setActiveTab('smoa')}>📈 SMOA</button>
       </div>
 
       <div className="dashboard-main">
@@ -574,6 +580,7 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'personal' && renderPersonal()}
         {activeTab === 'comunicados' && <PanelComunicadosAdmin admin={admin} onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'matriz' && <SuperAdminMatrizIndicadores onClose={() => setActiveTab('dashboard')} />}
+        {activeTab === 'smoa' && <SuperAdminSMOA onClose={() => setActiveTab('dashboard')} />}
       </div>
 
       {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}

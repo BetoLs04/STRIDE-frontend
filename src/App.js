@@ -14,6 +14,7 @@ import SuperAdminActividades from './components/SuperAdminActividades';
 import SuperAdminTareas from './components/SuperAdminTareas';
 import PersonalTareas from './components/PersonalTareas';
 import MatrizIndicadoresPage from './components/MatrizIndicadoresPage';
+import SMOAPage from './components/SMOAPage';
 import Footer from './components/Footer';
 import './styles/App.css';
 
@@ -148,6 +149,24 @@ function App() {
           <Route path="/personal/matriz-indicadores/:seccionId" element={
             user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
             <MatrizIndicadoresPage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/admin/smoa" element={
+            user && user.tipo === 'superadmin' ? 
+            <SMOAPage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/directivo/smoa" element={
+            user && (user.tipo === 'directivo' || user.tipo === 'superadmin') ? 
+            <SMOAPage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/personal/smoa" element={
+            user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
+            <SMOAPage user={user} /> : 
             <Navigate to="/login" />
           } />
 

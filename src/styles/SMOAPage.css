@@ -1,0 +1,247 @@
+.smoa-page-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.smoa-page-container .loading,
+.smoa-page-container .no-data {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-text);
+  font-size: 1.1rem;
+}
+
+.smoa-page-container .no-data p {
+  margin-bottom: 1rem;
+}
+
+.smoa-page-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.smoa-page-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.smoa-page-title h1 {
+  font-size: 1.4rem;
+  color: var(--primary-blue);
+  margin: 0;
+}
+
+.smoa-encabezado-contenido {
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  line-height: 1.7;
+}
+
+.smoa-encabezado-contenido h1,
+.smoa-encabezado-contenido h2,
+.smoa-encabezado-contenido h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.smoa-encabezado-contenido p {
+  margin: 0 0 0.5rem;
+}
+
+.smoa-encabezado-contenido table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.smoa-encabezado-contenido table td,
+.smoa-encabezado-contenido table th {
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+.smoa-banner {
+  background: #2563eb;
+  color: white;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 0.35rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 0;
+}
+
+.smoa-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.smoa-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  min-width: 800px;
+}
+
+.smoa-table thead th {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #374151;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.smoa-table thead th.smoa-th-mes {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 0.7rem;
+  min-width: 65px;
+}
+
+.smoa-table thead th.smoa-th-anual {
+  background: #fef3c7;
+  color: #92400e;
+  min-width: 70px;
+}
+
+.smoa-table thead th.smoa-th-acciones {
+  min-width: 60px;
+  background: #f3f4f6;
+}
+
+.smoa-table tbody td {
+  border: 1px solid #e5e7eb;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  color: #111827;
+}
+
+.smoa-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.smoa-cell {
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: center;
+  min-width: 80px;
+}
+
+.smoa-cell:hover:not(.smoa-cell-readonly) {
+  background: #eef2ff;
+}
+
+.smoa-cell-readonly {
+  cursor: default;
+  background: #f9fafb;
+}
+
+.smoa-cell-readonly:hover {
+  background: #f9fafb;
+}
+
+.smoa-cell-mes {
+  text-align: center;
+  min-width: 65px;
+}
+
+.smoa-cell-anual {
+  background: #fffbeb;
+  font-weight: 700;
+  text-align: center;
+  min-width: 70px;
+}
+
+.smoa-cell-text {
+  display: block;
+  min-height: 1.2em;
+}
+
+.smoa-cell-placeholder {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+.smoa-td-empty {
+  text-align: center;
+  padding: 2rem !important;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.cell-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.cell-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.cell-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cell-modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.cell-modal-body {
+  padding: 1.5rem;
+}
+
+.cell-modal-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.cell-modal-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.cell-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
