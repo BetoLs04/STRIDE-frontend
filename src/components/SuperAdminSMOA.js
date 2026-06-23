@@ -217,7 +217,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         <h2>📈 SMOA - Seguimiento Mensual de Objetivos Anuales</h2>
         <div className="tab-actions">
           <button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
-          <button className="btn btn-primary" onClick={() => navigate('/admin/smoa')}>📄 Ver hoja SMOA</button>
+          <button style={{ marginLeft: '2rem' }} className="btn btn-primary" onClick={() => navigate('/admin/smoa')}>📄 Ver hoja SMOA</button>
         </div>
       </div>
 
