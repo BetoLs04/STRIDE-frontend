@@ -135,14 +135,13 @@ const SMOAPage = ({ user }) => {
     setUploadingFila(fila.id);
     try {
       const formData = new FormData();
-      formData.append('archivo', file);
+      formData.append('pptx', file);
 
-      const uploadRes = await axios.post(`${API_URL}/api/university/smoa-upload`, formData, {
+      const res = await axios.put(`${API_URL}/api/university/smoa-filas/${fila.id}/pptx`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      const valores = setValorEnFila(fila, 'pres_archivo', uploadRes.data.filename);
-      await saveFila(fila, valores);
+      setFilas(prev => prev.map(f => f.id === fila.id ? res.data.data : f));
       toast.success('Presentación subida exitosamente');
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al subir archivo');
@@ -166,9 +165,13 @@ const SMOAPage = ({ user }) => {
 
   const handleEliminarPptx = async (fila) => {
     if (!window.confirm('¿Eliminar esta presentación?')) return;
-    const valores = setValorEnFila(fila, 'pres_archivo', '');
-    await saveFila(fila, valores);
-    toast.success('Presentación eliminada');
+    try {
+      const res = await axios.put(`${API_URL}/api/university/smoa-filas/${fila.id}/pptx`, { eliminar: 'true' });
+      setFilas(prev => prev.map(f => f.id === fila.id ? res.data.data : f));
+      toast.success('Presentación eliminada');
+    } catch (error) {
+      toast.error('Error al eliminar presentación');
+    }
   };
 
   const openModal = (fila, key) => {
