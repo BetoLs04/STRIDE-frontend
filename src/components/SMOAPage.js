@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -11,8 +11,14 @@ const MESES = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
+const COLUMNAS_FIJAS = [
+  { id: 'dir_nombre', nombre: 'Nombre de la Dirección' },
+  { id: 'pres_archivo', nombre: 'Presentación' }
+];
+
 const SMOAPage = ({ user }) => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const esSuperAdmin = user?.tipo === 'superadmin';
   const puedeEditar = esSuperAdmin;
@@ -24,6 +30,8 @@ const SMOAPage = ({ user }) => {
   const [denied, setDenied] = useState(false);
   const [adding, setAdding] = useState(false);
 
+  const [uploadingFila, setUploadingFila] = useState(null);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalFila, setModalFila] = useState(null);
   const [modalKey, setModalKey] = useState('');
@@ -31,7 +39,7 @@ const SMOAPage = ({ user }) => {
   const [modalSaving, setModalSaving] = useState(false);
 
   const columnasActivas = columnas.filter(c => c.activa !== 0);
-  const totalColumnas = columnasActivas.length + MESES.length + 1;
+  const totalColumnas = COLUMNAS_FIJAS.length + columnasActivas.length + MESES.length + 1;
 
   const getValor = (fila, key) => {
     try {
@@ -138,6 +146,7 @@ const SMOAPage = ({ user }) => {
   const handleDeleteFila = async (fila) => {
     if (!window.confirm('¿Eliminar esta fila?')) return;
     try {
+      const filename = getValor(fila, 'pres_archivo');
       await axios.delete(`${API_URL}/api/university/smoa-filas/${fila.id}`);
       setFilas(prev => prev.filter(f => f.id !== fila.id));
       toast.success('Fila eliminada');
@@ -146,8 +155,55 @@ const SMOAPage = ({ user }) => {
     }
   };
 
+  const handleUploadPptx = async (fila, file) => {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pptx')) {
+      toast.error('Solo se permiten archivos .pptx');
+      return;
+    }
+
+    setUploadingFila(fila.id);
+    try {
+      const formData = new FormData();
+      formData.append('archivo', file);
+
+      const uploadRes = await axios.post(`${API_URL}/api/university/smoa-upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const valores = setValorEnFila(fila, 'pres_archivo', uploadRes.data.filename);
+      await saveFila(fila, valores);
+      toast.success('Presentación subida exitosamente');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al subir archivo');
+    } finally {
+      setUploadingFila(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFileSelect = (fila) => {
+    if (!puedeEditar) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pptx';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) handleUploadPptx(fila, file);
+    };
+    input.click();
+  };
+
+  const handleEliminarPptx = async (fila) => {
+    if (!window.confirm('¿Eliminar esta presentación?')) return;
+    const valores = setValorEnFila(fila, 'pres_archivo', '');
+    await saveFila(fila, valores);
+    toast.success('Presentación eliminada');
+  };
+
   const openModal = (fila, key) => {
     if (!puedeEditar) return;
+    if (key === 'pres_archivo') return;
     let valor = getValor(fila, key);
     if (key.startsWith('f_') && key !== 'f_12') {
       const raw = parseNumero(valor);
@@ -243,6 +299,9 @@ const SMOAPage = ({ user }) => {
         <table className="smoa-table">
           <thead>
             <tr>
+              {COLUMNAS_FIJAS.map(col => (
+                <th key={col.id} className="smoa-th-fija">{col.nombre}</th>
+              ))}
               {columnasActivas.map((col) => (
                 <th key={col.id}>{col.nombre}</th>
               ))}
@@ -263,13 +322,50 @@ const SMOAPage = ({ user }) => {
             ) : (
               filas.map((fila) => (
                 <tr key={fila.id}>
+                  <td
+                    className={`smoa-cell smoa-cell-fija${!puedeEditar ? ' smoa-cell-readonly' : ''}`}
+                    onClick={() => openModal(fila, 'dir_nombre')}
+                  >
+                    <span className="smoa-cell-text">{getValor(fila, 'dir_nombre') || (puedeEditar ? <span className="smoa-cell-placeholder">Escribir...</span> : '')}</span>
+                  </td>
+                  <td className="smoa-cell smoa-cell-fija smoa-cell-pptx">
+                    {getValor(fila, 'pres_archivo') ? (
+                      <div className="smoa-pptx-actions">
+                        <a
+                          href={`${API_URL}/api/university/smoa-uploads/${getValor(fila, 'pres_archivo')}`}
+                          className="smoa-pptx-link"
+                          download
+                        >
+                          📥 Descargar
+                        </a>
+                        {puedeEditar && (
+                          <>
+                            <button className="btn btn-secondary btn-small" onClick={() => handleFileSelect(fila)}>🔄</button>
+                            <button className="btn btn-danger btn-small" onClick={() => handleEliminarPptx(fila)}>🗑️</button>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      puedeEditar ? (
+                        <button
+                          className="smoa-pptx-upload-btn"
+                          onClick={() => handleFileSelect(fila)}
+                          disabled={uploadingFila === fila.id}
+                        >
+                          {uploadingFila === fila.id ? '...' : '📤 Subir .pptx'}
+                        </button>
+                      ) : (
+                        <span className="smoa-cell-placeholder">—</span>
+                      )
+                    )}
+                  </td>
                   {columnasActivas.map((col) => {
                     const key = `d_${col.id}`;
                     return (
                       <td
                         key={col.id}
                         className={`smoa-cell${!puedeEditar ? ' smoa-cell-readonly' : ''}`}
-                        onClick={() => puedeEditar && openModal(fila, key)}
+                        onClick={() => openModal(fila, key)}
                       >
                         <span className="smoa-cell-text">{getValor(fila, key) || (puedeEditar ? <span className="smoa-cell-placeholder">Escribir...</span> : '')}</span>
                       </td>
@@ -282,7 +378,7 @@ const SMOAPage = ({ user }) => {
                       <td
                         key={key}
                         className={`smoa-cell smoa-cell-mes${!puedeEditar ? ' smoa-cell-readonly' : ''}`}
-                        onClick={() => puedeEditar && openModal(fila, key)}
+                        onClick={() => openModal(fila, key)}
                       >
                         <span className="smoa-cell-text">{displayVal || (puedeEditar ? <span className="smoa-cell-placeholder">0</span> : '')}</span>
                       </td>
