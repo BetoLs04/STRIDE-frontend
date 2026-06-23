@@ -226,6 +226,56 @@
   padding: 4px 8px;
 }
 
+.smoa-filas-pptx-list {
+  padding: 0.5rem 1rem;
+}
+
+.smoa-fila-pptx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #3b2f5c;
+  gap: 0.5rem;
+}
+
+.smoa-fila-pptx-item:last-child {
+  border-bottom: none;
+}
+
+.smoa-fila-pptx-nombre {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.smoa-fila-pptx-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.smoa-fila-pptx-actions .smoa-pptx-link {
+  font-size: 0.75rem;
+}
+
+.smoa-fila-pptx-item .btn-outline {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  flex-shrink: 0;
+}
+
+.smoa-fila-pptx-item .btn-danger {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 900px) {
   .smoa-main-layout {
     grid-template-columns: 1fr;

@@ -70,21 +70,9 @@
   font-size: 0.85rem;
 }
 
-.smoa-banner {
-  background: #2563eb;
-  color: white;
-  text-align: center;
-  font-weight: 800;
-  font-size: 0.8rem;
-  padding: 0.35rem;
-  letter-spacing: 0.15em;
-  margin-bottom: 0;
-}
-
 .smoa-table-wrapper {
   overflow-x: auto;
   border: 1px solid #ccc;
-  border-top: none;
 }
 
 .smoa-table {
@@ -117,8 +105,31 @@
 }
 
 .smoa-table thead th.smoa-th-acciones {
-  min-width: 60px;
+  min-width: 40px;
+  width: 40px;
   background: #f3f4f6;
+  padding: 6px 2px;
+}
+
+.smoa-cell-acciones {
+  text-align: center;
+  width: 40px;
+  min-width: 40px;
+  padding: 2px !important;
+}
+
+.smoa-btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 2px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.smoa-btn-delete:hover {
+  opacity: 1;
 }
 
 .smoa-table tbody td {

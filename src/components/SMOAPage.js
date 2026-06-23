@@ -45,13 +45,6 @@ const SMOAPage = ({ user }) => {
     }
   };
 
-  const formatConComas = (num) => {
-    if (num === '' || num === null || num === undefined) return '';
-    const partes = num.toString().split('.');
-    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return partes.join('.');
-  };
-
   const setValorEnFila = (fila, key, value) => {
     const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
     valores[key] = value;
@@ -248,14 +241,12 @@ const SMOAPage = ({ user }) => {
       </div>
 
       <div className="smoa-page-title">
-        <h1>SMOA - Seguimiento Mensual de Objetivos Anuales</h1>
+        <h1>Seguimiento Mensual de Objetivos Anuales</h1>
       </div>
 
       {encabezado?.contenido && (
         <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
       )}
-
-      <div className="smoa-banner">SEGUIMIENTO MENSUAL</div>
 
       <div className="smoa-table-wrapper">
         <table className="smoa-table">
@@ -330,8 +321,8 @@ const SMOAPage = ({ user }) => {
                     );
                   })}
                   {puedeEditar && (
-                    <td>
-                      <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>
+                    <td className="smoa-cell-acciones">
+                      <button className="smoa-btn-delete" onClick={() => handleDeleteFila(fila)} title="Eliminar fila">🗑️</button>
                     </td>
                   )}
                 </tr>

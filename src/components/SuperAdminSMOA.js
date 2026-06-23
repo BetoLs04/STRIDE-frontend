@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill-new';
 import axios from 'axios';
@@ -29,6 +29,13 @@ const SuperAdminSMOA = ({ onClose }) => {
   const [showAsignar, setShowAsignar] = useState(false);
   const [selectedUsuarios, setSelectedUsuarios] = useState(new Set());
 
+  const [filas, setFilas] = useState([]);
+  const [filasLoading, setFilasLoading] = useState(true);
+
+  const [uploadingFilaPptx, setUploadingFilaPptx] = useState(null);
+  const fileInputRef = useRef(null);
+  const [fileSelectFila, setFileSelectFila] = useState(null);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -37,8 +44,77 @@ const SuperAdminSMOA = ({ onClose }) => {
     await Promise.all([
       fetchEncabezado(),
       fetchColumnas(),
-      fetchUsuarios()
+      fetchUsuarios(),
+      fetchFilas()
     ]);
+  };
+
+  const fetchFilas = async () => {
+    setFilasLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/university/smoa-filas`);
+      setFilas(res.data.data || []);
+    } catch (error) {
+      toast.error('Error al cargar filas SMOA');
+    } finally {
+      setFilasLoading(false);
+    }
+  };
+
+  const getValor = (fila, key) => {
+    try {
+      const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
+      return valores[key] || '';
+    } catch {
+      return '';
+    }
+  };
+
+  const handleFileSelectFila = (fila) => {
+    setFileSelectFila(fila);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !fileSelectFila) return;
+    if (!file.name.endsWith('.pptx')) {
+      toast.error('Solo se permiten archivos .pptx');
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('El archivo no puede superar los 50MB');
+      return;
+    }
+    setUploadingFilaPptx(fileSelectFila.id);
+    try {
+      const formData = new FormData();
+      formData.append('pptx', file);
+      await axios.put(`${API_URL}/api/university/smoa-filas/${fileSelectFila.id}/pptx`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success('Presentación subida');
+      fetchFilas();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al subir presentación');
+    } finally {
+      setUploadingFilaPptx(null);
+      setFileSelectFila(null);
+    }
+  };
+
+  const handleEliminarPptxFila = async (fila) => {
+    if (!window.confirm(`¿Eliminar la presentación de "${getValor(fila, 'dir_nombre')}"?`)) return;
+    try {
+      await axios.put(`${API_URL}/api/university/smoa-filas/${fila.id}/pptx`, { eliminar: true });
+      toast.success('Presentación eliminada');
+      fetchFilas();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al eliminar presentación');
+    }
   };
 
   const fetchEncabezado = async () => {
@@ -240,6 +316,62 @@ const SuperAdminSMOA = ({ onClose }) => {
                     <button className="tag-remove" onClick={() => handleQuitarUsuario(u)}>×</button>
                   </span>
                 ))}
+              </div>
+            )}
+          </div>
+
+          <div className="smoa-panel">
+            <div className="smoa-panel-header">
+              <h3>📁 Presentaciones por dirección</h3>
+            </div>
+            {filasLoading ? (
+              <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
+            ) : filas.length === 0 ? (
+              <p className="text-muted" style={{ padding: '1rem' }}>No hay filas registradas</p>
+            ) : (
+              <div className="smoa-filas-pptx-list">
+                {filas.map(fila => {
+                  const nombre = getValor(fila, 'dir_nombre') || `Fila #${fila.id}`;
+                  const archivo = getValor(fila, 'pres_archivo');
+                  return (
+                    <div key={fila.id} className="smoa-fila-pptx-item">
+                      <span className="smoa-fila-pptx-nombre">{nombre}</span>
+                      {archivo ? (
+                        <div className="smoa-fila-pptx-actions">
+                          <a
+                            href={`${API_URL}/api/university/smoa-uploads/${archivo}`}
+                            className="smoa-pptx-link"
+                            download
+                          >
+                            📥 Descargar
+                          </a>
+                          <button
+                            className="btn btn-danger btn-small"
+                            onClick={() => handleEliminarPptxFila(fila)}
+                            disabled={uploadingFilaPptx === fila.id}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn btn-outline btn-small"
+                          onClick={() => handleFileSelectFila(fila)}
+                          disabled={uploadingFilaPptx === fila.id}
+                        >
+                          {uploadingFilaPptx === fila.id ? '...' : '📤 Subir .pptx'}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pptx"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
               </div>
             )}
           </div>
