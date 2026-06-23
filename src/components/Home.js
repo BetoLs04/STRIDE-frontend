@@ -75,6 +75,31 @@ const Home = () => {
     }
   };
 
+  const handleSMOAClick = async () => {
+    if (!isLoggedIn) {
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+      return;
+    }
+    const userData = JSON.parse(localStorage.getItem('stride_user'));
+    if (userData?.tipo === 'superadmin') {
+      navigate('/admin/dashboard', { state: { tab: 'smoa' } });
+      return;
+    }
+    try {
+      const res = await axios.get(`https://api1.strideutmat.com/api/university/smoa-usuarios`);
+      const asignados = res.data.data || [];
+      const tieneAcceso = asignados.some(u => u.usuario_id === userData.id && u.usuario_tipo === userData.tipo);
+      if (!tieneAcceso) {
+        toast.error('🚫 Permiso denegado. No tienes acceso al SMOA.');
+        return;
+      }
+      const prefix = userData.tipo === 'directivo' ? '/directivo' : '/personal';
+      navigate(`${prefix}/smoa`);
+    } catch (error) {
+      toast.error('Error al verificar acceso al SMOA');
+    }
+  };
+
   const checkSuperAdminExistence = async () => {
     try {
       const response = await axios.get('https://api1.strideutmat.com/api/university/superusers');
@@ -424,6 +449,15 @@ const Home = () => {
         >
           <div className="feature-icon">{isLoggedIn ? '📋' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>MATRIZ DE INDICADORES</h3>
+        </div>
+
+        <div
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          onClick={handleSMOAClick}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>SMOA</h3>
         </div>
       </div>
     </div>
