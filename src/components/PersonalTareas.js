@@ -486,13 +486,19 @@ const PersonalTareas = ({ user }) => {
           border-radius: 0 6px 6px 0;
         }
 
-        .tarea-descripcion-texto {
-          margin: 0;
+        .tarea-descripcion-completa .ql-editor {
           font-size: 0.92rem;
           color: #374151;
           line-height: 1.65;
-          white-space: pre-wrap;
-          word-break: break-word;
+          padding: 0;
+        }
+        .tarea-descripcion-completa .ql-editor p,
+        .tarea-descripcion-completa .ql-editor div {
+          margin-bottom: 0.5rem;
+        }
+        .tarea-descripcion-completa .ql-editor p:last-child,
+        .tarea-descripcion-completa .ql-editor div:last-child {
+          margin-bottom: 0;
         }
 
         .tarea-descripcion-modal {

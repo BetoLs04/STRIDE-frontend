@@ -758,7 +758,7 @@ const SuperAdminTareas = ({ admin }) => {
                     <h4>Descripción</h4>
                     <div
                       className="ql-editor"
-                      style={{ padding: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                      style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                       dangerouslySetInnerHTML={{ __html: selectedTarea.descripcion }}
                     />
                   </div>

@@ -899,13 +899,20 @@
   font-weight: 600;
 }
 
-.detalle-descripcion p {
-  margin: 0;
-  color: #475569;
-  line-height: 1.6;
+.detalle-descripcion .ql-editor {
   padding: 15px;
   background: #f8fafc;
   border-radius: 10px;
+  color: #475569;
+  line-height: 1.6;
+}
+.detalle-descripcion .ql-editor p,
+.detalle-descripcion .ql-editor div {
+  margin-bottom: 0.5rem;
+}
+.detalle-descripcion .ql-editor p:last-child,
+.detalle-descripcion .ql-editor div:last-child {
+  margin-bottom: 0;
 }
 
 .archivos-lista {
