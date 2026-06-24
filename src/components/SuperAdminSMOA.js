@@ -220,7 +220,10 @@ const SuperAdminSMOA = ({ onClose }) => {
   const handleSaveEncabezado = async () => {
     setEncabezadoSaving(true);
     try {
-      await axios.put(`${API_URL}/api/university/smoa-encabezado`, { contenido: encabezado.contenido });
+      const editor = quillRef.current?.getEditor?.();
+      const contenido = editor?.root?.innerHTML ?? encabezado.contenido;
+      await axios.put(`${API_URL}/api/university/smoa-encabezado`, { contenido });
+      setEncabezado(prev => ({ ...prev, contenido }));
       toast.success('Encabezado SMOA guardado correctamente');
       setEditingEncabezado(false);
     } catch (error) {
@@ -572,10 +575,7 @@ const SuperAdminSMOA = ({ onClose }) => {
                 <ReactQuill
                   ref={quillRef}
                   value={encabezado.contenido || ''}
-                  onChange={(valor, delta, source, editor) => {
-                    const html = editor?.getSemanticHTML ? editor.getSemanticHTML() : valor;
-                    setEncabezado(prev => ({ ...prev, contenido: html }));
-                  }}
+                  onChange={valor => setEncabezado(prev => ({ ...prev, contenido: valor }))}
                   placeholder="Escribe el contenido del encabezado SMOA..."
                   theme="snow"
                   modules={{
