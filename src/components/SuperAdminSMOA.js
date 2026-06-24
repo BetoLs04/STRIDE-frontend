@@ -572,7 +572,10 @@ const SuperAdminSMOA = ({ onClose }) => {
                 <ReactQuill
                   ref={quillRef}
                   value={encabezado.contenido || ''}
-                  onChange={valor => setEncabezado(prev => ({ ...prev, contenido: valor }))}
+                  onChange={(valor, delta, source, editor) => {
+                    const html = editor?.getSemanticHTML ? editor.getSemanticHTML() : valor;
+                    setEncabezado(prev => ({ ...prev, contenido: html }));
+                  }}
                   placeholder="Escribe el contenido del encabezado SMOA..."
                   theme="snow"
                   modules={{
