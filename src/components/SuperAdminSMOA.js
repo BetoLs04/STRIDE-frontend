@@ -222,7 +222,7 @@ const SuperAdminSMOA = ({ onClose }) => {
     try {
       const editor = quillRef.current?.getEditor?.();
       const contenido = editor?.root?.innerHTML ?? encabezado.contenido;
-      await axios.put(`${API_URL}/api/university/smoa-encabezado`, { contenido });
+      await axios.put(`${API_URL}/api/university/smoa-encabezado`, { contenido, imagen: encabezado.imagen ?? null });
       setEncabezado(prev => ({ ...prev, contenido }));
       toast.success('Encabezado SMOA guardado correctamente');
       setEditingEncabezado(false);
@@ -236,6 +236,41 @@ const SuperAdminSMOA = ({ onClose }) => {
   const handleCancelEncabezado = () => {
     fetchEncabezado();
     setEditingEncabezado(false);
+  };
+
+  const encabezadoImageUrl = encabezado?.imagen ? `${API_URL}/api/university/smoa-editor-images/${encabezado.imagen}` : null;
+
+  const handleUploadEncabezadoImage = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('imagen', file);
+      try {
+        const res = await axios.post(`${API_URL}/api/university/smoa-upload-image`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        setEncabezado(prev => ({ ...prev, imagen: res.data.filename }));
+        toast.success('Imagen de encabezado subida');
+      } catch (error) {
+        toast.error('Error al subir imagen');
+      }
+    };
+    input.click();
+  };
+
+  const handleDeleteEncabezadoImage = async () => {
+    if (!window.confirm('¿Eliminar la imagen del encabezado?')) return;
+    try {
+      await axios.put(`${API_URL}/api/university/smoa-encabezado`, { imagen: null, contenido: encabezado.contenido });
+      setEncabezado(prev => ({ ...prev, imagen: null }));
+      toast.success('Imagen eliminada');
+    } catch (error) {
+      toast.error('Error al eliminar imagen');
+    }
   };
 
   const handleImageUpload = () => {
@@ -596,6 +631,16 @@ const SuperAdminSMOA = ({ onClose }) => {
                   }}
                   style={{ minHeight: '200px' }}
                 />
+                <div className="smoa-encabezado-imagen-upload">
+                  {encabezadoImageUrl ? (
+                    <div className="smoa-encabezado-imagen-preview">
+                      <img src={encabezadoImageUrl} alt="Encabezado" />
+                      <button className="btn btn-danger btn-small" onClick={handleDeleteEncabezadoImage}>Eliminar imagen</button>
+                    </div>
+                  ) : (
+                    <button className="btn btn-outline btn-small" onClick={handleUploadEncabezadoImage}>Subir imagen de encabezado</button>
+                  )}
+                </div>
                 <div className="smoa-encabezado-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
@@ -605,6 +650,11 @@ const SuperAdminSMOA = ({ onClose }) => {
               </div>
             ) : (
               <div className="smoa-encabezado-view">
+                {encabezadoImageUrl && (
+                  <div className="smoa-encabezado-imagen-view">
+                    <img src={encabezadoImageUrl} alt="Encabezado SMOA" />
+                  </div>
+                )}
                 {encabezado.contenido ? (
                   <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
                 ) : (

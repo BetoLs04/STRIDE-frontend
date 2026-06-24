@@ -78,6 +78,15 @@
   height: auto;
   border-radius: 6px;
 }
+.smoa-encabezado-imagen-view {
+  margin-bottom: 1rem;
+}
+.smoa-encabezado-imagen-view img {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 8px;
+  object-fit: contain;
+}
 
 .smoa-table-wrapper {
   overflow-x: auto;
