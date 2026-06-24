@@ -43,6 +43,11 @@ const SMOAPage = ({ user }) => {
     const filaPermisos = permisosPptx[filaId] || [];
     return filaPermisos.some(p => p.usuario_id === user?.id && p.usuario_tipo === user?.tipo && p.puede_eliminar);
   };
+  const puedeVerPptxFila = (filaId) => {
+    if (esSuperAdmin) return true;
+    const filaPermisos = permisosPptx[filaId] || [];
+    return filaPermisos.some(p => p.usuario_id === user?.id && p.usuario_tipo === user?.tipo && (p.puede_subir || p.puede_cambiar || p.puede_eliminar));
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalFila, setModalFila] = useState(null);
@@ -302,7 +307,7 @@ const SMOAPage = ({ user }) => {
                     <span className="smoa-cell-text">{getValor(fila, 'dir_nombre') || (puedeEditar ? <span className="smoa-cell-placeholder">Escribir...</span> : '')}</span>
                   </td>
                   <td className="smoa-cell smoa-cell-fija smoa-cell-pptx">
-                    {getValor(fila, 'pres_archivo') ? (
+                    {getValor(fila, 'pres_archivo') && puedeVerPptxFila(fila.id) ? (
                       <div className="smoa-pptx-actions">
                         <a
                           href={`${API_URL}/api/university/smoa-uploads/${getValor(fila, 'pres_archivo')}`}
