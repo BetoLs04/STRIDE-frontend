@@ -3,6 +3,21 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import Header from './components/Header';
+import Home from './components/Home';
+import LoginGeneral from './components/LoginGeneral';
+import CreateSuperAdmin from './components/CreateSuperAdmin';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
+import DirectivoDashboard from './components/DirectivoDashboard';
+import PersonalDashboard from './components/PersonalDashboard';
+import StrideWelcome from './components/StrideWelcome';
+import SuperAdminActividades from './components/SuperAdminActividades';
+import SuperAdminTareas from './components/SuperAdminTareas';
+import PersonalTareas from './components/PersonalTareas';
+import MatrizIndicadoresPage from './components/MatrizIndicadoresPage';
+import SMOAPage from './components/SMOAPage';
+import Footer from './components/Footer';
+import './styles/App.css';
 
 // Global axios auth interceptor
 axios.interceptors.request.use(config => {
@@ -25,21 +40,6 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-import Header from './components/Header';
-import Home from './components/Home';
-import LoginGeneral from './components/LoginGeneral';
-import CreateSuperAdmin from './components/CreateSuperAdmin';
-import SuperAdminDashboard from './components/SuperAdminDashboard';
-import DirectivoDashboard from './components/DirectivoDashboard';
-import PersonalDashboard from './components/PersonalDashboard';
-import StrideWelcome from './components/StrideWelcome';
-import SuperAdminActividades from './components/SuperAdminActividades';
-import SuperAdminTareas from './components/SuperAdminTareas';
-import PersonalTareas from './components/PersonalTareas';
-import MatrizIndicadoresPage from './components/MatrizIndicadoresPage';
-import SMOAPage from './components/SMOAPage';
-import Footer from './components/Footer';
-import './styles/App.css';
 
 function App() {
   const [user, setUser] = useState(null);
