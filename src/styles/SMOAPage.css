@@ -83,9 +83,8 @@
 }
 .smoa-encabezado-imagen-view img {
   width: 100%;
-  max-height: 400px;
+  height: auto;
   border-radius: 8px;
-  object-fit: contain;
 }
 
 .smoa-table-wrapper {
