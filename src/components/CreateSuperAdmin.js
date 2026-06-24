@@ -86,8 +86,10 @@ const CreateSuperAdmin = ({ onLogin }) => {
 
       if (loginRes.data.success && onLogin) {
         const userData = loginRes.data.user;
+        const token = loginRes.data.token;
         onLogin(userData);
         localStorage.setItem('stride_user', JSON.stringify(userData));
+        if (token) localStorage.setItem('stride_token', token);
         
         // Mostrar mensaje de bienvenida especial
         setTimeout(() => {

@@ -2,6 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+
+// Global axios auth interceptor
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('stride_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/login')) {
+      localStorage.removeItem('stride_user');
+      localStorage.removeItem('stride_token');
+      toast.error('Sesión expirada. Inicia sesión nuevamente.');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 import Header from './components/Header';
 import Home from './components/Home';
 import LoginGeneral from './components/LoginGeneral';
@@ -33,6 +56,7 @@ function App() {
       } catch (error) {
         console.error('Error parsing user:', error);
         localStorage.removeItem('stride_user');
+        localStorage.removeItem('stride_token');
       }
     }
     setLoading(false);
@@ -49,6 +73,7 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('stride_user');
+    localStorage.removeItem('stride_token');
     toast.info('Sesión cerrada correctamente');
   };
 

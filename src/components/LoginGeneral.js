@@ -61,10 +61,12 @@ const LoginGeneral = ({ onLogin }) => {
 
       if (response.data.success && response.data.user) {
         const userData = response.data.user;
+        const token = response.data.token;
         console.log('Usuario autenticado:', userData);
         
         // Guardar en localStorage
         localStorage.setItem('stride_user', JSON.stringify(userData));
+        if (token) localStorage.setItem('stride_token', token);
         
         // Llamar a onLogin callback
         if (onLogin) {

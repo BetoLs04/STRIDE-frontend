@@ -294,6 +294,7 @@ const Header = ({ user, onLogout }) => {
   const handleLogout = () => {
     setShowUserMenu(false);
     localStorage.removeItem('stride_user');
+    localStorage.removeItem('stride_token');
     if (onLogout) onLogout();
     toast.info('Sesión cerrada correctamente');
     navigate('/login');
