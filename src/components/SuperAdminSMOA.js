@@ -607,16 +607,6 @@ const SuperAdminSMOA = ({ onClose }) => {
               <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
             ) : editingEncabezado ? (
               <div className="smoa-encabezado-editor">
-                <div className="smoa-encabezado-imagen-upload">
-                  {encabezadoImageUrl ? (
-                    <div className="smoa-encabezado-imagen-preview">
-                      <img src={encabezadoImageUrl} alt="Encabezado" />
-                      <button className="btn btn-danger btn-small" onClick={handleDeleteEncabezadoImage}>Eliminar imagen</button>
-                    </div>
-                  ) : (
-                    <button className="btn btn-outline btn-small" onClick={handleUploadEncabezadoImage}>Subir imagen de encabezado</button>
-                  )}
-                </div>
                 <ReactQuill
                   ref={quillRef}
                   value={encabezado.contenido || ''}
@@ -641,6 +631,16 @@ const SuperAdminSMOA = ({ onClose }) => {
                   }}
                   style={{ minHeight: '200px' }}
                 />
+                <div className="smoa-encabezado-imagen-upload">
+                  {encabezadoImageUrl ? (
+                    <div className="smoa-encabezado-imagen-preview">
+                      <img src={encabezadoImageUrl} alt="Encabezado" />
+                      <button className="btn btn-danger btn-small" onClick={handleDeleteEncabezadoImage}>Eliminar imagen</button>
+                    </div>
+                  ) : (
+                    <button className="btn btn-outline btn-small" onClick={handleUploadEncabezadoImage}>Subir imagen de encabezado</button>
+                  )}
+                </div>
                 <div className="smoa-encabezado-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
@@ -650,15 +650,15 @@ const SuperAdminSMOA = ({ onClose }) => {
               </div>
             ) : (
               <div className="smoa-encabezado-view">
-                {encabezadoImageUrl && (
-                  <div className="smoa-encabezado-imagen-view">
-                    <img src={encabezadoImageUrl} alt="Encabezado SMOA" />
-                  </div>
-                )}
                 {encabezado.contenido ? (
                   <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
                 ) : (
                   <p className="text-muted" style={{ padding: '1rem' }}>Sin contenido. Haz clic en Editar para escribir el encabezado.</p>
+                )}
+                {encabezadoImageUrl && (
+                  <div className="smoa-encabezado-imagen-view">
+                    <img src={encabezadoImageUrl} alt="Encabezado SMOA" />
+                  </div>
                 )}
               </div>
             )}

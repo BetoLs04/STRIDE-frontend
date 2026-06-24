@@ -273,13 +273,13 @@ const SMOAPage = ({ user }) => {
         <h1>Seguimiento Mensual de Objetivos Anuales</h1>
       </div>
 
+      {encabezado?.contenido && (
+        <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
+      )}
       {encabezado?.imagen && (
         <div className="smoa-encabezado-imagen-view">
           <img src={`${API_URL}/api/university/smoa-editor-images/${encabezado.imagen}`} alt="Encabezado SMOA" />
         </div>
-      )}
-      {encabezado?.contenido && (
-        <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
       )}
 
       <div className="smoa-table-wrapper">
