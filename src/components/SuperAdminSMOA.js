@@ -678,7 +678,7 @@ const SuperAdminSMOA = ({ onClose }) => {
 
       {showPermisosModal && permisosModalFila && (
         <div className="form-modal" onClick={closePermisosModal}>
-          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '850px' }}>
+          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '900px' }}>
             <div className="form-header">
               <h2>Permisos de presentación: {getValor(permisosModalFila, 'dir_nombre') || `Fila #${permisosModalFila.id}`}</h2>
               <button className="close-btn" onClick={closePermisosModal}>×</button>
