@@ -262,6 +262,33 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.tarea-descripcion p,
+.tarea-descripcion div,
+.tarea-descripcion span {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+.tarea-descripcion br {
+  display: none;
+}
+.tarea-descripcion ul,
+.tarea-descripcion ol {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.tarea-descripcion li {
+  display: inline;
+  margin-right: 5px;
+}
+.tarea-descripcion li::after {
+  content: ", ";
+}
+.tarea-descripcion li:last-child::after {
+  content: "";
+}
 
 .tarea-meta {
   display: flex;
@@ -905,6 +932,8 @@
   border-radius: 10px;
   color: #475569;
   line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 .detalle-descripcion .tarea-contenido p,
 .detalle-descripcion .tarea-contenido div,
@@ -915,6 +944,20 @@
 .detalle-descripcion .tarea-contenido div:last-child,
 .detalle-descripcion .tarea-contenido span:last-child {
   margin-bottom: 0;
+}
+.detalle-descripcion .tarea-contenido ul,
+.detalle-descripcion .tarea-contenido ol {
+  padding-left: 25px;
+  margin-bottom: 1rem;
+}
+.detalle-descripcion .tarea-contenido ul {
+  list-style-type: disc;
+}
+.detalle-descripcion .tarea-contenido ol {
+  list-style-type: decimal;
+}
+.detalle-descripcion .tarea-contenido li {
+  margin-bottom: 0.5rem;
 }
 
 .archivos-lista {

@@ -134,7 +134,7 @@ const PersonalTareas = ({ user }) => {
     setSubiendo(true);
     try {
       const formData = new FormData();
-      formData.append('comentarios', stripHtml(responderForm.comentarios));
+      formData.append('comentarios', responderForm.comentarios || '');
       archivos.forEach(file => formData.append('archivos', file));
       const response = await axios.post(
         `${API_URL}/api/university/tareas/completar/${tareaAResponder.asignacion_id}`,
@@ -490,7 +490,7 @@ const PersonalTareas = ({ user }) => {
           font-size: 0.92rem;
           color: #374151;
           line-height: 1.8;
-          white-space: normal;
+          white-space: pre-wrap;
           word-break: break-word;
         }
         .tarea-contenido p,
@@ -502,6 +502,20 @@ const PersonalTareas = ({ user }) => {
         .tarea-contenido div:last-child,
         .tarea-contenido span:last-child {
           margin-bottom: 0;
+        }
+        .tarea-contenido ul,
+        .tarea-contenido ol {
+          padding-left: 25px;
+          margin-bottom: 1rem;
+        }
+        .tarea-contenido ul {
+          list-style-type: disc;
+        }
+        .tarea-contenido ol {
+          list-style-type: decimal;
+        }
+        .tarea-contenido li {
+          margin-bottom: 0.5rem;
         }
 
         .tarea-descripcion-modal {
