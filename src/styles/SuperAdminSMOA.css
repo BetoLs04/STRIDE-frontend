@@ -285,10 +285,69 @@
   flex-shrink: 0;
 }
 
-.pptx-permiso-item {
+.pptx-permiso-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pptx-permiso-buscar {
+  flex: 1;
+  max-width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #3b2f5c;
+  border-radius: 6px;
+  background: #0f0a1a;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.pptx-permiso-buscar:focus {
+  border-color: #8b5cf6;
+}
+
+.pptx-permiso-buscar::placeholder {
+  color: #6b7280;
+}
+
+.pptx-permiso-toolbar-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.pptx-permiso-grid {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pptx-permiso-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pptx-permiso-grid::-webkit-scrollbar-track {
+  background: #1e1b2e;
+  border-radius: 3px;
+}
+
+.pptx-permiso-grid::-webkit-scrollbar-thumb {
+  background: #3b2f5c;
+  border-radius: 3px;
+}
+
+.pptx-permiso-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   border: 1px solid #3b2f5c;
   border-radius: 8px;
@@ -307,20 +366,35 @@
   font-weight: 500;
   cursor: pointer;
   user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .pptx-permiso-nombre:hover {
   color: #a78bfa;
 }
 
+.pptx-permiso-tipo {
+  font-size: 0.7rem;
+  color: #6b7280;
+  background: #1e1b2e;
+  padding: 1px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 .pptx-permiso-badges {
   display: flex;
   gap: 4px;
+  flex-shrink: 0;
 }
 
 .pptx-permiso-badge {
   font-size: 0.7rem;
-  padding: 1px 6px;
+  padding: 3px 10px;
   border-radius: 4px;
   border: 1px solid #3b2f5c;
   background: transparent;
