@@ -17,16 +17,32 @@ const SMOAPage = ({ user }) => {
 
   const esSuperAdmin = user?.tipo === 'superadmin';
   const puedeEditar = esSuperAdmin;
-  const puedeSubirPptx = !esSuperAdmin;
 
   const [encabezado, setEncabezado] = useState(null);
   const [columnas, setColumnas] = useState([]);
   const [filas, setFilas] = useState([]);
+  const [permisosPptx, setPermisosPptx] = useState({});
   const [loading, setLoading] = useState(true);
   const [denied, setDenied] = useState(false);
   const [adding, setAdding] = useState(false);
 
   const [uploadingFila, setUploadingFila] = useState(null);
+
+  const puedeSubirPptxFila = (filaId) => {
+    if (esSuperAdmin) return true;
+    const filaPermisos = permisosPptx[filaId] || [];
+    return filaPermisos.some(p => p.usuario_id === user?.id && p.usuario_tipo === user?.tipo && p.puede_subir);
+  };
+  const puedeCambiarPptxFila = (filaId) => {
+    if (esSuperAdmin) return true;
+    const filaPermisos = permisosPptx[filaId] || [];
+    return filaPermisos.some(p => p.usuario_id === user?.id && p.usuario_tipo === user?.tipo && p.puede_cambiar);
+  };
+  const puedeEliminarPptxFila = (filaId) => {
+    if (esSuperAdmin) return true;
+    const filaPermisos = permisosPptx[filaId] || [];
+    return filaPermisos.some(p => p.usuario_id === user?.id && p.usuario_tipo === user?.tipo && p.puede_eliminar);
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalFila, setModalFila] = useState(null);
@@ -81,15 +97,19 @@ const SMOAPage = ({ user }) => {
         }
       }
 
-      const [encRes, colRes, filasRes] = await Promise.all([
+      const [encRes, colRes, filasRes, permisosRes] = await Promise.all([
         axios.get(`${API_URL}/api/university/smoa-encabezado`),
         axios.get(`${API_URL}/api/university/smoa-columnas`),
-        axios.get(`${API_URL}/api/university/smoa-filas`)
+        axios.get(`${API_URL}/api/university/smoa-filas`),
+        esSuperAdmin ? Promise.resolve({ data: { data: {} } }) : axios.get(`${API_URL}/api/university/smoa-permisos-pptx`)
       ]);
 
       setEncabezado(encRes.data.data || null);
       setColumnas(colRes.data.data || []);
       setFilas(filasRes.data.data || []);
+      if (!esSuperAdmin && permisosRes.data?.data) {
+        setPermisosPptx(permisosRes.data.data);
+      }
     } catch (error) {
       toast.error('Error al cargar datos SMOA');
     } finally {
@@ -153,7 +173,7 @@ const SMOAPage = ({ user }) => {
   };
 
   const handleFileSelect = (fila) => {
-    if (!puedeEditar && !puedeSubirPptx) return;
+    if (!puedeEditar && !puedeSubirPptxFila(fila.id) && !puedeCambiarPptxFila(fila.id)) return;
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.pptx';
@@ -291,15 +311,15 @@ const SMOAPage = ({ user }) => {
                         >
                           Descargar
                         </a>
-                        {(puedeEditar || puedeSubirPptx) && (
+                        {(puedeEditar || puedeCambiarPptxFila(fila.id)) && (
                           <button className="btn btn-secondary btn-small" onClick={() => handleFileSelect(fila)}>Reemplazar</button>
                         )}
-                        {puedeEditar && (
+                        {(puedeEditar || puedeEliminarPptxFila(fila.id)) && (
                           <button className="btn btn-danger btn-small" onClick={() => handleEliminarPptx(fila)}>Eliminar</button>
                         )}
                       </div>
                     ) : (
-                      (puedeEditar || puedeSubirPptx) ? (
+                      (puedeEditar || puedeSubirPptxFila(fila.id)) ? (
                         <button
                           className="smoa-pptx-upload-btn"
                           onClick={() => handleFileSelect(fila)}

@@ -38,6 +38,12 @@ const SuperAdminSMOA = ({ onClose }) => {
   const fileInputRef = useRef(null);
   const [fileSelectFila, setFileSelectFila] = useState(null);
 
+  const [showPermisosModal, setShowPermisosModal] = useState(false);
+  const [permisosModalFila, setPermisosModalFila] = useState(null);
+  const [permisosModalData, setPermisosModalData] = useState({});
+  const [permisosModalLoading, setPermisosModalLoading] = useState(false);
+  const [permisosModalSaving, setPermisosModalSaving] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -116,6 +122,82 @@ const SuperAdminSMOA = ({ onClose }) => {
       fetchFilas();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al eliminar presentación');
+    }
+  };
+
+  const openPermisosModal = async (fila) => {
+    setPermisosModalFila(fila);
+    setPermisosModalLoading(true);
+    setPermisosModalSaving(false);
+    setPermisosModalData({});
+    setShowPermisosModal(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/university/smoa-filas/${fila.id}/permisos-pptx`);
+      const data = {};
+      for (const p of (res.data.data || [])) {
+        const key = `${p.usuario_id}_${p.usuario_tipo}`;
+        data[key] = {
+          usuario_id: p.usuario_id,
+          usuario_tipo: p.usuario_tipo,
+          puede_subir: !!p.puede_subir,
+          puede_cambiar: !!p.puede_cambiar,
+          puede_eliminar: !!p.puede_eliminar
+        };
+      }
+      setPermisosModalData(data);
+    } catch (error) {
+      toast.error('Error al cargar permisos');
+    } finally {
+      setPermisosModalLoading(false);
+    }
+  };
+
+  const closePermisosModal = () => {
+    setShowPermisosModal(false);
+    setPermisosModalFila(null);
+    setPermisosModalData({});
+  };
+
+  const togglePermisoUsuario = (usuario, permiso) => {
+    const key = `${usuario.id}_${usuario.tipo}`;
+    setPermisosModalData(prev => {
+      const next = { ...prev };
+      if (!next[key]) {
+        next[key] = { usuario_id: usuario.id, usuario_tipo: usuario.tipo, puede_subir: false, puede_cambiar: false, puede_eliminar: false };
+      }
+      next[key] = { ...next[key], [permiso]: !next[key][permiso] };
+      if (!next[key].puede_subir && !next[key].puede_cambiar && !next[key].puede_eliminar) {
+        delete next[key];
+      }
+      return next;
+    });
+  };
+
+  const toggleAllPermisosUsuario = (usuario, value) => {
+    const key = `${usuario.id}_${usuario.tipo}`;
+    setPermisosModalData(prev => {
+      const next = { ...prev };
+      if (value) {
+        next[key] = { usuario_id: usuario.id, usuario_tipo: usuario.tipo, puede_subir: true, puede_cambiar: true, puede_eliminar: true };
+      } else {
+        delete next[key];
+      }
+      return next;
+    });
+  };
+
+  const handleGuardarPermisos = async () => {
+    if (!permisosModalFila) return;
+    setPermisosModalSaving(true);
+    try {
+      const permisos = Object.values(permisosModalData);
+      await axios.put(`${API_URL}/api/university/smoa-filas/${permisosModalFila.id}/permisos-pptx`, { permisos });
+      toast.success('Permisos de presentación actualizados');
+      closePermisosModal();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al guardar permisos');
+    } finally {
+      setPermisosModalSaving(false);
     }
   };
 
@@ -365,32 +447,41 @@ const SuperAdminSMOA = ({ onClose }) => {
                   return (
                     <div key={fila.id} className="smoa-fila-pptx-item">
                       <span className="smoa-fila-pptx-nombre">{nombre}</span>
-                      {archivo ? (
-                        <div className="smoa-fila-pptx-actions">
-                          <a
-                            href={`${API_URL}/api/university/smoa-uploads/${archivo}`}
-                            className="smoa-pptx-link"
-                            download
-                          >
-                            Descargar
-                          </a>
+                      <div className="smoa-fila-pptx-actions">
+                        {archivo ? (
+                          <>
+                            <a
+                              href={`${API_URL}/api/university/smoa-uploads/${archivo}`}
+                              className="smoa-pptx-link"
+                              download
+                            >
+                              Descargar
+                            </a>
+                            <button
+                              className="btn btn-danger btn-small"
+                              onClick={() => handleEliminarPptxFila(fila)}
+                              disabled={uploadingFilaPptx === fila.id}
+                            >
+                              Eliminar
+                            </button>
+                          </>
+                        ) : (
                           <button
-                            className="btn btn-danger btn-small"
-                            onClick={() => handleEliminarPptxFila(fila)}
+                            className="btn btn-outline btn-small"
+                            onClick={() => handleFileSelectFila(fila)}
                             disabled={uploadingFilaPptx === fila.id}
                           >
-                            Eliminar
+                            {uploadingFilaPptx === fila.id ? '...' : 'Subir .pptx'}
                           </button>
-                        </div>
-                      ) : (
+                        )}
                         <button
-                          className="btn btn-outline btn-small"
-                          onClick={() => handleFileSelectFila(fila)}
-                          disabled={uploadingFilaPptx === fila.id}
+                          className="btn btn-secondary btn-small"
+                          onClick={() => openPermisosModal(fila)}
+                          title="Asignar permisos de presentación"
                         >
-                          {uploadingFilaPptx === fila.id ? '...' : 'Subir .pptx'}
+                          Asignar
                         </button>
-                      )}
+                      </div>
                     </div>
                   );
                 })}
@@ -579,6 +670,142 @@ const SuperAdminSMOA = ({ onClose }) => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showPermisosModal && permisosModalFila && (
+        <div className="form-modal" onClick={closePermisosModal}>
+          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            <div className="form-header">
+              <h2>Permisos de presentación: {getValor(permisosModalFila, 'dir_nombre') || `Fila #${permisosModalFila.id}`}</h2>
+              <button className="close-btn" onClick={closePermisosModal}>×</button>
+            </div>
+            {permisosModalLoading ? (
+              <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>
+            ) : (
+              <div className="asignar-modal-body">
+                <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem' }}>
+                  Selecciona los permisos para cada usuario: <strong>Subir</strong> (subir nueva presentación), <strong>Cambiar</strong> (reemplazar existente), <strong>Eliminar</strong>.
+                </p>
+                <div className="asignar-columnas">
+                  <div className="asignar-seccion">
+                    <h4>
+                      Directivos
+                      <button
+                        className="btn btn-outline btn-small"
+                        style={{ marginLeft: '0.5rem', fontSize: '0.7rem', padding: '1px 6px' }}
+                        onClick={() => {
+                          const allSelected = usuariosDisponibles.filter(u => u.tipo === 'directivo').every(u => permisosModalData[`${u.id}_${u.tipo}`]);
+                          usuariosDisponibles.filter(u => u.tipo === 'directivo').forEach(u => toggleAllPermisosUsuario(u, !allSelected));
+                        }}
+                      >
+                        {usuariosDisponibles.filter(u => u.tipo === 'directivo').every(u => permisosModalData[`${u.id}_${u.tipo}`]) ? 'Deselec.' : 'Sel. todos'}
+                      </button>
+                    </h4>
+                    <div className="asignar-lista">
+                      {usuariosDisponibles.filter(u => u.tipo === 'directivo').length === 0 ? (
+                        <p className="text-muted">No hay directivos disponibles</p>
+                      ) : (
+                        usuariosDisponibles.filter(u => u.tipo === 'directivo').map(u => {
+                          const key = `${u.id}_${u.tipo}`;
+                          const perm = permisosModalData[key] || {};
+                          return (
+                            <div key={key} className="pptx-permiso-item">
+                              <span className="pptx-permiso-nombre" onClick={() => toggleAllPermisosUsuario(u, !permisosModalData[key])}>
+                                {u.nombre}
+                              </span>
+                              <div className="pptx-permiso-badges">
+                                <span
+                                  className={`pptx-permiso-badge${perm.puede_subir ? ' active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); togglePermisoUsuario(u, 'puede_subir'); }}
+                                >
+                                  Subir
+                                </span>
+                                <span
+                                  className={`pptx-permiso-badge${perm.puede_cambiar ? ' active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); togglePermisoUsuario(u, 'puede_cambiar'); }}
+                                >
+                                  Cambiar
+                                </span>
+                                <span
+                                  className={`pptx-permiso-badge${perm.puede_eliminar ? ' active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); togglePermisoUsuario(u, 'puede_eliminar'); }}
+                                >
+                                  Eliminar
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                  <div className="asignar-divider-vertical"></div>
+                  <div className="asignar-seccion">
+                    <h4>
+                      Personal
+                      <button
+                        className="btn btn-outline btn-small"
+                        style={{ marginLeft: '0.5rem', fontSize: '0.7rem', padding: '1px 6px' }}
+                        onClick={() => {
+                          const allSelected = usuariosDisponibles.filter(u => u.tipo === 'personal').every(u => permisosModalData[`${u.id}_${u.tipo}`]);
+                          usuariosDisponibles.filter(u => u.tipo === 'personal').forEach(u => toggleAllPermisosUsuario(u, !allSelected));
+                        }}
+                      >
+                        {usuariosDisponibles.filter(u => u.tipo === 'personal').every(u => permisosModalData[`${u.id}_${u.tipo}`]) ? 'Deselec.' : 'Sel. todos'}
+                      </button>
+                    </h4>
+                    <div className="asignar-lista">
+                      {usuariosDisponibles.filter(u => u.tipo === 'personal').length === 0 ? (
+                        <p className="text-muted">No hay personal disponible</p>
+                      ) : (
+                        usuariosDisponibles.filter(u => u.tipo === 'personal').map(u => {
+                          const key = `${u.id}_${u.tipo}`;
+                          const perm = permisosModalData[key] || {};
+                          return (
+                            <div key={key} className="pptx-permiso-item">
+                              <span className="pptx-permiso-nombre" onClick={() => toggleAllPermisosUsuario(u, !permisosModalData[key])}>
+                                {u.nombre}
+                              </span>
+                              <div className="pptx-permiso-badges">
+                                <span
+                                  className={`pptx-permiso-badge${perm.puede_subir ? ' active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); togglePermisoUsuario(u, 'puede_subir'); }}
+                                >
+                                  Subir
+                                </span>
+                                <span
+                                  className={`pptx-permiso-badge${perm.puede_cambiar ? ' active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); togglePermisoUsuario(u, 'puede_cambiar'); }}
+                                >
+                                  Cambiar
+                                </span>
+                                <span
+                                  className={`pptx-permiso-badge${perm.puede_eliminar ? ' active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); togglePermisoUsuario(u, 'puede_eliminar'); }}
+                                >
+                                  Eliminar
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="asignar-footer">
+                  <span className="asignar-seleccionados">{Object.keys(permisosModalData).length} usuario(s) con permisos</span>
+                  <div className="asignar-footer-actions">
+                    <button className="btn btn-secondary" onClick={closePermisosModal}>Cancelar</button>
+                    <button className="btn btn-primary" onClick={handleGuardarPermisos} disabled={permisosModalSaving}>
+                      {permisosModalSaving ? 'Guardando...' : 'Guardar permisos'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

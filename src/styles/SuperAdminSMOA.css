@@ -285,6 +285,62 @@
   flex-shrink: 0;
 }
 
+.pptx-permiso-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #3b2f5c;
+  border-radius: 8px;
+  background: #0f0a1a;
+  cursor: default;
+  transition: border-color 0.2s;
+}
+
+.pptx-permiso-item:hover {
+  border-color: #8b5cf6;
+}
+
+.pptx-permiso-nombre {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pptx-permiso-nombre:hover {
+  color: #a78bfa;
+}
+
+.pptx-permiso-badges {
+  display: flex;
+  gap: 4px;
+}
+
+.pptx-permiso-badge {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #3b2f5c;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.pptx-permiso-badge:hover {
+  border-color: #8b5cf6;
+  color: #c4b5fd;
+}
+
+.pptx-permiso-badge.active {
+  background: #7c3aed;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
 @media (max-width: 900px) {
   .smoa-main-layout {
     grid-template-columns: 1fr;

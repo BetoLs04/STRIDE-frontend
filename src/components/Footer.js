@@ -12,17 +12,17 @@ const Footer = () => {
             Comprometidos con la excelencia académica y la innovación tecnológica.
           </p>
         </div>
-        
+
         <div className="footer-section">
           <h3>Contacto</h3>
           <p>Platform Development</p>
-          <p>📧 lazarox200@gmail.com</p>
+          <p>📧 lazarox2004@gmail.com</p>
           <p>📞 +52 449-550-5392</p>
           <p>Planeación Y Evaluación</p>
           <p>📧 ctorres@utma.edu.mx</p>
           <p>📞 +52 449-786-0951</p>
         </div>
-        
+
         <div className="footer-section">
           <h3>Direcciones Institucionales:</h3>
           <p>• Dirección Academica</p>
@@ -31,7 +31,7 @@ const Footer = () => {
           <p>• Dirección de Desarrollo Institucional y Presupuesto</p>
         </div>
       </div>
-      
+
       <div className="footer-bottom">
         <p>© {new Date().getFullYear()} STRIDE Todos los derechos reservados.</p>
         <p>Sistema de Gestión Académica v2.0. Creado por Lázaro Roberto Luevano Serna</p>
