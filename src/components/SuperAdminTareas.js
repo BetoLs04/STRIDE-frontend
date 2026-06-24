@@ -757,9 +757,8 @@ const SuperAdminTareas = ({ admin }) => {
                   <div className="detalle-descripcion">
                     <h4>Descripción</h4>
                     <div
-                      className="ql-editor"
-                      style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-                      dangerouslySetInnerHTML={{ __html: selectedTarea.descripcion }}
+                      className="tarea-contenido"
+                      dangerouslySetInnerHTML={{ __html: selectedTarea.descripcion ? selectedTarea.descripcion.replace(/&nbsp;/g, ' ') : '' }}
                     />
                   </div>
                 )}

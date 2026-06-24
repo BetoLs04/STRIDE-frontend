@@ -282,7 +282,7 @@ const PersonalTareas = ({ user }) => {
 
                   {tarea.descripcion && (
                     <div className="tarea-descripcion-completa">
-                      <div className="ql-editor" style={{ padding: 0 }} dangerouslySetInnerHTML={{ __html: tarea.descripcion.replace(/&nbsp;/g, ' ') }} />
+                      <div className="tarea-contenido" style={{ padding: 0 }} dangerouslySetInnerHTML={{ __html: tarea.descripcion.replace(/&nbsp;/g, ' ') }} />
                     </div>
                   )}
 
@@ -417,7 +417,7 @@ const PersonalTareas = ({ user }) => {
               <div className="tarea-info-resumen">
                 <h3>{tareaAResponder.titulo}</h3>
                 {tareaAResponder.descripcion && (
-                  <div className="ql-editor" style={{ padding: 0 }} dangerouslySetInnerHTML={{ __html: tareaAResponder.descripcion.replace(/&nbsp;/g, ' ') }} />
+                  <div className="tarea-contenido" style={{ padding: 0 }} dangerouslySetInnerHTML={{ __html: tareaAResponder.descripcion.replace(/&nbsp;/g, ' ') }} />
                 )}
                 {/* ✅ CORREGIDO: usar parseLocalDate en el modal también */}
                 <p className="fecha-entrega-resumen">
@@ -486,18 +486,21 @@ const PersonalTareas = ({ user }) => {
           border-radius: 0 6px 6px 0;
         }
 
-        .tarea-descripcion-completa .ql-editor {
+        .tarea-contenido {
           font-size: 0.92rem;
           color: #374151;
-          line-height: 1.65;
-          padding: 0;
+          line-height: 1.8;
+          white-space: normal;
+          word-break: break-word;
         }
-        .tarea-descripcion-completa .ql-editor p,
-        .tarea-descripcion-completa .ql-editor div {
-          margin-bottom: 0.5rem;
+        .tarea-contenido p,
+        .tarea-contenido div,
+        .tarea-contenido span {
+          margin-bottom: 1rem;
         }
-        .tarea-descripcion-completa .ql-editor p:last-child,
-        .tarea-descripcion-completa .ql-editor div:last-child {
+        .tarea-contenido p:last-child,
+        .tarea-contenido div:last-child,
+        .tarea-contenido span:last-child {
           margin-bottom: 0;
         }
 

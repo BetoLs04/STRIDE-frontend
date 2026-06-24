@@ -899,19 +899,21 @@
   font-weight: 600;
 }
 
-.detalle-descripcion .ql-editor {
+.detalle-descripcion .tarea-contenido {
   padding: 15px;
   background: #f8fafc;
   border-radius: 10px;
   color: #475569;
-  line-height: 1.6;
+  line-height: 1.8;
 }
-.detalle-descripcion .ql-editor p,
-.detalle-descripcion .ql-editor div {
-  margin-bottom: 0.5rem;
+.detalle-descripcion .tarea-contenido p,
+.detalle-descripcion .tarea-contenido div,
+.detalle-descripcion .tarea-contenido span {
+  margin-bottom: 1rem;
 }
-.detalle-descripcion .ql-editor p:last-child,
-.detalle-descripcion .ql-editor div:last-child {
+.detalle-descripcion .tarea-contenido p:last-child,
+.detalle-descripcion .tarea-contenido div:last-child,
+.detalle-descripcion .tarea-contenido span:last-child {
   margin-bottom: 0;
 }
 
