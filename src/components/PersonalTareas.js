@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import 'react-quill-new/dist/quill.snow.css';
 import '../styles/PersonalTareas.css';
 
 const API_URL = 'https://api1.strideutmat.com';
@@ -279,12 +280,9 @@ const PersonalTareas = ({ user }) => {
                     </span>
                   </div>
 
-                  {/* Descripción completa con saltos de línea respetados */}
                   {tarea.descripcion && (
                     <div className="tarea-descripcion-completa">
-                      <p className="tarea-descripcion-texto">
-                        {htmlToPlainText(tarea.descripcion)}
-                      </p>
+                      <div className="ql-editor" style={{ padding: 0 }} dangerouslySetInnerHTML={{ __html: tarea.descripcion.replace(/&nbsp;/g, ' ') }} />
                     </div>
                   )}
 
@@ -419,7 +417,7 @@ const PersonalTareas = ({ user }) => {
               <div className="tarea-info-resumen">
                 <h3>{tareaAResponder.titulo}</h3>
                 {tareaAResponder.descripcion && (
-                  <p className="tarea-descripcion-modal">{htmlToPlainText(tareaAResponder.descripcion)}</p>
+                  <div className="ql-editor" style={{ padding: 0 }} dangerouslySetInnerHTML={{ __html: tareaAResponder.descripcion.replace(/&nbsp;/g, ' ') }} />
                 )}
                 {/* ✅ CORREGIDO: usar parseLocalDate en el modal también */}
                 <p className="fecha-entrega-resumen">

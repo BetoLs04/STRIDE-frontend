@@ -475,10 +475,7 @@ const SuperAdminTareas = ({ admin }) => {
                       <button className="btn-eliminar-tarea" onClick={(e) => handleDeleteTarea(tarea.id, e)} title="Eliminar tarea">×</button>
                     </div>
                   </div>
-                  <p className="tarea-descripcion">
-                    {htmlToPlainText(tarea.descripcion)?.substring(0, 120)}
-                    {tarea.descripcion?.length > 120 ? '...' : ''}
-                  </p>
+                  <div className="tarea-descripcion" dangerouslySetInnerHTML={{ __html: tarea.descripcion ? tarea.descripcion.replace(/&nbsp;/g, ' ') : '' }} />
                   <div className="tarea-meta">
                     <div className={`fecha-entrega ${estadoClase}`}>
                       <span className="meta-icon"></span>
