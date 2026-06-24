@@ -275,6 +275,19 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     });
   };
 
+  const toggleAllUsuariosMatriz = (value) => {
+    const disponibles = getUsuariosDisponibles(showAsignarSeccion);
+    setSelectedUsuarios(prev => {
+      const next = new Set(prev);
+      for (const u of disponibles) {
+        const key = `${u.id}_${u.tipo}`;
+        if (value) next.add(key);
+        else next.delete(key);
+      }
+      return next;
+    });
+  };
+
   const handleConfirmarAsignacion = async () => {
     if (selectedUsuarios.size === 0) {
       toast.error('Selecciona al menos un usuario');
@@ -294,6 +307,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
       await Promise.all(promises);
       toast.success(`${selectedUsuarios.size} usuario(s) asignado(s) a "${showAsignarSeccion.nombre}"`);
       setShowAsignarSeccion(null);
+      setBusquedaPersonal('');
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al asignar usuarios');
@@ -622,16 +636,31 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
 
       {showAsignarSeccion && (
         <div className="form-modal" onClick={() => setShowAsignarSeccion(null)}>
-          <div className="form-modal-content asignar-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
+          <div className="form-modal-content asignar-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '1200px' }}>
             <div className="form-header">
-              <h2>👥 Asignar usuarios a: <em>{showAsignarSeccion.nombre}</em></h2>
+              <h2>Asignar usuarios a: <em>{showAsignarSeccion.nombre}</em></h2>
               <button className="close-btn" onClick={() => setShowAsignarSeccion(null)}>×</button>
             </div>
             <div className="asignar-modal-body">
+              <div className="pptx-permiso-toolbar">
+                <span></span>
+                <div className="pptx-permiso-toolbar-actions">
+                  <button
+                    className="btn btn-outline btn-small"
+                    onClick={() => {
+                      const disponibles = getUsuariosDisponibles(showAsignarSeccion);
+                      const allSelected = disponibles.every(u => selectedUsuarios.has(`${u.id}_${u.tipo}`));
+                      toggleAllUsuariosMatriz(!allSelected);
+                    }}
+                  >
+                    {getUsuariosDisponibles(showAsignarSeccion).every(u => selectedUsuarios.has(`${u.id}_${u.tipo}`)) ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                  </button>
+                </div>
+              </div>
               <div className="asignar-columnas">
                 <div className="asignar-seccion">
                   <h4>Directivos</h4>
-                  <div className="asignar-lista">
+                  <div className="asignar-lista pptx-permiso-col-lista">
                     {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'directivo').length === 0 ? (
                       <p className="text-muted">No hay directivos disponibles</p>
                     ) : (
@@ -651,19 +680,16 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                 <div className="asignar-divider-vertical"></div>
                 <div className="asignar-seccion">
                   <h4>Personal {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 0 && <span className="asignar-count">{getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length}</span>}</h4>
-                  {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal').length > 5 && (
-                    <input
-                      type="text"
-                      className="asignar-buscar"
-                      placeholder="Buscar personal..."
-                      value={busquedaPersonal}
-                      onChange={e => setBusquedaPersonal(e.target.value)}
-                      autoFocus
-                    />
-                  )}
-                  <div className="asignar-lista">
+                  <input
+                    type="text"
+                    className="pptx-permiso-buscar"
+                    placeholder="Buscar personal..."
+                    value={busquedaPersonal}
+                    onChange={e => setBusquedaPersonal(e.target.value)}
+                  />
+                  <div className="asignar-lista pptx-permiso-col-lista">
                     {getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).length === 0 ? (
-                      <p className="text-muted">{busquedaPersonal ? 'Sin resultados' : 'No hay personal disponible'}</p>
+                      <p className="text-muted">{busquedaPersonal ? 'Sin resultados para "' + busquedaPersonal + '"' : 'No hay personal disponible'}</p>
                     ) : (
                       getUsuariosDisponibles(showAsignarSeccion).filter(u => u.tipo === 'personal' && (!busquedaPersonal || u.nombre.toLowerCase().includes(busquedaPersonal.toLowerCase()))).map(u => {
                         const key = `${u.id}_${u.tipo}`;
