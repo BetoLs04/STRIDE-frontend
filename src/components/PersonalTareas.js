@@ -11,6 +11,14 @@ const stripHtml = (html) => {
   return html.replace(/<[^>]*>/g, '');
 };
 
+// ✅ Convertir HTML a texto plano (etiquetas + entidades)
+const htmlToPlainText = (html) => {
+  if (!html) return '';
+  const txt = document.createElement('textarea');
+  txt.innerHTML = html;
+  return txt.value;
+};
+
 // ✅ Función para parsear fecha sin desfase de timezone
 const parseLocalDate = (dateStr) => {
   if (!dateStr) return new Date();
@@ -275,7 +283,7 @@ const PersonalTareas = ({ user }) => {
                   {tarea.descripcion && (
                     <div className="tarea-descripcion-completa">
                       <p className="tarea-descripcion-texto">
-                        {tarea.descripcion}
+                        {htmlToPlainText(tarea.descripcion)}
                       </p>
                     </div>
                   )}
@@ -411,7 +419,7 @@ const PersonalTareas = ({ user }) => {
               <div className="tarea-info-resumen">
                 <h3>{tareaAResponder.titulo}</h3>
                 {tareaAResponder.descripcion && (
-                  <p className="tarea-descripcion-modal">{tareaAResponder.descripcion}</p>
+                  <p className="tarea-descripcion-modal">{htmlToPlainText(tareaAResponder.descripcion)}</p>
                 )}
                 {/* ✅ CORREGIDO: usar parseLocalDate en el modal también */}
                 <p className="fecha-entrega-resumen">

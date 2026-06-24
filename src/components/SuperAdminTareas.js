@@ -30,6 +30,14 @@ const stripHtml = (html) => {
   return html.replace(/<[^>]*>/g, '');
 };
 
+// ✅ Convertir HTML a texto plano (etiquetas + entidades)
+const htmlToPlainText = (html) => {
+  if (!html) return '';
+  const txt = document.createElement('textarea');
+  txt.innerHTML = html;
+  return txt.value;
+};
+
 // ✅ Función para parsear fecha sin desfase de timezone
 const parseLocalDate = (dateStr) => {
   if (!dateStr) return new Date();
@@ -373,7 +381,7 @@ const SuperAdminTareas = ({ admin }) => {
     return true;
   }).filter(tarea =>
     tarea.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tarea.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
+    htmlToPlainText(tarea.descripcion)?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const personalFiltrado = personal.filter(p =>
@@ -468,7 +476,7 @@ const SuperAdminTareas = ({ admin }) => {
                     </div>
                   </div>
                   <p className="tarea-descripcion">
-                    {tarea.descripcion?.substring(0, 120)}
+                    {htmlToPlainText(tarea.descripcion)?.substring(0, 120)}
                     {tarea.descripcion?.length > 120 ? '...' : ''}
                   </p>
                   <div className="tarea-meta">
