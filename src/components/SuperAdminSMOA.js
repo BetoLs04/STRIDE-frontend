@@ -21,8 +21,12 @@ const SuperAdminSMOA = ({ onClose }) => {
   const [columnas, setColumnas] = useState([]);
   const [columnasLoading, setColumnasLoading] = useState(true);
   const [nuevaColumna, setNuevaColumna] = useState('');
+  const [nuevaColumnaTipo, setNuevaColumnaTipo] = useState('texto');
+  const [nuevaColumnaPermiso, setNuevaColumnaPermiso] = useState('todos');
   const [editColumnaId, setEditColumnaId] = useState(null);
   const [editColumnaNombre, setEditColumnaNombre] = useState('');
+  const [editColumnaTipo, setEditColumnaTipo] = useState('texto');
+  const [editColumnaPermiso, setEditColumnaPermiso] = useState('todos');
   const [columnaSaving, setColumnaSaving] = useState(false);
 
   const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
@@ -319,9 +323,15 @@ const SuperAdminSMOA = ({ onClose }) => {
     }
     setColumnaSaving(true);
     try {
-      await axios.post(`${API_URL}/api/university/smoa-columnas`, { nombre: nuevaColumna.trim() });
+      await axios.post(`${API_URL}/api/university/smoa-columnas`, {
+        nombre: nuevaColumna.trim(),
+        tipo_dato: nuevaColumnaTipo,
+        permiso_subida: nuevaColumnaPermiso
+      });
       toast.success('Columna SMOA creada');
       setNuevaColumna('');
+      setNuevaColumnaTipo('texto');
+      setNuevaColumnaPermiso('todos');
       fetchColumnas();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al crear columna SMOA');
@@ -333,6 +343,8 @@ const SuperAdminSMOA = ({ onClose }) => {
   const handleStartEditColumna = (columna) => {
     setEditColumnaId(columna.id);
     setEditColumnaNombre(columna.nombre);
+    setEditColumnaTipo(columna.tipo_dato || 'texto');
+    setEditColumnaPermiso(columna.permiso_subida || 'todos');
   };
 
   const handleSaveEditColumna = async () => {
@@ -342,7 +354,11 @@ const SuperAdminSMOA = ({ onClose }) => {
     }
     setColumnaSaving(true);
     try {
-      await axios.put(`${API_URL}/api/university/smoa-columnas/${editColumnaId}`, { nombre: editColumnaNombre.trim() });
+      await axios.put(`${API_URL}/api/university/smoa-columnas/${editColumnaId}`, {
+        nombre: editColumnaNombre.trim(),
+        tipo_dato: editColumnaTipo,
+        permiso_subida: editColumnaPermiso
+      });
       toast.success('Columna SMOA actualizada');
       setEditColumnaId(null);
       setEditColumnaNombre('');
@@ -357,6 +373,8 @@ const SuperAdminSMOA = ({ onClose }) => {
   const handleCancelEditColumna = () => {
     setEditColumnaId(null);
     setEditColumnaNombre('');
+    setEditColumnaTipo('texto');
+    setEditColumnaPermiso('todos');
   };
 
   const handleDeleteColumna = async (columna) => {
@@ -545,16 +563,35 @@ const SuperAdminSMOA = ({ onClose }) => {
             ) : (
               <div className="smoa-columnas-content">
                 <div className="smoa-columnas-add-form">
-                  <input
-                    type="text"
-                    value={nuevaColumna}
-                    onChange={e => setNuevaColumna(e.target.value)}
-                    placeholder="Nombre de la nueva columna"
-                    onKeyDown={e => { if (e.key === 'Enter') handleAddColumna(); }}
-                  />
-                  <button className="btn btn-primary btn-small" onClick={handleAddColumna} disabled={columnaSaving}>
-                    {columnaSaving ? '...' : '+ Agregar'}
-                  </button>
+                  <div className="smoa-columna-add-row">
+                    <input
+                      type="text"
+                      value={nuevaColumna}
+                      onChange={e => setNuevaColumna(e.target.value)}
+                      placeholder="Nombre de la nueva columna"
+                      onKeyDown={e => { if (e.key === 'Enter') handleAddColumna(); }}
+                    />
+                    <select
+                      value={nuevaColumnaTipo}
+                      onChange={e => setNuevaColumnaTipo(e.target.value)}
+                      className="smoa-columna-tipo-select"
+                    >
+                      <option value="texto">Texto</option>
+                      <option value="documento">Documento</option>
+                      <option value="enlace">Enlace</option>
+                    </select>
+                    <label className="smoa-columna-permiso-toggle">
+                      <input
+                        type="checkbox"
+                        checked={nuevaColumnaPermiso === 'solo_admin'}
+                        onChange={e => setNuevaColumnaPermiso(e.target.checked ? 'solo_admin' : 'todos')}
+                      />
+                      <span>Solo admin sube</span>
+                    </label>
+                    <button className="btn btn-primary btn-small" onClick={handleAddColumna} disabled={columnaSaving}>
+                      {columnaSaving ? '...' : '+ Agregar'}
+                    </button>
+                  </div>
                 </div>
                 {columnas.length === 0 ? (
                   <p className="text-muted" style={{ padding: '0.5rem' }}>No hay columnas registradas</p>
@@ -572,12 +609,35 @@ const SuperAdminSMOA = ({ onClose }) => {
                               onKeyDown={e => { if (e.key === 'Enter') handleSaveEditColumna(); if (e.key === 'Escape') handleCancelEditColumna(); }}
                               autoFocus
                             />
+                            <select
+                              value={editColumnaTipo}
+                              onChange={e => setEditColumnaTipo(e.target.value)}
+                              className="smoa-columna-tipo-select"
+                            >
+                              <option value="texto">Texto</option>
+                              <option value="documento">Documento</option>
+                              <option value="enlace">Enlace</option>
+                            </select>
+                            <label className="smoa-columna-permiso-toggle">
+                              <input
+                                type="checkbox"
+                                checked={editColumnaPermiso === 'solo_admin'}
+                                onChange={e => setEditColumnaPermiso(e.target.checked ? 'solo_admin' : 'todos')}
+                              />
+                              <span>Solo admin</span>
+                            </label>
                             <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>Guardar</button>
                             <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>Cancelar</button>
                           </div>
                         ) : (
                           <>
                             <span className="smoa-columna-nombre">{columna.nombre}</span>
+                            <span className={`smoa-columna-tipo-badge tipo-${columna.tipo_dato || 'texto'}`}>
+                              {columna.tipo_dato === 'documento' ? '📄' : columna.tipo_dato === 'enlace' ? '🔗' : '📝'} {columna.tipo_dato || 'texto'}
+                            </span>
+                            {columna.permiso_subida === 'solo_admin' && (
+                              <span className="smoa-columna-permiso-badge" title="Solo el admin puede subir contenido">🔒 Solo admin</span>
+                            )}
                             <div className="smoa-columna-actions">
                               <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>Editar</button>
                               <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>Eliminar</button>
