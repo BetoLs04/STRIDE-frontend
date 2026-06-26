@@ -440,36 +440,77 @@
 }
 
 .smoa-columna-tipo-select {
-  padding: 8px 12px;
+  padding: 7px 24px 7px 10px;
   border: 1px solid #3b2f5c;
   border-radius: 6px;
   background: #0f0a1a;
   color: #e2e8f0;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   cursor: pointer;
   outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a78bfa' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 12px;
+  min-width: 100px;
 }
 
 .smoa-columna-tipo-select:focus {
   border-color: #8b5cf6;
 }
 
-.smoa-columna-permiso-toggle {
+.smoa-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: #a78bfa;
-  font-size: 0.8rem;
+  gap: 8px;
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.smoa-columna-permiso-toggle input[type="checkbox"] {
-  accent-color: #8b5cf6;
+.smoa-toggle input {
+  display: none;
+}
+
+.smoa-toggle-slider {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: #3b2f5c;
+  border-radius: 10px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.smoa-toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
   width: 16px;
   height: 16px;
-  cursor: pointer;
+  background: #6b7280;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.smoa-toggle.active .smoa-toggle-slider {
+  background: #7c3aed;
+}
+
+.smoa-toggle.active .smoa-toggle-slider::after {
+  left: 18px;
+  background: #fff;
+}
+
+.smoa-toggle-label {
+  font-size: 0.78rem;
+  color: #a78bfa;
+  font-weight: 500;
 }
 
 .smoa-columna-tipo-badge {
@@ -504,11 +545,12 @@
   font-size: 0.7rem;
   padding: 3px 8px;
   border-radius: 4px;
-  background: #3b1e1e;
-  border: 1px solid #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
   white-space: nowrap;
   flex-shrink: 0;
+  font-weight: 500;
 }
 
 .smoa-encabezado-imagen-upload {

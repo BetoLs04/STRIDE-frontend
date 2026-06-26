@@ -580,13 +580,14 @@ const SuperAdminSMOA = ({ onClose }) => {
                       <option value="documento">Documento</option>
                       <option value="enlace">Enlace</option>
                     </select>
-                    <label className="smoa-columna-permiso-toggle">
+                    <label className={`smoa-toggle ${nuevaColumnaPermiso === 'solo_admin' ? 'active' : ''}`}>
                       <input
                         type="checkbox"
                         checked={nuevaColumnaPermiso === 'solo_admin'}
                         onChange={e => setNuevaColumnaPermiso(e.target.checked ? 'solo_admin' : 'todos')}
                       />
-                      <span>Solo admin sube</span>
+                      <span className="smoa-toggle-slider"></span>
+                      <span className="smoa-toggle-label">Solo admin</span>
                     </label>
                     <button className="btn btn-primary btn-small" onClick={handleAddColumna} disabled={columnaSaving}>
                       {columnaSaving ? '...' : '+ Agregar'}
@@ -618,13 +619,14 @@ const SuperAdminSMOA = ({ onClose }) => {
                               <option value="documento">Documento</option>
                               <option value="enlace">Enlace</option>
                             </select>
-                            <label className="smoa-columna-permiso-toggle">
+                            <label className={`smoa-toggle ${editColumnaPermiso === 'solo_admin' ? 'active' : ''}`}>
                               <input
                                 type="checkbox"
                                 checked={editColumnaPermiso === 'solo_admin'}
                                 onChange={e => setEditColumnaPermiso(e.target.checked ? 'solo_admin' : 'todos')}
                               />
-                              <span>Solo admin</span>
+                              <span className="smoa-toggle-slider"></span>
+                              <span className="smoa-toggle-label">Solo admin</span>
                             </label>
                             <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>Guardar</button>
                             <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>Cancelar</button>
@@ -633,10 +635,10 @@ const SuperAdminSMOA = ({ onClose }) => {
                           <>
                             <span className="smoa-columna-nombre">{columna.nombre}</span>
                             <span className={`smoa-columna-tipo-badge tipo-${columna.tipo_dato || 'texto'}`}>
-                              {columna.tipo_dato === 'documento' ? '📄' : columna.tipo_dato === 'enlace' ? '🔗' : '📝'} {columna.tipo_dato || 'texto'}
+                              {columna.tipo_dato === 'documento' ? 'Documento' : columna.tipo_dato === 'enlace' ? 'Enlace' : 'Texto'}
                             </span>
                             {columna.permiso_subida === 'solo_admin' && (
-                              <span className="smoa-columna-permiso-badge" title="Solo el admin puede subir contenido">🔒 Solo admin</span>
+                              <span className="smoa-columna-permiso-badge" title="Solo el admin puede subir contenido">Solo admin</span>
                             )}
                             <div className="smoa-columna-actions">
                               <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>Editar</button>

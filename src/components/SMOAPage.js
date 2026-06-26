@@ -470,10 +470,12 @@ const SMOAPage = ({ user }) => {
               filas.map((fila) => (
                 <tr key={fila.id}>
                   <td
-                    className={`smoa-cell smoa-cell-fija${!puedeEditar ? ' smoa-cell-readonly' : ''}`}
-                    onClick={() => openModal(fila, 'dir_nombre')}
+                    className={`smoa-cell smoa-cell-fija${(!puedeEditar || !puedeVerPptxFila(fila.id)) ? ' smoa-cell-readonly' : ''}`}
+                    onClick={() => { if (puedeEditar && puedeVerPptxFila(fila.id)) openModal(fila, 'dir_nombre'); }}
                   >
-                    <span className="smoa-cell-text">{getValor(fila, 'dir_nombre') || (puedeEditar ? <span className="smoa-cell-placeholder">Escribir...</span> : '')}</span>
+                    <span className="smoa-cell-text">
+                      {puedeVerPptxFila(fila.id) ? (getValor(fila, 'dir_nombre') || (puedeEditar ? <span className="smoa-cell-placeholder">Escribir...</span> : '')) : <span className="smoa-cell-placeholder">—</span>}
+                    </span>
                   </td>
                   <td className="smoa-cell smoa-cell-fija smoa-cell-pptx">
                     {getValor(fila, 'pres_archivo') && puedeVerPptxFila(fila.id) ? (
@@ -514,6 +516,11 @@ const SMOAPage = ({ user }) => {
                     const puedeSubir = puedeSubirColumna(col);
                     const puedeEliminar = puedeEliminarColumna(fila, col);
                     const esReadonly = !puedeEditar && !puedeCambiar && !puedeSubir;
+                    const tieneAccesoFila = esSuperAdmin || puedeVerPptxFila(fila.id);
+
+                    if (!tieneAccesoFila) {
+                      return <td key={col.id} className="smoa-cell smoa-cell-readonly"><span className="smoa-cell-placeholder">—</span></td>;
+                    }
 
                     if (tipo === 'documento') {
                       return (
