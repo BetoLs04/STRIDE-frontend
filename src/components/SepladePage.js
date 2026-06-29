@@ -236,7 +236,7 @@ const SepladePage = ({ user }) => {
                       return (
                         <td
                           key={mes}
-                          className={hasVal ? '' : 'cell-empty'}
+                          className={hasVal ? '' : 'fill-green'}
                           onClick={() => esSuperAdmin && openModal(ind.id, 'valor', mes, 'programado', val)}
                           style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
                         >{val || ''}</td>
@@ -269,11 +269,12 @@ const SepladePage = ({ user }) => {
                     <td className="meta-label-real">Realizado</td>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(mes => {
                       const val = getValor(ind.id, mes, 'realizado');
-                      const hasVal = val !== '';
+                      const progVal = getValor(ind.id, mes, 'programado');
+                      const progHasVal = progVal !== '';
                       return (
                         <td
                           key={mes}
-                          className={hasVal ? '' : 'cell-empty'}
+                          className={progHasVal ? 'fill-green' : 'fill-red'}
                           onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}
                           style={{ cursor: 'pointer' }}
                         >{val || ''}</td>
@@ -289,12 +290,12 @@ const SepladePage = ({ user }) => {
         <div className="seplade-symbology">
           <strong>Simbología:</strong>
           <div className="sym-box">
-            <div className="sym-color" style={{ background: '#e5e7eb', border: '1px solid #ccc' }}></div>
-            <span>Sin valor</span>
+            <div className="sym-color" style={{ background: '#d5f5e3' }}></div>
+            <span>Espacios a llenar</span>
           </div>
           <div className="sym-box">
-            <div className="sym-color" style={{ background: '#d5f5e3' }}></div>
-            <span>Evidencia</span>
+            <div className="sym-color" style={{ background: '#fadbd8' }}></div>
+            <span>Se hicieron antes o después del plazo</span>
           </div>
         </div>
       </div>
