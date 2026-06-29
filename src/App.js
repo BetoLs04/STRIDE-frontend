@@ -16,6 +16,7 @@ import SuperAdminTareas from './components/SuperAdminTareas';
 import PersonalTareas from './components/PersonalTareas';
 import MatrizIndicadoresPage from './components/MatrizIndicadoresPage';
 import SMOAPage from './components/SMOAPage';
+import SepladePage from './components/SepladePage';
 import Footer from './components/Footer';
 import './styles/App.css';
 
@@ -192,6 +193,12 @@ function App() {
           <Route path="/personal/smoa" element={
             user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
             <SMOAPage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/admin/seplade" element={
+            user && user.tipo === 'superadmin' ? 
+            <SepladePage user={user} /> : 
             <Navigate to="/login" />
           } />
 
