@@ -328,9 +328,11 @@ const SepladePage = ({ user }) => {
                         <td
                           key={mes}
                           className={progHasVal ? 'fill-green' : 'fill-red'}
+                          onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}
                           style={{ cursor: 'pointer', position: 'relative' }}
+                          title={getNota(ind.id, mes) || 'Sin nota'}
                         >
-                          <span onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}>{val || ''}</span>
+                          {val || ''}
                           <button
                             className="note-btn"
                             title="Agregar nota"
@@ -370,9 +372,11 @@ const SepladePage = ({ user }) => {
               {modalField === 'valor' ? (
                 <input
                   className="cell-modal-input"
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={modalValue}
-                  onChange={e => setModalValue(e.target.value)}
+                  onChange={e => setModalValue(e.target.value.replace(/\D/g, ''))}
                   autoFocus
                 />
               ) : (
