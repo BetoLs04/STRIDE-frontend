@@ -602,3 +602,30 @@
 .smoa-encabezado-imagen-tamano input:focus {
   border-color: #8b5cf6;
 }
+.smoa-alineacion-btns {
+  display: flex;
+  gap: 4px;
+}
+.smoa-alineacion-btn {
+  width: 36px;
+  height: 32px;
+  border: 1px solid #3b2f5c;
+  border-radius: 6px;
+  background: #0f0a1a;
+  color: #6b7280;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.smoa-alineacion-btn:hover {
+  border-color: #8b5cf6;
+  color: #c4b5fd;
+}
+.smoa-alineacion-btn.active {
+  background: #7c3aed;
+  border-color: #8b5cf6;
+  color: #fff;
+}

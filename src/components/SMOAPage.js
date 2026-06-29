@@ -441,11 +441,11 @@ const SMOAPage = ({ user }) => {
         <div className="smoa-encabezado-contenido" dangerouslySetInnerHTML={{ __html: encabezado.contenido }} />
       )}
       {encabezado?.imagen && (
-        <div className="smoa-encabezado-imagen-view">
+        <div className={`smoa-encabezado-imagen-view smoa-align-${encabezado.imagen_alineacion || 'center'}`}>
           <img
             src={`${API_URL}/api/university/smoa-editor-images/${encabezado.imagen}`}
             alt="Encabezado SMOA"
-            style={encabezado.imagen_ancho ? { width: encabezado.imagen_ancho + 'px', maxWidth: '100%' } : {}}
+            style={encabezado.imagen_ancho ? { width: encabezado.imagen_ancho + 'px' } : {}}
           />
         </div>
       )}

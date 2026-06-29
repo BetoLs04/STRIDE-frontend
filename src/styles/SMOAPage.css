@@ -82,9 +82,18 @@
   margin-bottom: 1rem;
 }
 .smoa-encabezado-imagen-view img {
-  width: 100%;
+  max-width: 100%;
   height: auto;
   border-radius: 8px;
+}
+.smoa-align-left {
+  text-align: left;
+}
+.smoa-align-center {
+  text-align: center;
+}
+.smoa-align-right {
+  text-align: right;
 }
 
 .smoa-table-wrapper {

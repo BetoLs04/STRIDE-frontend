@@ -229,7 +229,8 @@ const SuperAdminSMOA = ({ onClose }) => {
       await axios.put(`${API_URL}/api/university/smoa-encabezado`, {
         contenido,
         imagen: encabezado.imagen ?? null,
-        imagen_ancho: encabezado.imagen_ancho ? Number(encabezado.imagen_ancho) : null
+        imagen_ancho: encabezado.imagen_ancho ? Number(encabezado.imagen_ancho) : null,
+        imagen_alineacion: encabezado.imagen_alineacion || 'center'
       });
       setEncabezado(prev => ({ ...prev, contenido }));
       toast.success('Encabezado SMOA guardado correctamente');
@@ -708,17 +709,39 @@ const SuperAdminSMOA = ({ onClose }) => {
                   )}
                 </div>
                 {encabezadoImageUrl && (
-                  <div className="smoa-encabezado-imagen-tamano">
-                    <label>Ancho de imagen (px):</label>
-                    <input
-                      type="number"
-                      min="50"
-                      max="1920"
-                      value={encabezado.imagen_ancho || ''}
-                      onChange={e => setEncabezado(prev => ({ ...prev, imagen_ancho: e.target.value }))}
-                      placeholder="Ej: 800"
-                    />
-                  </div>
+                  <>
+                    <div className="smoa-encabezado-imagen-tamano">
+                      <label>Ancho (px):</label>
+                      <input
+                        type="number"
+                        min="50"
+                        max="1920"
+                        value={encabezado.imagen_ancho || ''}
+                        onChange={e => setEncabezado(prev => ({ ...prev, imagen_ancho: e.target.value }))}
+                        placeholder="Ej: 800"
+                      />
+                    </div>
+                    <div className="smoa-encabezado-imagen-tamano">
+                      <label>Alineación:</label>
+                      <div className="smoa-alineacion-btns">
+                        <button
+                          className={`smoa-alineacion-btn${encabezado.imagen_alineacion === 'left' ? ' active' : ''}`}
+                          onClick={() => setEncabezado(prev => ({ ...prev, imagen_alineacion: 'left' }))}
+                          title="Izquierda"
+                        >◀</button>
+                        <button
+                          className={`smoa-alineacion-btn${(!encabezado.imagen_alineacion || encabezado.imagen_alineacion === 'center') ? ' active' : ''}`}
+                          onClick={() => setEncabezado(prev => ({ ...prev, imagen_alineacion: 'center' }))}
+                          title="Centro"
+                        >⏺</button>
+                        <button
+                          className={`smoa-alineacion-btn${encabezado.imagen_alineacion === 'right' ? ' active' : ''}`}
+                          onClick={() => setEncabezado(prev => ({ ...prev, imagen_alineacion: 'right' }))}
+                          title="Derecha"
+                        >▶</button>
+                      </div>
+                    </div>
+                  </>
                 )}
                 <div className="smoa-encabezado-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
