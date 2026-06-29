@@ -330,7 +330,7 @@ const SepladePage = ({ user }) => {
                           className={progHasVal ? 'fill-green' : 'fill-red'}
                           onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}
                           style={{ cursor: 'pointer', position: 'relative' }}
-                          title={getNota(ind.id, mes) || 'Sin nota'}
+                          data-nota={getNota(ind.id, mes) || ''}
                         >
                           {val || ''}
                           <button

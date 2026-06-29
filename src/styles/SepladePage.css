@@ -123,6 +123,47 @@
   background: #fdf2f8;
 }
 
+.seplade-table td[data-nota]:not([data-nota=""]) {
+  cursor: pointer;
+}
+.seplade-table td[data-nota]:not([data-nota=""])::after {
+  content: attr(data-nota);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  max-width: 260px;
+  word-break: break-word;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.seplade-table td[data-nota]:not([data-nota=""])::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #333;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+.seplade-table td[data-nota]:not([data-nota=""]):hover::after,
+.seplade-table td[data-nota]:not([data-nota=""]):hover::before {
+  opacity: 1;
+}
+
 .seplade-table td .note-btn {
   position: absolute;
   top: 1px;
