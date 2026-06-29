@@ -442,7 +442,11 @@ const SMOAPage = ({ user }) => {
       )}
       {encabezado?.imagen && (
         <div className="smoa-encabezado-imagen-view">
-          <img src={`${API_URL}/api/university/smoa-editor-images/${encabezado.imagen}`} alt="Encabezado SMOA" />
+          <img
+            src={`${API_URL}/api/university/smoa-editor-images/${encabezado.imagen}`}
+            alt="Encabezado SMOA"
+            style={encabezado.imagen_ancho ? { width: encabezado.imagen_ancho + 'px', maxWidth: '100%' } : {}}
+          />
         </div>
       )}
 

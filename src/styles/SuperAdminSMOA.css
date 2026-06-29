@@ -577,3 +577,28 @@
   height: auto;
   border-radius: 8px;
 }
+.smoa-encabezado-imagen-tamano {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-top: 1px solid #3b2f5c;
+}
+.smoa-encabezado-imagen-tamano label {
+  color: #a78bfa;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.smoa-encabezado-imagen-tamano input {
+  width: 100px;
+  padding: 6px 10px;
+  border: 1px solid #3b2f5c;
+  border-radius: 6px;
+  background: #0f0a1a;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  outline: none;
+}
+.smoa-encabezado-imagen-tamano input:focus {
+  border-color: #8b5cf6;
+}

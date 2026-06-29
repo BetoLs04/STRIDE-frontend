@@ -226,7 +226,11 @@ const SuperAdminSMOA = ({ onClose }) => {
     try {
       const editor = quillRef.current?.getEditor?.();
       const contenido = editor?.root?.innerHTML ?? encabezado.contenido;
-      await axios.put(`${API_URL}/api/university/smoa-encabezado`, { contenido, imagen: encabezado.imagen ?? null });
+      await axios.put(`${API_URL}/api/university/smoa-encabezado`, {
+        contenido,
+        imagen: encabezado.imagen ?? null,
+        imagen_ancho: encabezado.imagen_ancho ? Number(encabezado.imagen_ancho) : null
+      });
       setEncabezado(prev => ({ ...prev, contenido }));
       toast.success('Encabezado SMOA guardado correctamente');
       setEditingEncabezado(false);
@@ -703,6 +707,19 @@ const SuperAdminSMOA = ({ onClose }) => {
                     <button className="btn btn-outline btn-small" onClick={handleUploadEncabezadoImage}>Subir imagen de encabezado</button>
                   )}
                 </div>
+                {encabezadoImageUrl && (
+                  <div className="smoa-encabezado-imagen-tamano">
+                    <label>Ancho de imagen (px):</label>
+                    <input
+                      type="number"
+                      min="50"
+                      max="1920"
+                      value={encabezado.imagen_ancho || ''}
+                      onChange={e => setEncabezado(prev => ({ ...prev, imagen_ancho: e.target.value }))}
+                      placeholder="Ej: 800"
+                    />
+                  </div>
+                )}
                 <div className="smoa-encabezado-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
