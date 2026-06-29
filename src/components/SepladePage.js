@@ -333,6 +333,7 @@ const SepladePage = ({ user }) => {
                           data-nota={getNota(ind.id, mes) || ''}
                         >
                           {val || ''}
+                          {getNota(ind.id, mes) && <span className="note-indicator" />}
                           <button
                             className="note-btn"
                             title="Agregar nota"

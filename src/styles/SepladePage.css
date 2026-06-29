@@ -124,44 +124,44 @@
 }
 
 .seplade-table td[data-nota]:not([data-nota=""]) {
-  cursor: pointer;
+  position: relative;
 }
 .seplade-table td[data-nota]:not([data-nota=""])::after {
   content: attr(data-nota);
   position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 6px;
+  bottom: calc(100% + 2px);
+  left: 0;
+  background: #fff;
+  color: #222;
+  padding: 8px 10px;
+  border-radius: 4px;
   font-size: 12px;
+  line-height: 1.4;
   white-space: pre-wrap;
-  max-width: 260px;
+  min-width: 180px;
+  max-width: 300px;
   word-break: break-word;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 1px solid #d0d0d0;
+  font-family: inherit;
 }
-.seplade-table td[data-nota]:not([data-nota=""])::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: #333;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s;
-  z-index: 100;
-}
-.seplade-table td[data-nota]:not([data-nota=""]):hover::after,
-.seplade-table td[data-nota]:not([data-nota=""]):hover::before {
+.seplade-table td[data-nota]:not([data-nota=""]):hover::after {
   opacity: 1;
+}
+/* small triangle indicator on cells with notes */
+.seplade-table td[data-nota]:not([data-nota=""]) .note-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 8px 8px 0;
+  border-color: transparent #f9a825 transparent transparent;
 }
 
 .seplade-table td .note-btn {
