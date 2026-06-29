@@ -236,7 +236,7 @@ const SepladePage = ({ user }) => {
                       return (
                         <td
                           key={mes}
-                          className={hasVal ? '' : 'fill-green'}
+                          className={hasVal ? '' : 'cell-empty'}
                           onClick={() => esSuperAdmin && openModal(ind.id, 'valor', mes, 'programado', val)}
                           style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
                         >{val || ''}</td>
@@ -295,7 +295,7 @@ const SepladePage = ({ user }) => {
           </div>
           <div className="sym-box">
             <div className="sym-color" style={{ background: '#fadbd8' }}></div>
-            <span>Se hicieron antes o después del plazo</span>
+            <span>Se hicieron antes o después del plazo. Se debe de justificar la razón.</span>
           </div>
         </div>
       </div>

@@ -127,6 +127,10 @@
   background: #d5f5e3 !important;
 }
 
+.seplade-table .cell-empty {
+  background: #e5e7eb !important;
+}
+
 .seplade-table .fill-red {
   background: #fadbd8 !important;
 }
