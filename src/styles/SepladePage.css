@@ -123,6 +123,32 @@
   background: #fdf2f8;
 }
 
+.seplade-table td .note-btn {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.seplade-table td .note-btn:hover {
+  opacity: 1;
+}
+
+.cell-modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
 .seplade-table .fill-green {
   background: #d5f5e3 !important;
 }

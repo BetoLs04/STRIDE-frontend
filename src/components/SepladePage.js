@@ -19,6 +19,7 @@ const SepladePage = ({ user }) => {
   const [hoja, setHoja] = useState(null);
   const [indicadores, setIndicadores] = useState([]);
   const [valores, setValores] = useState([]);
+  const [notas, setNotas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -30,11 +31,22 @@ const SepladePage = ({ user }) => {
   const [modalMes, setModalMes] = useState(null);
   const [modalTipo, setModalTipo] = useState(null);
 
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [noteModalValue, setNoteModalValue] = useState('');
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [noteIndicadorId, setNoteIndicadorId] = useState(null);
+  const [noteMes, setNoteMes] = useState(null);
+
   const getValor = (indicadorId, mes, tipo) => {
     const v = valores.find(
       val => val.indicador_id === indicadorId && val.mes === mes && val.tipo === tipo
     );
     return v?.valor || '';
+  };
+
+  const getNota = (indicadorId, mes) => {
+    const n = notas.find(nt => nt.indicador_id === indicadorId && nt.mes === mes);
+    return n?.nota || '';
   };
 
   const fetchHoja = useCallback(async () => {
@@ -45,6 +57,7 @@ const SepladePage = ({ user }) => {
         setHoja(res.data.data);
         setIndicadores(res.data.data.indicadores || []);
         setValores(res.data.data.valores || []);
+        setNotas(res.data.data.notas || []);
       }
     } catch (error) {
       toast.error('Error al cargar hoja SEPLADE');
@@ -107,6 +120,45 @@ const SepladePage = ({ user }) => {
     }
   };
 
+  const openNoteModal = (indicadorId, mes) => {
+    setNoteIndicadorId(indicadorId);
+    setNoteMes(mes);
+    setNoteModalValue(getNota(indicadorId, mes));
+    setNoteModalOpen(true);
+  };
+
+  const closeNoteModal = () => {
+    setNoteModalOpen(false);
+    setNoteIndicadorId(null);
+    setNoteMes(null);
+    setNoteModalValue('');
+  };
+
+  const handleSaveNote = async () => {
+    if (!noteIndicadorId || !noteMes) return;
+    setNoteSaving(true);
+    try {
+      await axios.put(`${API_URL}/api/university/seplade-notas/${noteIndicadorId}/${noteMes}`, {
+        nota: noteModalValue
+      });
+      setNotas(prev => {
+        const existing = prev.findIndex(n => n.indicador_id === noteIndicadorId && n.mes === noteMes);
+        if (existing >= 0) {
+          const updated = [...prev];
+          updated[existing] = { ...updated[existing], nota: noteModalValue };
+          return updated;
+        }
+        return [...prev, { indicador_id: noteIndicadorId, mes: noteMes, nota: noteModalValue }];
+      });
+      closeNoteModal();
+      toast.success('Nota guardada');
+    } catch (error) {
+      toast.error('Error al guardar nota');
+    } finally {
+      setNoteSaving(false);
+    }
+  };
+
   const handleAddIndicador = async () => {
     setAdding(true);
     try {
@@ -133,6 +185,7 @@ const SepladePage = ({ user }) => {
       await axios.delete(`${API_URL}/api/university/seplade-indicadores/${indicadorId}`);
       setIndicadores(prev => prev.filter(i => i.id !== indicadorId));
       setValores(prev => prev.filter(v => v.indicador_id !== indicadorId));
+      setNotas(prev => prev.filter(n => n.indicador_id !== indicadorId));
       toast.success('Indicador eliminado');
     } catch (error) {
       toast.error('Error al eliminar indicador');
@@ -275,9 +328,15 @@ const SepladePage = ({ user }) => {
                         <td
                           key={mes}
                           className={progHasVal ? 'fill-green' : 'fill-red'}
-                          onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}
-                          style={{ cursor: 'pointer' }}
-                        >{val || ''}</td>
+                          style={{ cursor: 'pointer', position: 'relative' }}
+                        >
+                          <span onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}>{val || ''}</span>
+                          <button
+                            className="note-btn"
+                            title="Agregar nota"
+                            onClick={e => { e.stopPropagation(); openNoteModal(ind.id, mes); }}
+                          >📝</button>
+                        </td>
                       );
                     })}
                   </tr>
@@ -308,17 +367,53 @@ const SepladePage = ({ user }) => {
               <button className="close-btn" onClick={closeModal}>×</button>
             </div>
             <div className="cell-modal-body">
-              <textarea
-                className="cell-modal-textarea"
-                value={modalValue}
-                onChange={e => setModalValue(e.target.value)}
-                autoFocus
-              />
+              {modalField === 'valor' ? (
+                <input
+                  className="cell-modal-input"
+                  type="number"
+                  value={modalValue}
+                  onChange={e => setModalValue(e.target.value)}
+                  autoFocus
+                />
+              ) : (
+                <textarea
+                  className="cell-modal-textarea"
+                  value={modalValue}
+                  onChange={e => setModalValue(e.target.value)}
+                  autoFocus
+                />
+              )}
             </div>
             <div className="cell-modal-footer">
               <button className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
               <button className="btn btn-primary" onClick={handleSaveModal} disabled={modalSaving}>
                 {modalSaving ? 'Guardando...' : '💾 Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {noteModalOpen && (
+        <div className="cell-modal-overlay" onClick={closeNoteModal}>
+          <div className="cell-modal" onClick={e => e.stopPropagation()}>
+            <div className="cell-modal-header">
+              <h3>Nota - {MESES[noteMes - 1]}</h3>
+              <button className="close-btn" onClick={closeNoteModal}>×</button>
+            </div>
+            <div className="cell-modal-body">
+              <textarea
+                className="cell-modal-textarea"
+                value={noteModalValue}
+                onChange={e => setNoteModalValue(e.target.value)}
+                autoFocus
+                placeholder="Escribe una nota o justificación..."
+              />
+            </div>
+            <div className="cell-modal-footer">
+              <button className="btn btn-secondary" onClick={closeNoteModal}>Cancelar</button>
+              <button className="btn btn-primary" onClick={handleSaveNote} disabled={noteSaving}>
+                {noteSaving ? 'Guardando...' : '💾 Guardar nota'}
               </button>
             </div>
           </div>
