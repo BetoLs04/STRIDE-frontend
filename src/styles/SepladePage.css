@@ -97,6 +97,10 @@
   text-align: left;
 }
 
+.seplade-table .col-evidence-green {
+  background: #d5f5e3 !important;
+}
+
 .seplade-table .month-group {
   background: #eaf3fb;
 }
@@ -119,8 +123,8 @@
   background: #fdf2f8;
 }
 
-.seplade-table .fill-green {
-  background: #d5f5e3 !important;
+.seplade-table .cell-empty {
+  background: #e5e7eb !important;
 }
 
 .seplade-table .fill-red {

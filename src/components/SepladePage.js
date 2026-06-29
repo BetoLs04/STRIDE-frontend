@@ -236,9 +236,9 @@ const SepladePage = ({ user }) => {
                       return (
                         <td
                           key={mes}
-                          className={hasVal ? '' : 'fill-green'}
-                          onClick={() => openModal(ind.id, 'valor', mes, 'programado', val)}
-                          style={{ cursor: 'pointer' }}
+                          className={hasVal ? '' : 'cell-empty'}
+                          onClick={() => esSuperAdmin && openModal(ind.id, 'valor', mes, 'programado', val)}
+                          style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
                         >{val || ''}</td>
                       );
                     })}
@@ -249,13 +249,13 @@ const SepladePage = ({ user }) => {
                     >{ind.encargado || '—'}</td>
                     <td
                       rowSpan="2"
-                      className="col-evidencia"
+                      className="col-evidencia col-evidence-green"
                       onClick={() => esSuperAdmin && openModal(ind.id, 'evidencia_fisica', null, null, ind.evidencia_fisica)}
                       style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
                     >{ind.evidencia_fisica || '—'}</td>
                     <td
                       rowSpan="2"
-                      className="col-online"
+                      className="col-online col-evidence-green"
                       onClick={() => esSuperAdmin && openModal(ind.id, 'evidencia_online', null, null, ind.evidencia_online)}
                       style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
                     >{ind.evidencia_online || '—'}</td>
@@ -273,7 +273,7 @@ const SepladePage = ({ user }) => {
                       return (
                         <td
                           key={mes}
-                          className={hasVal ? '' : 'fill-green'}
+                          className={hasVal ? '' : 'cell-empty'}
                           onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}
                           style={{ cursor: 'pointer' }}
                         >{val || ''}</td>
@@ -289,12 +289,12 @@ const SepladePage = ({ user }) => {
         <div className="seplade-symbology">
           <strong>Simbología:</strong>
           <div className="sym-box">
-            <div className="sym-color" style={{ background: '#d5f5e3' }}></div>
-            <span>Espacios a llenar</span>
+            <div className="sym-color" style={{ background: '#e5e7eb', border: '1px solid #ccc' }}></div>
+            <span>Sin valor</span>
           </div>
           <div className="sym-box">
-            <div className="sym-color" style={{ background: '#fadbd8' }}></div>
-            <span>Se hicieron antes o después del plazo</span>
+            <div className="sym-color" style={{ background: '#d5f5e3' }}></div>
+            <span>Evidencia</span>
           </div>
         </div>
       </div>
