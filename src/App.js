@@ -196,7 +196,7 @@ function App() {
             <Navigate to="/login" />
           } />
 
-          <Route path="/admin/seplade" element={
+          <Route path="/admin/seplade/:hojaId" element={
             user && user.tipo === 'superadmin' ? 
             <SepladePage user={user} /> : 
             <Navigate to="/login" />

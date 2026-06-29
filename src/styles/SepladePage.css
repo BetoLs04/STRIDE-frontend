@@ -10,6 +10,25 @@
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
+.seplade-page-toolbar .btn-primary {
+  margin-left: auto;
+}
+.seplade-page-container .loading,
+.seplade-page-container .no-data {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-text);
+  font-size: 1.1rem;
+}
+.seplade-page-container .no-data p {
+  margin-bottom: 1rem;
+}
+.td-empty {
+  padding: 2rem;
+  color: var(--gray-text);
+  font-style: italic;
+  font-size: 12px !important;
+}
 
 .seplade-page {
   background: #fff;
