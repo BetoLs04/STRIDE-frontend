@@ -24,30 +24,44 @@
   color: #ddd6fe;
 }
 
-.seplade-indicadores .seplade-info-content p {
-  margin: 0 0 0.5rem;
-  color: #a78bfa;
-  font-size: 0.95rem;
-}
-
 .seplade-indicadores .seplade-info-desc {
   color: #6b7280 !important;
   font-size: 0.85rem !important;
   line-height: 1.5;
+  margin: 0;
 }
 
-.btn-success {
+.seplade-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.seplade-actions .btn-success {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  text-align: center;
   background: #059669 !important;
   color: #fff !important;
   border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 1rem;
   transition: background 0.2s;
 }
 
-.btn-success:hover {
+.seplade-actions .btn-success:hover {
   background: #047857 !important;
+}
+
+.seplade-actions .btn-secondary {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
 }
