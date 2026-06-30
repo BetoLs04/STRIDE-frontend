@@ -20,8 +20,9 @@ const SepladePage = ({ user }) => {
 
   const puedeEditarRealizado = (indicador) => {
     if (esSuperAdmin) return true;
-    if (indicador?.encargado === 'Directivos' && esDirectivo) return true;
-    if (indicador?.encargado === 'Personal de la BD' && esPersonal) return true;
+    const asignados = usuariosAsignados.filter(u => u.indicador_id === indicador?.id);
+    if (esDirectivo && asignados.some(u => u.usuario_id === user.id && u.usuario_tipo === 'directivo')) return true;
+    if (esPersonal && asignados.some(u => u.usuario_id === user.id && u.usuario_tipo === 'personal')) return true;
     return false;
   };
 
@@ -29,6 +30,8 @@ const SepladePage = ({ user }) => {
   const [indicadores, setIndicadores] = useState([]);
   const [valores, setValores] = useState([]);
   const [notas, setNotas] = useState([]);
+  const [usuariosAsignados, setUsuariosAsignados] = useState([]);
+  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -46,6 +49,8 @@ const SepladePage = ({ user }) => {
   const [noteIndicadorId, setNoteIndicadorId] = useState(null);
   const [noteMes, setNoteMes] = useState(null);
 
+  const [asignandoUsuario, setAsignandoUsuario] = useState(false);
+
   const getValor = (indicadorId, mes, tipo) => {
     const v = valores.find(
       val => val.indicador_id === indicadorId && val.mes === mes && val.tipo === tipo
@@ -61,12 +66,19 @@ const SepladePage = ({ user }) => {
   const fetchHoja = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/api/university/seplade-hojas/${hojaId}`);
-      if (res.data.success && res.data.data) {
-        setHoja(res.data.data);
-        setIndicadores(res.data.data.indicadores || []);
-        setValores(res.data.data.valores || []);
-        setNotas(res.data.data.notas || []);
+      const [hojaRes, usuariosRes] = await Promise.all([
+        axios.get(`${API_URL}/api/university/seplade-hojas/${hojaId}`),
+        axios.get(`${API_URL}/api/university/seplade-usuarios`)
+      ]);
+      if (hojaRes.data.success && hojaRes.data.data) {
+        setHoja(hojaRes.data.data);
+        setIndicadores(hojaRes.data.data.indicadores || []);
+        setValores(hojaRes.data.data.valores || []);
+        setNotas(hojaRes.data.data.notas || []);
+        setUsuariosAsignados(hojaRes.data.data.usuarios_asignados || []);
+      }
+      if (usuariosRes.data.success) {
+        setUsuariosDisponibles(usuariosRes.data.data || []);
       }
     } catch (error) {
       toast.error('Error al cargar hoja SEPLADE');
@@ -185,6 +197,45 @@ const SepladePage = ({ user }) => {
       toast.error('Error al agregar indicador');
     } finally {
       setAdding(false);
+    }
+  };
+
+  const getAsignadosIndicador = (indicadorId) => {
+    return usuariosAsignados.filter(u => u.indicador_id === indicadorId);
+  };
+
+  const handleAsignarUsuario = async (indicadorId, usuarioId, usuarioTipo) => {
+    if (asignandoUsuario) return;
+    setAsignandoUsuario(true);
+    try {
+      await axios.post(`${API_URL}/api/university/seplade-indicadores/${indicadorId}/usuarios`, {
+        usuario_id: usuarioId,
+        usuario_tipo: usuarioTipo
+      });
+      const usuario = usuariosDisponibles.find(u => u.id === usuarioId && u.tipo === usuarioTipo);
+      setUsuariosAsignados(prev => [...prev, {
+        indicador_id: indicadorId,
+        usuario_id: usuarioId,
+        usuario_tipo: usuarioTipo,
+        nombre: usuario?.nombre || '—'
+      }]);
+      toast.success('Usuario asignado');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al asignar usuario');
+    } finally {
+      setAsignandoUsuario(false);
+    }
+  };
+
+  const handleQuitarUsuario = async (indicadorId, usuarioId, usuarioTipo) => {
+    try {
+      await axios.delete(`${API_URL}/api/university/seplade-indicadores/${indicadorId}/usuarios/${usuarioId}/${usuarioTipo}`);
+      setUsuariosAsignados(prev => prev.filter(u =>
+        !(u.indicador_id === indicadorId && u.usuario_id === usuarioId && u.usuario_tipo === usuarioTipo)
+      ));
+      toast.success('Usuario quitado');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al quitar usuario');
     }
   };
 
@@ -309,13 +360,20 @@ const SepladePage = ({ user }) => {
                     <td
                       rowSpan="2"
                       onClick={() => esSuperAdmin && openModal(ind.id, 'encargado', null, null, ind.encargado)}
-                      style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
+                      style={{ cursor: esSuperAdmin ? 'pointer' : 'default', textAlign: 'left' }}
                     >
-                      {ind.encargado ? (
-                        <span className={`encargado-badge ${ind.encargado === 'Directivos' ? 'badge-directivos' : 'badge-personal'}`}>
-                          {ind.encargado}
-                        </span>
-                      ) : '—'}
+                      {(() => {
+                        const asignados = getAsignadosIndicador(ind.id);
+                        return asignados.length > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            {asignados.map(a => (
+                              <span key={`${a.usuario_id}-${a.usuario_tipo}`} className={`encargado-badge ${a.usuario_tipo === 'directivo' ? 'badge-directivos' : 'badge-personal'}`}>
+                                {a.nombre}
+                              </span>
+                            ))}
+                          </div>
+                        ) : '—';
+                      })()}
                     </td>
                     <td
                       rowSpan="2"
@@ -390,7 +448,7 @@ const SepladePage = ({ user }) => {
         <div className="cell-modal-overlay" onClick={closeModal}>
           <div className="cell-modal" onClick={e => e.stopPropagation()}>
             <div className="cell-modal-header">
-              <h3>Editar celda</h3>
+              <h3>{modalField === 'encargado' ? 'Asignar encargados' : 'Editar celda'}</h3>
               <button className="close-btn" onClick={closeModal}>×</button>
             </div>
             <div className="cell-modal-body">
@@ -405,16 +463,72 @@ const SepladePage = ({ user }) => {
                   autoFocus
                 />
               ) : modalField === 'encargado' ? (
-                <select
-                  className="cell-modal-select"
-                  value={modalValue}
-                  onChange={e => setModalValue(e.target.value)}
-                  autoFocus
-                >
-                  <option value="">Seleccionar encargado...</option>
-                  <option value="Directivos">Directivos</option>
-                  <option value="Personal de la BD">Personal de la BD</option>
-                </select>
+                <div className="asignar-encargados">
+                  <p className="asignar-subtitle">Usuarios que pueden editar las celdas de Realizado:</p>
+                  <div className="asignar-lista">
+                    {getAsignadosIndicador(modalIndicadorId).length === 0 ? (
+                      <p className="asignar-vacio">Ningún usuario asignado aún</p>
+                    ) : (
+                      getAsignadosIndicador(modalIndicadorId).map(asignado => (
+                        <div key={`${asignado.usuario_id}-${asignado.usuario_tipo}`} className="asignar-item">
+                          <span className={`asignar-tag ${asignado.usuario_tipo === 'directivo' ? 'tag-directivo' : 'tag-personal'}`}>
+                            {asignado.usuario_tipo === 'directivo' ? '👔' : '📝'}
+                          </span>
+                          <span className="asignar-nombre">{asignado.nombre || '—'}</span>
+                          <button
+                            className="asignar-quitar"
+                            title="Quitar usuario"
+                            onClick={() => handleQuitarUsuario(modalIndicadorId, asignado.usuario_id, asignado.usuario_tipo)}
+                          >✕</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="asignar-agregar">
+                    <h4>Agregar Directivo</h4>
+                    <select
+                      className="cell-modal-select"
+                      value=""
+                      onChange={e => {
+                        if (e.target.value) {
+                          handleAsignarUsuario(modalIndicadorId, parseInt(e.target.value), 'directivo');
+                          e.target.value = '';
+                        }
+                      }}
+                    >
+                      <option value="">Seleccionar directivo...</option>
+                      {usuariosDisponibles
+                        .filter(u => u.tipo === 'directivo')
+                        .filter(u => !getAsignadosIndicador(modalIndicadorId).some(a => a.usuario_id === u.id && a.usuario_tipo === 'directivo'))
+                        .map(u => (
+                          <option key={`d-${u.id}`} value={u.id}>{u.nombre}</option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                  <div className="asignar-agregar">
+                    <h4>Agregar Personal BD</h4>
+                    <select
+                      className="cell-modal-select"
+                      value=""
+                      onChange={e => {
+                        if (e.target.value) {
+                          handleAsignarUsuario(modalIndicadorId, parseInt(e.target.value), 'personal');
+                          e.target.value = '';
+                        }
+                      }}
+                    >
+                      <option value="">Seleccionar personal...</option>
+                      {usuariosDisponibles
+                        .filter(u => u.tipo === 'personal')
+                        .filter(u => !getAsignadosIndicador(modalIndicadorId).some(a => a.usuario_id === u.id && a.usuario_tipo === 'personal'))
+                        .map(u => (
+                          <option key={`p-${u.id}`} value={u.id}>{u.nombre}</option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                </div>
               ) : (
                 <textarea
                   className="cell-modal-textarea"
@@ -425,10 +539,16 @@ const SepladePage = ({ user }) => {
               )}
             </div>
             <div className="cell-modal-footer">
-              <button className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
-              <button className="btn btn-primary" onClick={handleSaveModal} disabled={modalSaving}>
-                {modalSaving ? 'Guardando...' : '💾 Guardar'}
-              </button>
+              {modalField === 'encargado' ? (
+                <button className="btn btn-secondary" onClick={closeModal}>Cerrar</button>
+              ) : (
+                <>
+                  <button className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
+                  <button className="btn btn-primary" onClick={handleSaveModal} disabled={modalSaving}>
+                    {modalSaving ? 'Guardando...' : '💾 Guardar'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
