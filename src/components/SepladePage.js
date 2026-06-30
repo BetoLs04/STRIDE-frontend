@@ -15,6 +15,15 @@ const SepladePage = ({ user }) => {
   const { hojaId } = useParams();
   const navigate = useNavigate();
   const esSuperAdmin = user?.tipo === 'superadmin';
+  const esDirectivo = user?.tipo === 'directivo';
+  const esPersonal = user?.tipo === 'personal';
+
+  const puedeEditarRealizado = (indicador) => {
+    if (esSuperAdmin) return true;
+    if (indicador?.encargado === 'Directivos' && esDirectivo) return true;
+    if (indicador?.encargado === 'Personal de la BD' && esPersonal) return true;
+    return false;
+  };
 
   const [hoja, setHoja] = useState(null);
   const [indicadores, setIndicadores] = useState([]);
@@ -194,6 +203,8 @@ const SepladePage = ({ user }) => {
 
   const goBack = () => {
     if (esSuperAdmin) navigate('/admin/dashboard', { state: { tab: 'seplade' } });
+    else if (esDirectivo) navigate('/directivo/dashboard');
+    else if (esPersonal) navigate('/personal/dashboard');
     else navigate('/');
   };
 
@@ -299,7 +310,13 @@ const SepladePage = ({ user }) => {
                       rowSpan="2"
                       onClick={() => esSuperAdmin && openModal(ind.id, 'encargado', null, null, ind.encargado)}
                       style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
-                    >{ind.encargado || '—'}</td>
+                    >
+                      {ind.encargado ? (
+                        <span className={`encargado-badge ${ind.encargado === 'Directivos' ? 'badge-directivos' : 'badge-personal'}`}>
+                          {ind.encargado}
+                        </span>
+                      ) : '—'}
+                    </td>
                     <td
                       rowSpan="2"
                       className="col-evidencia col-evidence-green"
@@ -324,12 +341,17 @@ const SepladePage = ({ user }) => {
                       const val = getValor(ind.id, mes, 'realizado');
                       const progVal = getValor(ind.id, mes, 'programado');
                       const progHasVal = progVal !== '';
+                      const puedeEditar = puedeEditarRealizado(ind);
                       return (
                         <td
                           key={mes}
                           className={progHasVal ? 'fill-green' : 'fill-red'}
-                          onClick={() => openModal(ind.id, 'valor', mes, 'realizado', val)}
-                          style={{ cursor: 'pointer', position: 'relative' }}
+                          onClick={() => puedeEditar && openModal(ind.id, 'valor', mes, 'realizado', val)}
+                          style={{
+                            cursor: puedeEditar ? 'pointer' : 'default',
+                            position: 'relative',
+                            opacity: puedeEditar ? 1 : 0.7
+                          }}
                           data-nota={getNota(ind.id, mes) || ''}
                         >
                           {val || ''}
@@ -337,7 +359,9 @@ const SepladePage = ({ user }) => {
                           <button
                             className="note-btn"
                             title="Agregar nota"
-                            onClick={e => { e.stopPropagation(); openNoteModal(ind.id, mes); }}
+                            onClick={e => { e.stopPropagation(); puedeEditar && openNoteModal(ind.id, mes); }}
+                            disabled={!puedeEditar}
+                            style={{ opacity: puedeEditar ? 0.5 : 0.2 }}
                           >📝</button>
                         </td>
                       );
@@ -380,6 +404,17 @@ const SepladePage = ({ user }) => {
                   onChange={e => setModalValue(e.target.value.replace(/\D/g, ''))}
                   autoFocus
                 />
+              ) : modalField === 'encargado' ? (
+                <select
+                  className="cell-modal-select"
+                  value={modalValue}
+                  onChange={e => setModalValue(e.target.value)}
+                  autoFocus
+                >
+                  <option value="">Seleccionar encargado...</option>
+                  <option value="Directivos">Directivos</option>
+                  <option value="Personal de la BD">Personal de la BD</option>
+                </select>
               ) : (
                 <textarea
                   className="cell-modal-textarea"

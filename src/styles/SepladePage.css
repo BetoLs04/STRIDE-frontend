@@ -181,13 +181,19 @@
   opacity: 1;
 }
 
-.cell-modal-input {
+.cell-modal-input,
+.cell-modal-select {
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
+}
+.cell-modal-select {
+  background: #fff;
+  cursor: pointer;
+  appearance: auto;
 }
 
 .seplade-table .fill-green {
@@ -200,6 +206,38 @@
 
 .seplade-table .fill-red {
   background: #fadbd8 !important;
+}
+
+.encargado-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.badge-directivos {
+  background: #d4efdf;
+  color: #1a5276;
+  border: 1px solid #a3d9b1;
+}
+.badge-personal {
+  background: #d6eaf8;
+  color: #1a5276;
+  border: 1px solid #85c1e9;
+}
+
+.cell-modal-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
 }
 
 .seplade-symbology {

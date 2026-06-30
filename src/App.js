@@ -202,6 +202,18 @@ function App() {
             <Navigate to="/login" />
           } />
 
+          <Route path="/directivo/seplade/:hojaId" element={
+            user && (user.tipo === 'directivo' || user.tipo === 'superadmin') ? 
+            <SepladePage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
+          <Route path="/personal/seplade/:hojaId" element={
+            user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
+            <SepladePage user={user} /> : 
+            <Navigate to="/login" />
+          } />
+
           {/* Ruta por defecto */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
