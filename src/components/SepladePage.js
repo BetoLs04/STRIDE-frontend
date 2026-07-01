@@ -27,6 +27,7 @@ const SepladePage = ({ user }) => {
   };
 
   const [hoja, setHoja] = useState(null);
+  const [hojas, setHojas] = useState([]);
   const [indicadores, setIndicadores] = useState([]);
   const [valores, setValores] = useState([]);
   const [notas, setNotas] = useState([]);
@@ -66,9 +67,10 @@ const SepladePage = ({ user }) => {
   const fetchHoja = useCallback(async () => {
     setLoading(true);
     try {
-      const [hojaRes, usuariosRes] = await Promise.all([
+      const [hojaRes, usuariosRes, hojasRes] = await Promise.all([
         axios.get(`${API_URL}/api/university/seplade-hojas/${hojaId}`),
-        axios.get(`${API_URL}/api/university/seplade-usuarios`)
+        axios.get(`${API_URL}/api/university/seplade-usuarios`),
+        axios.get(`${API_URL}/api/university/seplade-hojas`)
       ]);
       if (hojaRes.data.success && hojaRes.data.data) {
         setHoja(hojaRes.data.data);
@@ -79,6 +81,9 @@ const SepladePage = ({ user }) => {
       }
       if (usuariosRes.data.success) {
         setUsuariosDisponibles(usuariosRes.data.data || []);
+      }
+      if (hojasRes.data.success) {
+        setHojas(hojasRes.data.data || []);
       }
     } catch (error) {
       toast.error('Error al cargar hoja SEPLADE');
@@ -442,6 +447,27 @@ const SepladePage = ({ user }) => {
             <span>Se hicieron antes o después del plazo. Se debe de justificar la razón.</span>
           </div>
         </div>
+
+        {hojas.length > 1 && (
+          <div className="seplade-hojas-nav">
+            <span className="seplade-hojas-nav-label">Navegar hojas:</span>
+            <div className="seplade-hojas-nav-list">
+              {hojas.map(h => (
+                <button
+                  key={h.id}
+                  className={`seplade-hojas-nav-btn ${parseInt(hojaId) === h.id ? 'active' : ''}`}
+                  onClick={() => {
+                    const path = window.location.pathname.split('/');
+                    path[path.length - 1] = h.id;
+                    navigate(path.join('/'));
+                  }}
+                >
+                  {h.titulo}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {modalOpen && (
