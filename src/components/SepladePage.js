@@ -482,10 +482,10 @@ const SepladePage = ({ user }) => {
                 <input
                   className="cell-modal-input"
                   type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
+                  inputMode="decimal"
+                  pattern="[0-9.]*"
                   value={modalValue}
-                  onChange={e => setModalValue(e.target.value.replace(/\D/g, ''))}
+                  onChange={e => setModalValue(e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                   autoFocus
                 />
               ) : modalField === 'encargado' ? (
