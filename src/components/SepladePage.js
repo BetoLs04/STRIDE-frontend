@@ -450,7 +450,6 @@ const SepladePage = ({ user }) => {
 
         {hojas.length > 1 && (
           <div className="seplade-hojas-nav">
-            <span className="seplade-hojas-nav-label">Navegar hojas:</span>
             <div className="seplade-hojas-nav-list">
               {hojas.map(h => (
                 <button
