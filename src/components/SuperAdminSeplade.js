@@ -14,6 +14,7 @@ const SuperAdminSeplade = ({ onClose }) => {
   const [editId, setEditId] = useState(null);
   const [formTitulo, setFormTitulo] = useState('');
   const [formSubtitulo, setFormSubtitulo] = useState('');
+  const [formNombre, setFormNombre] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ const SuperAdminSeplade = ({ onClose }) => {
     setEditId(null);
     setFormTitulo('');
     setFormSubtitulo('');
+    setFormNombre('');
     setShowForm(true);
   };
 
@@ -43,6 +45,7 @@ const SuperAdminSeplade = ({ onClose }) => {
     setEditId(hoja.id);
     setFormTitulo(hoja.titulo || '');
     setFormSubtitulo(hoja.subtitulo || '');
+    setFormNombre(hoja.nombre || '');
     setShowForm(true);
   };
 
@@ -53,13 +56,15 @@ const SuperAdminSeplade = ({ onClose }) => {
       if (editId) {
         await axios.put(`${API_URL}/api/university/seplade-hojas/${editId}`, {
           titulo: formTitulo.trim(),
-          subtitulo: formSubtitulo.trim()
+          subtitulo: formSubtitulo.trim(),
+          nombre: formNombre.trim()
         });
         toast.success('Hoja actualizada');
       } else {
         await axios.post(`${API_URL}/api/university/seplade-hojas`, {
           titulo: formTitulo.trim(),
-          subtitulo: formSubtitulo.trim()
+          subtitulo: formSubtitulo.trim(),
+          nombre: formNombre.trim()
         });
         toast.success('Hoja creada');
       }
@@ -104,6 +109,7 @@ const SuperAdminSeplade = ({ onClose }) => {
             <div key={hoja.id} className="seplade-hoja-card">
               <div className="seplade-hoja-info">
                 <h3>{hoja.titulo || 'Sin título'}</h3>
+                {hoja.nombre && <p className="seplade-hoja-sub"><strong>Nombre:</strong> {hoja.nombre}</p>}
                 {hoja.subtitulo && <p className="seplade-hoja-sub">{hoja.subtitulo}</p>}
               </div>
               <div className="seplade-hoja-actions">
@@ -126,6 +132,15 @@ const SuperAdminSeplade = ({ onClose }) => {
               <button className="close-btn" onClick={() => setShowForm(false)}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 30px 30px' }}>
+              <div className="form-group">
+                <label>Nombre corto (para navegación)</label>
+                <input
+                  type="text"
+                  value={formNombre}
+                  onChange={e => setFormNombre(e.target.value)}
+                  placeholder="Ej: PAMID 2026"
+                />
+              </div>
               <div className="form-group">
                 <label>Título</label>
                 <input

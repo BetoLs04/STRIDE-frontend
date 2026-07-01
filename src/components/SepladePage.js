@@ -456,13 +456,14 @@ const SepladePage = ({ user }) => {
                 <button
                   key={h.id}
                   className={`seplade-hojas-nav-btn ${parseInt(hojaId) === h.id ? 'active' : ''}`}
+                  title={h.titulo}
                   onClick={() => {
                     const path = window.location.pathname.split('/');
                     path[path.length - 1] = h.id;
                     navigate(path.join('/'));
                   }}
                 >
-                  {h.titulo}
+                  {h.nombre || h.titulo}
                 </button>
               ))}
             </div>
