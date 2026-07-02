@@ -383,14 +383,14 @@ const SepladePage = ({ user }) => {
                     <td
                       rowSpan="2"
                       className="col-evidencia col-evidence-green"
-                      onClick={() => esSuperAdmin && openModal(ind.id, 'evidencia_fisica', null, null, ind.evidencia_fisica)}
-                      style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
+                      onClick={() => puedeEditarRealizado(ind) && openModal(ind.id, 'evidencia_fisica', null, null, ind.evidencia_fisica)}
+                      style={{ cursor: puedeEditarRealizado(ind) ? 'pointer' : 'default' }}
                     >{ind.evidencia_fisica || '—'}</td>
                     <td
                       rowSpan="2"
                       className="col-online col-evidence-green"
-                      onClick={() => esSuperAdmin && openModal(ind.id, 'evidencia_online', null, null, ind.evidencia_online)}
-                      style={{ cursor: esSuperAdmin ? 'pointer' : 'default' }}
+                      onClick={() => puedeEditarRealizado(ind) && openModal(ind.id, 'evidencia_online', null, null, ind.evidencia_online)}
+                      style={{ cursor: puedeEditarRealizado(ind) ? 'pointer' : 'default' }}
                     >{ind.evidencia_online || '—'}</td>
                     {esSuperAdmin && (
                       <td rowSpan="2">
