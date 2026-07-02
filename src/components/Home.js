@@ -100,6 +100,30 @@ const Home = () => {
     }
   };
 
+  const handleSepladeClick = async () => {
+    if (!isLoggedIn) {
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+      return;
+    }
+    const userData = JSON.parse(localStorage.getItem('stride_user'));
+    if (userData?.tipo === 'superadmin') {
+      navigate('/admin/dashboard', { state: { tab: 'seplade' } });
+      return;
+    }
+    try {
+      const res = await axios.get(`https://api1.strideutmat.com/api/university/seplade-hojas`);
+      const hojas = res.data.data || [];
+      const prefix = userData.tipo === 'directivo' ? '/directivo' : '/personal';
+      if (hojas.length > 0) {
+        navigate(`${prefix}/seplade/${hojas[0].id}`);
+      } else {
+        toast.error('🚫 No hay hojas SEPLADE disponibles.');
+      }
+    } catch (error) {
+      toast.error('Error al cargar hojas SEPLADE');
+    }
+  };
+
   const checkSuperAdminExistence = async () => {
     try {
       const response = await axios.get('https://api1.strideutmat.com/api/university/superusers');
@@ -436,7 +460,7 @@ const Home = () => {
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
-          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1OsH2fEAE6-3gwiM3w6Lf6q2U2AO3ngharO1lmLCJVHM/edit?gid=1961082688#gid=1961082688')}
+          onClick={handleSepladeClick}
         >
           <div className="feature-icon">{isLoggedIn ? '📑' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>SEPLADE</h3>
