@@ -520,52 +520,6 @@ const SuperAdminDashboard = ({ admin }) => {
     );
   };
 
-  return (
-    <div className="superadmin-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <h1>STRIDE University Admin</h1>
-          <div className="user-info">
-            <span className="user-avatar">{(admin?.username || 'A').charAt(0).toUpperCase()}</span>
-            <span>{admin?.username || 'Admin'} • Super Admin</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-tabs">
-        <button className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>🏠 Dashboard</button>
-        <button className={`tab-btn ${activeTab === 'usuarios' ? 'active' : ''}`} onClick={() => setActiveTab('usuarios')}>👥 Usuarios</button>
-        <button className={`tab-btn ${activeTab === 'direcciones' ? 'active' : ''}`} onClick={() => setActiveTab('direcciones')}>🏛️ Direcciones</button>
-        <button className={`tab-btn ${activeTab === 'directivos' ? 'active' : ''}`} onClick={() => setActiveTab('directivos')}>👔 Directivos</button>
-        <button className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => setActiveTab('personal')}>👤 Personal</button>
-        <button className={`tab-btn ${activeTab === 'comunicados' ? 'active' : ''}`} onClick={() => setActiveTab('comunicados')}>📢 Comunicados</button>
-        <button className={`tab-btn ${activeTab === 'matriz' ? 'active' : ''}`} onClick={() => setActiveTab('matriz')}>📊 Matriz de Indicadores</button>
-        <button className={`tab-btn ${activeTab === 'smoa' ? 'active' : ''}`} onClick={() => setActiveTab('smoa')}>📈 SMOA</button>
-        <button className={`tab-btn ${activeTab === 'seplade' ? 'active' : ''}`} onClick={() => setActiveTab('seplade')}>📋 SEPLADE</button>
-      </div>
-
-      <div className="dashboard-main">
-        {activeTab === 'dashboard' && renderDashboard()}
-        {activeTab === 'usuarios' && renderUsuarios()}
-        {activeTab === 'direcciones' && renderDirecciones()}
-        {activeTab === 'directivos' && renderDirectivos()}
-        {activeTab === 'personal' && renderPersonal()}
-        {activeTab === 'comunicados' && <PanelComunicadosAdmin admin={admin} onClose={() => setActiveTab('dashboard')} />}
-        {activeTab === 'matriz' && <SuperAdminMatrizIndicadores onClose={() => setActiveTab('dashboard')} />}
-        {activeTab === 'smoa' && <SuperAdminSMOA onClose={() => setActiveTab('dashboard')} />}
-        {activeTab === 'seplade' && <SuperAdminSeplade onClose={() => setActiveTab('dashboard')} />}
-      </div>
-
-      {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}
-      {showFormDirectivo && <FormNuevoDirectivo admin={admin} onClose={() => setShowFormDirectivo(false)} onSuccess={fetchData} />}
-      {showFormPersonal && <FormNuevoPersonal admin={admin} onClose={() => setShowFormPersonal(false)} onSuccess={fetchData} />}
-
-      {renderModalEditDirectivo()}
-      {renderModalEditPersonal()}
-    </div>
-  );
-};
-
   const refreshRef = useRef();
   refreshRef.current = fetchData;
 
