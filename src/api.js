@@ -8,6 +8,7 @@ const PUBLIC_API_PREFIXES = [
   '/api/university/login',
   '/api/university/check-superadmin',
   '/api/university/superusers',
+  '/api/university/create-superuser',
   '/api/university/comunicados',
   '/api/university/check-logo',
   '/uploads/',
