@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import useAuth from './hooks/useAuth';
 import Layout from './components/layout/Layout';
+import { SocketProvider } from './contexts/SocketContext';
 import Home from './components/pages/Home';
 import LoginGeneral from './components/pages/LoginGeneral';
 import CreateSuperAdmin from './components/pages/CreateSuperAdmin';
@@ -32,6 +33,7 @@ function App() {
   }
 
   return (
+    <SocketProvider>
     <Layout user={user} onLogout={handleLogout}>
       <Routes>
         <Route path={ROUTES.HOME} element={<Home />} />
@@ -138,6 +140,7 @@ function App() {
         <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
       </Routes>
     </Layout>
+    </SocketProvider>
   );
 }
 

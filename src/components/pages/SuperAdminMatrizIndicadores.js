@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES } from '../../constants/routes';
@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import '../../styles/SuperAdminMatrizIndicadores.css';
 import FormInput from '../shared/FormInput';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const navigate = useNavigate();
@@ -48,6 +49,11 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     fetchEncabezado();
     fetchColumnas();
   }, []);
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchData;
+
+  useSocketEvent('matriz:updated', () => refreshRef.current());
 
   const fetchData = async () => {
     setLoading(true);

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import useSocketEvent from '../../hooks/useSocketEvent';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES, getRoutePrefix } from '../../constants/routes';
@@ -188,6 +189,14 @@ const Home = () => {
       sliderRef.current.slickPrev();
     }
   };
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchComunicadosRecientes;
+
+  useSocketEvent('comunicado:created', () => refreshRef.current());
+  useSocketEvent('comunicado:updated', () => refreshRef.current());
+  useSocketEvent('comunicado:deleted', () => refreshRef.current());
+  useSocketEvent('comunicado:archivo-deleted', () => refreshRef.current());
 
   if (loading) {
     return (

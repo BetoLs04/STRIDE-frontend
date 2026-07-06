@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES } from '../../constants/routes';
@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import '../../styles/SuperAdminSeplade.css';
 import FormInput from '../shared/FormInput';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const SuperAdminSeplade = ({ onClose }) => {
   const navigate = useNavigate();
@@ -21,6 +22,11 @@ const SuperAdminSeplade = ({ onClose }) => {
   useEffect(() => {
     fetchHojas();
   }, []);
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchHojas;
+
+  useSocketEvent('seplade:updated', () => refreshRef.current());
 
   const fetchHojas = async () => {
     setLoading(true);

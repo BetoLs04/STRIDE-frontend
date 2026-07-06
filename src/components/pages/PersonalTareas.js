@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import useSocketEvent from '../../hooks/useSocketEvent';
 import api, { API_URL } from '../../api';
 import { toast } from 'react-toastify';
 import 'react-quill-new/dist/quill.snow.css';
@@ -197,6 +198,14 @@ const PersonalTareas = ({ user }) => {
   });
 
   const pendientesCount = stats.pendientes + stats.en_progreso;
+
+  const refreshRef = useRef();
+  refreshRef.current = cargarTareas;
+
+  useSocketEvent('tarea:created', () => refreshRef.current());
+  useSocketEvent('tarea:updated', () => refreshRef.current());
+  useSocketEvent('tarea:completada', () => refreshRef.current());
+  useSocketEvent('tarea:asignacion-updated', () => refreshRef.current());
 
   return (
     <div className="personal-tareas-container">

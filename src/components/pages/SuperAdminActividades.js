@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import useSocketEvent from '../../hooks/useSocketEvent';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES } from '../../constants/routes';
@@ -592,6 +593,14 @@ const SuperAdminActividades = ({ admin }) => {
     
     toast.info('Datos de ejemplo cargados. Crea actividades reales para ver datos reales.');
   };
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchTodasActividades;
+
+  useSocketEvent('actividad:created', () => refreshRef.current());
+  useSocketEvent('actividad:updated', () => refreshRef.current());
+  useSocketEvent('actividad:deleted', () => refreshRef.current());
+  useSocketEvent('actividad:estado-changed', () => refreshRef.current());
 
   if (!admin) {
     return (

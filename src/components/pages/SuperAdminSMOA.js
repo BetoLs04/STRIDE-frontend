@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import 'react-quill-new/dist/quill.snow.css';
 import '../../styles/SuperAdminSMOA.css';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const SuperAdminSMOA = ({ onClose }) => {
   const navigate = useNavigate();
@@ -52,6 +53,11 @@ const SuperAdminSMOA = ({ onClose }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchData;
+
+  useSocketEvent('smoa:updated', () => refreshRef.current());
 
   const fetchData = async () => {
     await Promise.all([

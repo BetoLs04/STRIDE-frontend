@@ -5,6 +5,7 @@ import { ROUTES } from '../../constants/routes';
 import { toast } from 'react-toastify';
 import '../../styles/SMOAPage.css';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const COLUMNAS_FIJAS = [
   { id: 'dir_nombre', nombre: 'Nombre de la Dirección' },
@@ -168,6 +169,11 @@ const SMOAPage = ({ user }) => {
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchAll;
+
+  useSocketEvent('smoa:updated', () => refreshRef.current());
 
   const handleAddFila = async () => {
     setAdding(true);

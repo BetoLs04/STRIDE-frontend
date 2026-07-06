@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import useSocketEvent from '../../hooks/useSocketEvent';
 import { useNavigate } from 'react-router-dom';
 import api, { API_URL } from '../../api';
 import { ROUTES } from '../../constants/routes';
@@ -536,6 +537,14 @@ const PersonalDashboard = ({ user }) => {
       </div>
     );
   };
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchActividades;
+
+  useSocketEvent('actividad:created', () => refreshRef.current());
+  useSocketEvent('actividad:updated', () => refreshRef.current());
+  useSocketEvent('actividad:deleted', () => refreshRef.current());
+  useSocketEvent('actividad:estado-changed', () => refreshRef.current());
 
   if (!user) {
     return (

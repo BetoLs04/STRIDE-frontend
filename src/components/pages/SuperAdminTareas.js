@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import useSocketEvent from '../../hooks/useSocketEvent';
 import ReactQuill from 'react-quill-new';
 import api, { API_URL } from '../../api';
 import { toast } from 'react-toastify';
@@ -385,6 +386,15 @@ const SuperAdminTareas = ({ admin }) => {
   );
 
   const totalSeleccionados = Object.keys(usuariosSeleccionados).length;
+
+  const refreshRef = useRef();
+  refreshRef.current = cargarTareas;
+
+  useSocketEvent('tarea:created', () => refreshRef.current());
+  useSocketEvent('tarea:updated', () => refreshRef.current());
+  useSocketEvent('tarea:deleted', () => refreshRef.current());
+  useSocketEvent('tarea:completada', () => refreshRef.current());
+  useSocketEvent('tarea:asignacion-updated', () => refreshRef.current());
 
   return (
     <div className="tareas-container">

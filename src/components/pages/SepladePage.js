@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES } from '../../constants/routes';
 import { toast } from 'react-toastify';
 import '../../styles/SepladePage.css';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -103,6 +104,11 @@ const SepladePage = ({ user }) => {
   useEffect(() => {
     fetchHoja();
   }, [fetchHoja]);
+
+  const refreshRef = useRef();
+  refreshRef.current = fetchHoja;
+
+  useSocketEvent('seplade:updated', () => refreshRef.current());
 
   const openModal = (indicadorId, field, mes, tipo, currentValue) => {
     setModalIndicadorId(indicadorId);

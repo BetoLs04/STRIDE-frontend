@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { API_URL } from '../../api';
 import { ROUTES } from '../../constants/routes';
 import { toast } from 'react-toastify';
-import { io } from 'socket.io-client';
 import '../../styles/MatrizIndicadoresPage.css';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const COLUMNAS_RESULTADO = [
   '1er Cuatrimestre',
@@ -148,13 +148,10 @@ const MatrizIndicadoresPage = ({ user }) => {
     fetchAll();
   }, [fetchAll]);
 
-  useEffect(() => {
-    const socket = io(API_URL);
-    socket.on('matriz-update', () => {
-      fetchAll();
-    });
-    return () => { socket.disconnect(); };
-  }, [fetchAll]);
+  const refreshRef = useRef();
+  refreshRef.current = fetchAll;
+
+  useSocketEvent('matriz:updated', () => refreshRef.current());
 
   const handleUnidadChange = async (fila, value) => {
     const valores = setValorEnFila(fila, `d_${colUnidad.id}`, value);
