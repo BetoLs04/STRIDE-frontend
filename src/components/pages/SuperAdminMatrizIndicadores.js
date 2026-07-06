@@ -51,9 +51,8 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   }, []);
 
   const refreshRef = useRef();
-  refreshRef.current = fetchData;
 
-  useSocketEvent('matriz:updated', () => refreshRef.current());
+  useSocketEvent('matriz:updated', () => refreshRef.current && refreshRef.current());
 
   const fetchData = async () => {
     setLoading(true);
@@ -70,6 +69,10 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    refreshRef.current = fetchData;
+  });
 
   const fetchEncabezado = async () => {
     setEncabezadoLoading(true);

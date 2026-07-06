@@ -24,9 +24,8 @@ const SuperAdminSeplade = ({ onClose }) => {
   }, []);
 
   const refreshRef = useRef();
-  refreshRef.current = fetchHojas;
 
-  useSocketEvent('seplade:updated', () => refreshRef.current());
+  useSocketEvent('seplade:updated', () => refreshRef.current && refreshRef.current());
 
   const fetchHojas = async () => {
     setLoading(true);
@@ -39,6 +38,10 @@ const SuperAdminSeplade = ({ onClose }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    refreshRef.current = fetchHojas;
+  });
 
   const handleOpenNew = () => {
     setEditId(null);

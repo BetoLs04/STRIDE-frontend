@@ -55,9 +55,8 @@ const SuperAdminSMOA = ({ onClose }) => {
   }, []);
 
   const refreshRef = useRef();
-  refreshRef.current = fetchData;
 
-  useSocketEvent('smoa:updated', () => refreshRef.current());
+  useSocketEvent('smoa:updated', () => refreshRef.current && refreshRef.current());
 
   const fetchData = async () => {
     await Promise.all([
@@ -67,6 +66,10 @@ const SuperAdminSMOA = ({ onClose }) => {
       fetchFilas()
     ]);
   };
+
+  useEffect(() => {
+    refreshRef.current = fetchData;
+  });
 
   const fetchFilas = async () => {
     setFilasLoading(true);
