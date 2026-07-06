@@ -113,11 +113,11 @@ const CreateSuperAdmin = ({ onLogin }) => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
+            <span className="auth-logo">🔒</span>
             <h2 className="auth-title">Acceso Restringido</h2>
             <p className="auth-subtitle">El sistema ya está configurado</p>
           </div>
           <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔒</div>
             <h3>Ya existe un Super Administrador</h3>
             <p style={{ marginBottom: '2rem' }}>
               Solo puede existir un Super Administrador principal en el sistema.
@@ -147,9 +147,10 @@ const CreateSuperAdmin = ({ onLogin }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h2 className="auth-title">Configurar Sistema</h2>
-          <p className="auth-subtitle">Crear primer Super Administrador</p>
-        </div>
+            <span className="auth-logo">🏛️</span>
+            <h2 className="auth-title">Configurar Sistema</h2>
+            <p className="auth-subtitle">Crear primer Super Administrador</p>
+          </div>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">

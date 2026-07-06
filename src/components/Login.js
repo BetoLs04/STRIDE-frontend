@@ -69,6 +69,7 @@ const Login = ({ onLogin }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
+          <span className="auth-logo">🏛️</span>
           <h2 className="auth-title">Iniciar Sesión</h2>
           <p className="auth-subtitle">Accede al sistema STRIDE University</p>
         </div>
@@ -115,7 +116,7 @@ const Login = ({ onLogin }) => {
           <div className="auth-footer">
             <p>
               ¿No tienes cuenta?{' '}
-              <Link to="/create-superadmin" style={{ color: 'var(--secondary-blue)' }}>
+              <Link to="/create-superadmin" className="auth-link">
                 Crear Super Admin
               </Link>
             </p>

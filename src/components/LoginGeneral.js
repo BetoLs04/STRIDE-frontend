@@ -115,6 +115,7 @@ const LoginGeneral = ({ onLogin }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
+          <span className="auth-logo">🏛️</span>
           <h2 className="auth-title">Iniciar Sesión</h2>
           <p className="auth-subtitle">Accede al sistema STRIDE University</p>
         </div>
@@ -170,12 +171,12 @@ const LoginGeneral = ({ onLogin }) => {
             {!superAdminExists ? (
               <p>
                 ¿Eres el primer administrador?{' '}
-                <Link to="/create-superadmin" style={{ color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                <Link to="/create-superadmin" className="auth-link">
                   Crear cuenta de Super Admin
                 </Link>
               </p>
             ) : (
-              <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>
+              <p className="auth-system-ok">
                 Sistema configurado correctamente
               </p>
             )}
