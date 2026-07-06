@@ -25,10 +25,9 @@ const LoginGeneral = ({ onLogin }) => {
 
   const checkSuperAdminExistence = async () => {
     try {
-      const response = await api.get('/api/university/superusers');
-      const hasSuperAdmin = response.data.data && response.data.data.length > 0;
-      setSuperAdminExists(hasSuperAdmin);
-      console.log('¿Super Admin existe?', hasSuperAdmin);
+      const response = await api.get('/api/university/check-superadmin');
+      setSuperAdminExists(response.data.exists);
+      console.log('¿Super Admin existe?', response.data.exists);
     } catch (error) {
       handleApiError(error, 'Error al verificar superusuarios');
       setSuperAdminExists(false);

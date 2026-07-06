@@ -25,8 +25,8 @@ const CreateSuperAdmin = ({ onLogin }) => {
 
   const checkSuperAdminExistence = async () => {
     try {
-      const response = await api.get('/api/university/superusers');
-      const hasSuperAdmin = response.data.data && response.data.data.length > 0;
+      const response = await api.get('/api/university/check-superadmin');
+      const hasSuperAdmin = response.data.exists;
       setSuperAdminExists(hasSuperAdmin);
       
       // Si ya existe un super admin, redirigir al login
