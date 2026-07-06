@@ -20,14 +20,14 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.email || !formData.password) {
       toast.error('Email y contraseña son requeridos');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       console.log('Enviando login a https://api1.strideutmat.com/api/university/login');
       const response = await axios.post('https://api1.strideutmat.com/api/university/login', {
@@ -40,25 +40,25 @@ const Login = ({ onLogin }) => {
       if (response.data.success) {
         // El backend devuelve 'user' no 'admin'
         const userData = response.data.user;
-        
+
         localStorage.setItem('stride_user', JSON.stringify(userData));
-        
+
         if (onLogin) {
           onLogin(userData);
         }
-        
+
         toast.success('¡Login exitoso!');
         navigate('/admin/dashboard');
       }
-      
+
     } catch (error) {
       console.error('Error completo:', error);
-      
+
       let errorMessage = 'Error al iniciar sesión';
       if (error.response) {
         errorMessage = error.response.data?.error || errorMessage;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -69,7 +69,6 @@ const Login = ({ onLogin }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <span className="auth-logo">🏛️</span>
           <h2 className="auth-title">Iniciar Sesión</h2>
           <p className="auth-subtitle">Accede al sistema STRIDE University</p>
         </div>
@@ -104,8 +103,8 @@ const Login = ({ onLogin }) => {
           </div>
 
           <div className="button-group">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary"
               disabled={loading}
             >

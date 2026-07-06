@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -25,6 +25,14 @@ const SepladePage = ({ user }) => {
     if (esPersonal && asignados.some(u => u.usuario_id === user.id && u.usuario_tipo === 'personal')) return true;
     return false;
   };
+
+  const indicadoresVisibles = useMemo(() => {
+    if (esSuperAdmin) return indicadores;
+    return indicadores.filter(ind => {
+      const asignados = usuariosAsignados.filter(u => u.indicador_id === ind.id);
+      return asignados.some(u => u.usuario_id === user.id && u.usuario_tipo === user.tipo);
+    });
+  }, [indicadores, usuariosAsignados, esSuperAdmin, user]);
 
   const [hoja, setHoja] = useState(null);
   const [hojas, setHojas] = useState([]);
@@ -318,14 +326,16 @@ const SepladePage = ({ user }) => {
             </tr>
           </thead>
           <tbody>
-            {indicadores.length === 0 ? (
+            {indicadoresVisibles.length === 0 ? (
               <tr>
                 <td colSpan={20 + (esSuperAdmin ? 1 : 0)} className="td-empty">
-                  Sin indicadores registrados. {esSuperAdmin ? 'Haz clic en "+ Agregar indicador"' : ''}
+                  {esSuperAdmin
+                    ? 'Sin indicadores registrados. Haz clic en "+ Agregar indicador"'
+                    : 'No tienes indicadores asignados en esta hoja'}
                 </td>
               </tr>
             ) : (
-              indicadores.map(ind => (
+              indicadoresVisibles.map(ind => (
                 <React.Fragment key={ind.id}>
                   <tr className="row-prog">
                     <td
