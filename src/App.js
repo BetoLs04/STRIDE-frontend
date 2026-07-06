@@ -1,82 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
-import Header from './components/Header';
-import Home from './components/Home';
-import LoginGeneral from './components/LoginGeneral';
-import CreateSuperAdmin from './components/CreateSuperAdmin';
-import SuperAdminDashboard from './components/SuperAdminDashboard';
-import DirectivoDashboard from './components/DirectivoDashboard';
-import PersonalDashboard from './components/PersonalDashboard';
-import StrideWelcome from './components/StrideWelcome';
-import SuperAdminActividades from './components/SuperAdminActividades';
-import SuperAdminTareas from './components/SuperAdminTareas';
-import PersonalTareas from './components/PersonalTareas';
-import MatrizIndicadoresPage from './components/MatrizIndicadoresPage';
-import SMOAPage from './components/SMOAPage';
-import SepladePage from './components/SepladePage';
-import Footer from './components/Footer';
-import './styles/App.css';
-
-// Global axios auth interceptor
-axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('stride_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-axios.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401 && !error.config?.url?.includes('/login')) {
-      localStorage.removeItem('stride_user');
-      localStorage.removeItem('stride_token');
-      toast.error('Sesión expirada. Inicia sesión nuevamente.');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+import useAuth from './hooks/useAuth';
+import Layout from './components/layout/Layout';
+import Home from './components/pages/Home';
+import LoginGeneral from './components/pages/LoginGeneral';
+import CreateSuperAdmin from './components/pages/CreateSuperAdmin';
+import SuperAdminDashboard from './components/pages/SuperAdminDashboard';
+import DirectivoDashboard from './components/pages/DirectivoDashboard';
+import PersonalDashboard from './components/pages/PersonalDashboard';
+import StrideWelcome from './components/pages/StrideWelcome';
+import SuperAdminActividades from './components/pages/SuperAdminActividades';
+import SuperAdminTareas from './components/pages/SuperAdminTareas';
+import PersonalTareas from './components/pages/PersonalTareas';
+import MatrizIndicadoresPage from './components/pages/MatrizIndicadoresPage';
+import SMOAPage from './components/pages/SMOAPage';
+import SepladePage from './components/pages/SepladePage';
+import ProtectedRoute from './components/shared/ProtectedRoute';
+import { ROUTES, getDashboardPath, matrizIndicadores, seplade } from './constants/routes';
+import { USER_TYPE_ARRAYS } from './constants/index';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Cargar usuario desde localStorage
-    const storedUser = localStorage.getItem('stride_user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        console.log('Usuario cargado desde localStorage:', parsedUser);
-      } catch (error) {
-        console.error('Error parsing user:', error);
-        localStorage.removeItem('stride_user');
-        localStorage.removeItem('stride_token');
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  const handleLogin = (userData) => {
-    console.log('Usuario logueado en App:', userData);
-    setUser(userData);
-    localStorage.setItem('stride_user', JSON.stringify(userData));
-    const userName = userData.nombre || userData.username || 'Usuario';
-    toast.success(`¡Bienvenido ${userName}!`);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('stride_user');
-    localStorage.removeItem('stride_token');
-    toast.info('Sesión cerrada correctamente');
-  };
+  const { user, loading, login: handleLogin, logout: handleLogout } = useAuth();
 
   if (loading) {
     return (
@@ -87,140 +31,113 @@ function App() {
     );
   }
 
-  // Función para obtener ruta de dashboard según tipo de usuario
-  const getDashboardPath = (userType) => {
-    switch(userType) {
-      case 'superadmin': return '/admin/dashboard';
-      case 'directivo': return '/directivo/dashboard';
-      case 'personal': return '/personal/dashboard';
-      default: return '/welcome';
-    }
-  };
-
   return (
-    <div className="App">
-      <ToastContainer 
-        position="top-right" 
-        autoClose={3000}
-        theme="colored"
-      />
-      
-      <Header user={user} onLogout={handleLogout} />
-      
-      <main className="main-content">
-        <Routes>
-          {/* Rutas públicas */}
-          <Route path="/" element={<Home />} />
-          <Route path="/welcome" element={<StrideWelcome user={user} />} />
-          
-          {/* Login - solo accesible si NO hay usuario logueado */}
-          <Route path="/login" element={
-            !user ? <LoginGeneral onLogin={handleLogin} /> : <Navigate to="/" replace/>
-          } />
-          
-          {/* Crear Super Admin - solo accesible si NO hay usuario logueado */}
-          <Route path="/create-superadmin" element={
-            !user ? <CreateSuperAdmin onLogin={handleLogin} /> : <Navigate to="/admin/dashboard" />
-          } />
-          
-          {/* Dashboards protegidos por tipo de usuario */}
-          <Route path="/admin/dashboard" element={
-            user && user.tipo === 'superadmin' ? 
-            <SuperAdminDashboard admin={user} /> : 
-            <Navigate to="/login" />
-          } />
-          
-          <Route path="/directivo/dashboard" element={
-            user && user.tipo === 'directivo' ? 
-            <DirectivoDashboard user={user} /> : 
-            <Navigate to="/login" />
-          } />
-          
-          <Route path="/personal/dashboard" element={
-            user && user.tipo === 'personal' ? 
-            <PersonalDashboard user={user} /> : 
-            <Navigate to="/login" />
-          } />
+    <Layout user={user} onLogout={handleLogout}>
+      <Routes>
+        <Route path={ROUTES.HOME} element={<Home />} />
+        <Route path={ROUTES.WELCOME} element={<StrideWelcome user={user} />} />
+        
+        <Route path={ROUTES.LOGIN} element={
+          !user ? <LoginGeneral onLogin={handleLogin} /> : <Navigate to={ROUTES.HOME} replace/>
+        } />
+        
+        <Route path={ROUTES.CREATE_SUPERADMIN} element={
+          !user ? <CreateSuperAdmin onLogin={handleLogin} /> : <Navigate to={ROUTES.ADMIN_DASHBOARD} />
+        } />
+        
+        <Route path={ROUTES.ADMIN_DASHBOARD} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <SuperAdminDashboard admin={user} />
+          </ProtectedRoute>
+        } />
+        
+        <Route path={ROUTES.DIRECTIVO_DASHBOARD} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.DIRECTIVO}>
+            <DirectivoDashboard user={user} />
+          </ProtectedRoute>
+        } />
+        
+        <Route path={ROUTES.PERSONAL_DASHBOARD} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.PERSONAL}>
+            <PersonalDashboard user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/actividades" element={
-            user && user.tipo === 'superadmin' ? 
-            <SuperAdminActividades admin={user} /> : 
-            <Navigate to="/login" />
-          } />
-          
-          <Route path="/admin/tareas" element={
-            user && user.tipo === 'superadmin' ? 
-            <SuperAdminTareas admin={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path={ROUTES.ADMIN_ACTIVIDADES} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <SuperAdminActividades admin={user} />
+          </ProtectedRoute>
+        } />
+        
+        <Route path={ROUTES.ADMIN_TAREAS} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <SuperAdminTareas admin={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/personal/tareas" element={
-            user && user.tipo === 'personal' ? 
-            <PersonalTareas user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path={ROUTES.PERSONAL_TAREAS} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.PERSONAL}>
+            <PersonalTareas user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/matriz-indicadores/:seccionId" element={
-            user ? 
-            <MatrizIndicadoresPage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path="/admin/matriz-indicadores/:seccionId" element={
+          <ProtectedRoute user={user}>
+            <MatrizIndicadoresPage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/directivo/matriz-indicadores/:seccionId" element={
-            user && (user.tipo === 'directivo' || user.tipo === 'superadmin') ? 
-            <MatrizIndicadoresPage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path="/directivo/matriz-indicadores/:seccionId" element={
+          <ProtectedRoute user={user}>
+            <MatrizIndicadoresPage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/personal/matriz-indicadores/:seccionId" element={
-            user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
-            <MatrizIndicadoresPage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path="/personal/matriz-indicadores/:seccionId" element={
+          <ProtectedRoute user={user}>
+            <MatrizIndicadoresPage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/smoa" element={
-            user && user.tipo === 'superadmin' ? 
-            <SMOAPage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path={ROUTES.ADMIN_SMOA} element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <SMOAPage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/directivo/smoa" element={
-            user && (user.tipo === 'directivo' || user.tipo === 'superadmin') ? 
-            <SMOAPage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path={ROUTES.DIRECTIVO_SMOA} element={
+          <ProtectedRoute user={user}>
+            <SMOAPage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/personal/smoa" element={
-            user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
-            <SMOAPage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path={ROUTES.PERSONAL_SMOA} element={
+          <ProtectedRoute user={user}>
+            <SMOAPage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/seplade/:hojaId" element={
-            user && user.tipo === 'superadmin' ? 
-            <SepladePage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path="/admin/seplade/:hojaId" element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <SepladePage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/directivo/seplade/:hojaId" element={
-            user && (user.tipo === 'directivo' || user.tipo === 'superadmin') ? 
-            <SepladePage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path="/directivo/seplade/:hojaId" element={
+          <ProtectedRoute user={user}>
+            <SepladePage user={user} />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/personal/seplade/:hojaId" element={
-            user && (user.tipo === 'personal' || user.tipo === 'superadmin') ? 
-            <SepladePage user={user} /> : 
-            <Navigate to="/login" />
-          } />
+        <Route path="/personal/seplade/:hojaId" element={
+          <ProtectedRoute user={user}>
+            <SepladePage user={user} />
+          </ProtectedRoute>
+        } />
 
-          {/* Ruta por defecto */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </main>
-      
-      <Footer />
-    </div>
+        <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
+      </Routes>
+    </Layout>
   );
 }
 

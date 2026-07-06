@@ -1,0 +1,66 @@
+/* ===== BANNER MEJORADO PARA DIRECTIVO ===== */
+.dashboard-header-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--turquesa) 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 20px rgba(31, 111, 214, 0.25);
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.banner-left {
+  flex: 1;
+  min-width: 300px;
+}
+
+.banner-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.banner-subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.banner-right {
+  text-align: right;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.periodo-actual-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.periodo-emoji-banner {
+  font-size: 1.8rem;
+}
+
+.periodo-text-banner h4 {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.periodo-text-banner p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}

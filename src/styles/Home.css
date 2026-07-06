@@ -1,0 +1,972 @@
+.home-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-section {
+  background: linear-gradient(rgba(31, 111, 214, 0.9), rgba(34, 193, 195, 0.9)),
+    url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 4rem 2rem;
+  border-radius: 15px;
+  text-align: center;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  opacity: 0.95;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 3px solid var(--soft-yellow);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  color: var(--turquesa);
+  margin-bottom: 0.75rem;
+}
+
+.feature-card h3 {
+  color: var(--primary-blue);
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.feature-card p {
+  color: var(--gray-text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+/* ===== CARRUSEL DE COMUNICADOS - NUEVO DISEÑO ===== */
+
+.comunicados-carousel-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin: 3rem 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(31, 111, 214, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.comunicados-carousel-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--turquesa), var(--soft-yellow));
+}
+
+.comunicados-carousel-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.comunicado-slide {
+  padding: 10px;
+}
+
+.slide-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--soft-yellow));
+}
+
+/* Encabezado - Título izquierda, Fecha derecha */
+.comunicado-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.comunicado-titulo {
+  color: var(--primary-blue);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.comunicado-meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.comunicado-author {
+  font-size: 0.95rem;
+  color: var(--gray-text);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--light-bg);
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.comunicado-date {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--turquesa);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #e8f4fd;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.comunicado-status {
+  font-size: 1.2rem;
+  background: var(--light-bg);
+  padding: 0.3rem 0.6rem;
+  border-radius: 10px;
+}
+
+/* Cuerpo - Contenido en el medio */
+.comunicado-body {
+  flex: 1;
+  overflow-y: auto;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.comunicado-content {
+  line-height: 1.8;
+  color: var(--dark-text);
+  font-size: 1.05rem;
+}
+
+.comunicado-content p {
+  margin: 0;
+  text-align: justify;
+}
+
+/* Pie - Enlace en la parte inferior */
+.comunicado-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  margin-top: auto;
+  border-top: 2px dashed #dee2e6;
+}
+
+.link-container {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.link-label {
+  font-weight: 600;
+  color: var(--primary-blue);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.external-link {
+  color: var(--turquesa);
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(31, 111, 214, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(31, 111, 214, 0.2);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.external-link:hover {
+  background: rgba(31, 111, 214, 0.15);
+  border-color: var(--turquesa);
+  text-decoration: underline;
+  color: var(--primary-blue);
+}
+
+/* Botón ver completo */
+.btn-small {
+  padding: 0.5rem 1.2rem !important;
+  font-size: 0.9rem !important;
+}
+
+/* Sección sin comunicados */
+.no-comunicados-section {
+  background: linear-gradient(135deg, var(--light-bg) 0%, #e9ecef 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  margin: 3rem 0;
+  text-align: center;
+  border: 2px dashed #ced4da;
+}
+
+.no-comunicados-content {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.no-comunicados-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  color: #adb5bd;
+}
+
+.no-comunicados-section h3 {
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.no-comunicados-section p {
+  color: var(--gray-text);
+  margin-bottom: 0.5rem;
+}
+
+.no-comunicados-section .hint {
+  font-size: 0.9rem;
+  color: var(--gray-text);
+  font-style: italic;
+}
+
+/* Controles del carrusel */
+.carousel-controls-info {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--gray-text);
+  font-size: 0.9rem;
+  padding: 0.8rem;
+  background: var(--light-bg);
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+}
+
+/* Estilos del carrusel slick */
+.slick-prev,
+.slick-next {
+  width: 45px !important;
+  height: 45px !important;
+  z-index: 1;
+  background: rgba(31, 111, 214, 0.9) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease !important;
+}
+
+.slick-prev {
+  left: -55px !important;
+}
+
+.slick-next {
+  right: -55px !important;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background: var(--primary-blue) !important;
+  transform: scale(1.1) !important;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-size: 26px !important;
+  color: white !important;
+  opacity: 1 !important;
+}
+
+.slick-dots {
+  bottom: -45px !important;
+}
+
+.slick-dots li button:before {
+  color: var(--primary-blue) !important;
+  font-size: 12px !important;
+  opacity: 0.5 !important;
+}
+
+.slick-dots li.slick-active button:before {
+  color: var(--turquesa) !important;
+  opacity: 1 !important;
+}
+
+.slick-dots li button:hover:before {
+  color: var(--soft-yellow) !important;
+}
+
+/* Responsive para carrusel */
+@media (max-width: 1200px) {
+  .slick-prev {
+    left: 10px !important;
+  }
+
+  .slick-next {
+    right: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .comunicados-carousel-section {
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border-radius: 15px;
+  }
+
+  .slide-content {
+    padding: 1.5rem;
+    height: 450px;
+  }
+
+  .comunicado-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .comunicado-date {
+    align-self: flex-start;
+  }
+
+  .comunicado-titulo {
+    font-size: 1.3rem;
+  }
+
+  .comunicado-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .link-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .external-link {
+    width: 100%;
+  }
+
+  .slick-prev,
+  .slick-next {
+    width: 35px !important;
+    height: 35px !important;
+  }
+
+  .slick-prev:before,
+  .slick-next:before {
+    font-size: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .comunicado-titulo {
+    font-size: 1.1rem;
+  }
+
+  .comunicado-date {
+    font-size: 0.9rem;
+  }
+
+  .comunicado-content {
+    font-size: 0.95rem;
+  }
+
+  .slide-content {
+    height: 500px;
+  }
+
+  .comunicados-carousel-section {
+    padding: 1rem;
+  }
+}
+
+/* ===== ESTILOS PARA CONTENIDO HTML EN HOME ===== */
+.comunicado-content-html h1,
+.comunicado-content-html h2,
+.comunicado-content-html h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+.comunicado-content-html h1 {
+  font-size: 2em;
+}
+
+.comunicado-content-html h2 {
+  font-size: 1.5em;
+}
+
+.comunicado-content-html h3 {
+  font-size: 1.17em;
+}
+
+.comunicado-content-html p {
+  margin: 0 0 1em 0;
+  padding: 0;
+  line-height: 1.5;
+  text-align: justify;
+  font-size: 0.95rem;
+}
+
+.comunicado-content-html .ql-align-center {
+  text-align: center;
+}
+
+.comunicado-content-html .ql-align-right {
+  text-align: right;
+}
+
+.comunicado-content-html .ql-align-justify {
+  text-align: justify;
+}
+
+.comunicado-content-html strong,
+.comunicado-content-html b {
+  font-weight: 700;
+  color: var(--dark-text);
+}
+
+.comunicado-content-html em,
+.comunicado-content-html i {
+  font-style: italic;
+  color: #555;
+}
+
+.comunicado-content-html u {
+  text-decoration: underline;
+}
+
+.comunicado-content-html a {
+  color: var(--turquesa);
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.comunicado-content-html a:hover {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.comunicado-content-html ul,
+.comunicado-content-html ol {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+.comunicado-content-html li {
+  margin: 0 0 0.5em 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.comunicado-content-html ul li {
+  list-style-type: disc;
+}
+
+.comunicado-content-html ol li {
+  list-style-type: decimal;
+}
+
+.comunicado-content-html blockquote {
+  border-left: 4px solid #ccc;
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  color: #666;
+}
+
+.comunicado-content-html code {
+  background: var(--light-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #d63384;
+}
+
+.comunicado-content-html pre {
+  background: var(--light-bg);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  border: 1px solid #dee2e6;
+}
+
+.comunicado-content-html pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.comunicado-content-html table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.comunicado-content-html th,
+.comunicado-content-html td {
+  border: 1px solid #dee2e6;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.comunicado-content-html th {
+  background: var(--light-bg);
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.comunicado-content-html tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+/* Estilos para texto con formato específico */
+.comunicado-content-html .text-center {
+  text-align: center;
+}
+
+.comunicado-content-html .text-right {
+  text-align: right;
+}
+
+.comunicado-content-html .text-justify {
+  text-align: justify;
+}
+
+.comunicado-content-html .text-muted {
+  color: var(--gray-text);
+}
+
+.comunicado-content-html .text-primary {
+  color: var(--primary-blue);
+}
+
+.comunicado-content-html .text-success {
+  color: #28a745;
+}
+
+.comunicado-content-html .text-warning {
+  color: #ffc107;
+}
+
+.comunicado-content-html .text-danger {
+  color: #dc3545;
+}
+
+/* Estilos para imágenes dentro del contenido */
+.comunicado-content-html img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1em 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comunicado-content-html img.align-left {
+  float: left;
+  margin-right: 1.5em;
+  margin-bottom: 1em;
+}
+
+.comunicado-content-html img.align-right {
+  float: right;
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.comunicado-content-html img.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Clear floats */
+.comunicado-content-html .clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Responsive para contenido HTML */
+@media (max-width: 768px) {
+  .comunicado-content-html h1 {
+    font-size: 1.5rem;
+  }
+
+  .comunicado-content-html h2 {
+    font-size: 1.3rem;
+  }
+
+  .comunicado-content-html h3 {
+    font-size: 1.2rem;
+  }
+
+  .comunicado-content-html p {
+    font-size: 1rem;
+    text-align: left;
+  }
+
+  .comunicado-content-html ul,
+  .comunicado-content-html ol {
+    margin-left: 1.5em;
+  }
+
+  .comunicado-content-html img.align-left,
+  .comunicado-content-html img.align-right {
+    float: none;
+    margin: 1em auto;
+    display: block;
+  }
+}
+
+/* Scrollbar personalizado para el contenido */
+.comunicado-content-html::-webkit-scrollbar {
+  width: 8px;
+}
+
+.comunicado-content-html::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.comunicado-content-html::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.comunicado-content-html::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animación suave para el carrusel */
+.slick-slide {
+  transition: opacity 0.5s ease;
+}
+
+/* Estilos específicos para el carrusel en Home */
+.comunicados-carousel-section .slick-slider {
+  margin-bottom: 0;
+}
+
+.comunicados-carousel-section .slick-list {
+  padding: 0 !important;
+}
+
+.comunicados-carousel-section .slick-slide>div {
+  padding: 0;
+}
+
+/* Botones de navegación mejorados */
+.comunicados-carousel-section .btn-small {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.comunicados-carousel-section .btn-small:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comunicados-carousel-section .btn-small:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Mejora para el contenedor del contenido */
+.comunicado-content-html {
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+/* ===== BOTONES DEL CARRUSEL - ESTILO MEJORADO Y AJUSTADO ===== */
+.carousel-nav-btn {
+  width: 45px;
+  height: 45px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(31, 111, 214, 0.95);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 600;
+  z-index: 30;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.carousel-nav-btn:hover {
+  background: var(--turquesa);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  border-color: white;
+}
+
+.carousel-nav-btn:active {
+  transform: translateY(-50%) scale(0.92);
+  transition-duration: 0.1s;
+}
+
+/* Posicionamiento específico */
+.carousel-nav-btn.prev {
+  left: 15px;
+}
+
+.carousel-nav-btn.next {
+  right: 15px;
+}
+
+/* Asegurar que las flechas estén centradas perfectamente */
+.carousel-nav-btn span {
+  display: block;
+  line-height: 1;
+  margin-top: -1px;
+}
+
+/* Puntos de navegación - más compactos */
+/* Animación de deslizamiento vertical para comunicados */
+.comunicado-vertical-slide {
+  animation: slideVertical 0.35s ease-out;
+}
+
+@keyframes slideVertical {
+  from {
+    transform: translateY(25px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.carousel-dots-container {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #ced4da;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+  margin: 0;
+  position: relative;
+}
+
+.carousel-dot:hover {
+  background: #adb5bd;
+  transform: scale(1.4);
+}
+
+.carousel-dot.active {
+  width: 30px;
+  border-radius: 15px;
+  background: var(--primary-blue);
+  transform: scale(1);
+}
+
+/* Ajustes para pantallas más pequeñas */
+@media (max-width: 768px) {
+  .carousel-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .carousel-nav-btn.prev {
+    left: 10px;
+  }
+
+  .carousel-nav-btn.next {
+    right: 10px;
+  }
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .carousel-dot.active {
+    width: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .carousel-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .carousel-dot.active {
+    width: 20px;
+  }
+}
+
+/* Estilos para el logo pequeño de STRIDE */
+.stride-logo-container-small {
+  height: 60px;
+  /* Altura más pequeña */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.stride-logo-small {
+  max-height: 100%;
+  /* Ocupa toda la altura del contenedor */
+  width: auto;
+  /* Mantiene proporción */
+  max-width: 180px;
+  /* Ancho máximo más pequeño */
+  object-fit: contain;
+  /* Mantiene proporciones */
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-icon-small {
+  font-size: 2rem;
+  /* Más pequeño que antes */
+  margin-right: 10px;
+}
+
+/* Ajusta el contenedor principal de logos si es necesario */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  /* Espacio entre logos */
+}
+
+.stride-logo-section {
+  flex-shrink: 0;
+  /* Evita que se encoja demasiado */
+}
+
+/* ===== ELIMINAR PUNTOS DEL CARRUSEL - FORZADO ===== */
+.directivo-carousel .slick-dots,
+.imagenes-carousel .slick-dots {
+  display: none !important;
+}
+
+/* Para asegurarse en todos los navegadores */
+.slick-dots,
+.slick-dotted.slick-slider {
+  margin-bottom: 0 !important;
+}

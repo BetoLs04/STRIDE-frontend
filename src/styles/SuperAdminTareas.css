@@ -1709,3 +1709,269 @@
   white-space: nowrap;
 }
 
+
+
+/* ===== ESTILOS PARA TARJETAS EN LISTA ===== */
+.actividades-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.actividad-lista-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.actividad-lista-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--turquesa);
+}
+
+.actividad-lista-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.actividad-lista-header h3 {
+  margin: 0;
+  color: var(--primary-blue);
+  font-size: 1.2rem;
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.actividad-lista-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.tipo-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.tipo-badge.personal {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.tipo-badge.directivo {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.actividad-lista-body {
+  margin-bottom: 1rem;
+}
+
+.actividad-lista-descripcion {
+  color: var(--gray-text);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.actividad-lista-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+  background: var(--light-bg);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  color: var(--gray-text);
+  margin-bottom: 0.2rem;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  font-weight: 500;
+}
+
+.actividad-lista-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.imagenes-count {
+  font-size: 0.85rem;
+  color: var(--gray-text);
+}
+
+.imagenes-badge {
+  background: #e8f4fd;
+  color: var(--turquesa);
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-weight: 500;
+}
+
+
+/* ===== TARJETAS MINIMALISTAS (SOLO TÍTULO) ===== */
+.actividades-lista-minimalista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.actividad-minimalista-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.2rem;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.actividad-minimalista-card:hover {
+  border-color: var(--turquesa);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.actividad-minimalista-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.actividad-minimalista-info {
+  flex: 1;
+}
+
+.actividad-minimalista-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-blue);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.actividad-minimalista-metadata {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actividad-minimalista-creador,
+.actividad-minimalista-fecha {
+  font-size: 0.85rem;
+  color: var(--gray-text);
+  background: var(--light-bg);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.actividad-minimalista-actions {
+  flex-shrink: 0;
+}
+
+/* Para móviles */
+@media (max-width: 768px) {
+  .actividad-minimalista-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .actividad-minimalista-actions {
+    align-self: flex-end;
+  }
+
+  .actividad-minimalista-metadata {
+    gap: 0.5rem;
+  }
+}
+
+/* Para el icono de tareas */
+.tareas-icon {
+  margin-right: 4px;
+  font-size: 1.1rem;
+}
+
+/* Para el enlace de tareas (opcional, para darle un color diferente) */
+.tareas-link {
+  position: relative;
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  color: white !important;
+  padding: 6px 15px !important;
+  border-radius: 30px !important;
+  margin-left: 5px;
+  transition: all 0.3s ease;
+}
+
+.tareas-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(56, 189, 248, 0.4);
+}
+
+/* Badge de tareas */
+.tareas-badge {
+  background: #0ea5e9;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 0 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tareas-link {
+    margin-left: 0;
+    margin-top: 5px;
+    text-align: center;
+  }
+}

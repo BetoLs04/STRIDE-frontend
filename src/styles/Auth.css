@@ -1,0 +1,143 @@
+.auth-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--turquesa) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: "STRIDE";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20rem;
+  font-weight: 900;
+  opacity: 0.06;
+  color: white;
+  z-index: 0;
+  letter-spacing: 2rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem 3rem 3rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 1;
+  border-top: 4px solid var(--cyan);
+  animation: authFadeIn 0.5s ease;
+}
+
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-logo {
+  font-size: 3rem;
+  color: var(--primary-blue);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.auth-title {
+  color: var(--primary-blue);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  color: var(--gray-text);
+  font-size: 0.95rem;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.auth-footer p {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--gray-text);
+}
+
+.auth-footer .btn-text {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.auth-footer .btn-text:hover {
+  opacity: 1;
+}
+
+.auth-link {
+  color: var(--turquesa);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-link:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
+.auth-system-ok {
+  color: var(--success-text);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.auth-system-ok::before {
+  content: "✓";
+  font-weight: bold;
+}
+
+.warning-note {
+  background: var(--warning-bg);
+  border: 1px solid #ffc107;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.warning-note small {
+  color: var(--warning-text);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 2rem;
+  }
+}

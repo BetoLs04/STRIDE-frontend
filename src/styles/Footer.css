@@ -1,0 +1,135 @@
+.university-footer {
+  background: var(--primary-blue);
+  color: white;
+  padding: 3rem 2rem;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.footer-section h3 {
+  color: var(--soft-yellow);
+  margin-bottom: 1rem;
+}
+
+.footer-section p {
+  opacity: 0.8;
+  line-height: 1.8;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+}
+
+/* ===== FOOTER SIMPLIFICADO ===== */
+.actividad-footer .footer-left {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.direccion-tag {
+  background: #e8f4fd;
+  color: #1565c0;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .user-info-large {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .user-details {
+    text-align: center;
+    margin-right: 0;
+  }
+
+  .user-details p {
+    justify-content: center;
+  }
+
+  .dashboard-header-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .banner-left,
+  .banner-right {
+    width: 100%;
+    text-align: center;
+  }
+
+  .periodo-actual-banner {
+    justify-content: center;
+  }
+
+  .fechas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actividad-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .tipo-actividad-badge {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-details p {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .user-separator {
+    display: none;
+  }
+
+  .banner-title {
+    font-size: 1.5rem;
+  }
+
+  .banner-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .fecha-item {
+    padding: 0.8rem;
+  }
+
+  .fecha-valor {
+    font-size: 0.9rem;
+  }
+}
