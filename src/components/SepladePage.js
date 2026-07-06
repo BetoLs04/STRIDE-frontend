@@ -26,14 +26,6 @@ const SepladePage = ({ user }) => {
     return false;
   };
 
-  const indicadoresVisibles = useMemo(() => {
-    if (esSuperAdmin) return indicadores;
-    return indicadores.filter(ind => {
-      const asignados = usuariosAsignados.filter(u => u.indicador_id === ind.id);
-      return asignados.some(u => u.usuario_id === user.id && u.usuario_tipo === user.tipo);
-    });
-  }, [indicadores, usuariosAsignados, esSuperAdmin, user]);
-
   const [hoja, setHoja] = useState(null);
   const [hojas, setHojas] = useState([]);
   const [indicadores, setIndicadores] = useState([]);
@@ -41,6 +33,14 @@ const SepladePage = ({ user }) => {
   const [notas, setNotas] = useState([]);
   const [usuariosAsignados, setUsuariosAsignados] = useState([]);
   const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+
+  const indicadoresVisibles = useMemo(() => {
+    if (esSuperAdmin) return indicadores;
+    return indicadores.filter(ind => {
+      const asignados = usuariosAsignados.filter(u => u.indicador_id === ind.id);
+      return asignados.some(u => u.usuario_id === user.id && u.usuario_tipo === user.tipo);
+    });
+  }, [indicadores, usuariosAsignados, esSuperAdmin, user]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
