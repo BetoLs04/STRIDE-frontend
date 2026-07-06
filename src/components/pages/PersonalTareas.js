@@ -442,6 +442,7 @@ const PersonalTareas = ({ user }) => {
               </div>
               <FormFileUpload
                 label="Archivos adjuntos (opcional)"
+                accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.pptx,.zip"
                 multiple
                 onChange={handleFileChange}
                 files={archivos}

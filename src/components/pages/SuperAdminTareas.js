@@ -545,7 +545,7 @@ const SuperAdminTareas = ({ admin }) => {
                   </div>
                 </div>
                 <FormInput label="Fecha de entrega *" name="fecha_entrega" type="date" value={formData.fecha_entrega} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} required />
-                <FormFileUpload label="Archivos adjuntos (opcional, máx. 5)" multiple onChange={handleFileChange} files={archivos} onRemove={removeArchivo} maxFiles={LIMITS.MAX_FILES} hint="Máx. 5 archivos, 10MB c/u" />
+                <FormFileUpload label="Archivos adjuntos (opcional, máx. 5)" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.pptx,.zip" multiple onChange={handleFileChange} files={archivos} onRemove={removeArchivo} maxFiles={LIMITS.MAX_FILES} hint="Máx. 5 archivos, 10MB c/u" />
               </div>
 
               <div className="form-section">
@@ -639,7 +639,7 @@ const SuperAdminTareas = ({ admin }) => {
                 <div className="form-group">
                   <label>Agregar nuevos archivos</label>
                   <div className="file-upload-area">
-                    <input type="file" id="archivos-edit" multiple onChange={handleFileChange} className="file-input" />
+                    <input type="file" id="archivos-edit" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.pptx,.zip" multiple onChange={handleFileChange} className="file-input" />
                     <label htmlFor="archivos-edit" className="file-upload-label">
                       <span className="upload-icon"></span>
                       <span>Seleccionar archivos</span>

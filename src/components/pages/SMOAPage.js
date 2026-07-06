@@ -375,6 +375,7 @@ const SMOAPage = ({ user }) => {
   const handleSelectColFile = (fila, columna) => {
     const input = document.createElement('input');
     input.type = 'file';
+    input.accept = '.jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.pptx';
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (file) handleUploadColFile(fila, columna, file);

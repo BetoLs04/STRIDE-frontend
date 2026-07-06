@@ -288,7 +288,7 @@ const PanelComunicadosAdmin = ({ admin, onClose }) => {
 
             <FormInput label="Enlace relacionado (opcional)" name="link_externo" type="url" value={formData.link_externo} onChange={handleInputChange} placeholder="https://ejemplo.com" hint="Enlace externo relacionado con el comunicado" />
 
-            <FormFileUpload label="Archivos adjuntos (opcional, máx. 5)" multiple onChange={handleFileChange} files={archivos} onRemove={removeArchivo} maxFiles={LIMITS.MAX_FILES} hint="Máx. 10MB c/u" />
+            <FormFileUpload label="Archivos adjuntos (opcional, máx. 5)" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.pptx,.zip" multiple onChange={handleFileChange} files={archivos} onRemove={removeArchivo} maxFiles={LIMITS.MAX_FILES} hint="Máx. 10MB c/u" />
 
             <FormSelect label="Estado" name="estado" value={formData.estado} onChange={handleInputChange}>
               <option value="publicado">✅ Publicado (visible para todos)</option>
