@@ -129,6 +129,32 @@ const Home = () => {
     }
   };
 
+  const handlePOAClick = async () => {
+    if (!isLoggedIn) {
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+      return;
+    }
+    const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
+    if (userData?.tipo === USER_TYPES.SUPERADMIN) {
+      navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'poa' } });
+      return;
+    }
+    try {
+      const res = await api.get('/api/university/poa-secciones');
+      const secciones = (res.data.data || []).filter(s =>
+        s.usuarios && s.usuarios.some(u => u.usuario_id === userData.id && u.usuario_tipo === userData.tipo)
+      );
+      if (secciones.length === 0) {
+        toast.error('🚫 Permiso denegado. No tienes acceso al POA.');
+        return;
+      }
+      const prefix = getRoutePrefix(userData.tipo);
+      navigate(`${prefix}/poa/${secciones[0].id}`);
+    } catch (error) {
+      handleApiError(error, 'Error al cargar hojas del POA');
+    }
+  };
+
   const checkSuperAdminExistence = async () => {
     try {
       const response = await api.get('/api/university/check-superadmin');
@@ -463,7 +489,7 @@ const Home = () => {
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
-          onClick={() => handleLinkClick('https://docs.google.com/spreadsheets/d/1KGx6xJbtxp-Cszxzp3kt-quJFiNUAza7ERufQrb6UuM/edit?pli=1&gid=440700565#gid=440700565')}
+          onClick={handlePOAClick}
         >
           <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>POA</h3>
