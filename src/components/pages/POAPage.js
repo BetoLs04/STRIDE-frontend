@@ -300,7 +300,7 @@ const POAPage = ({ user }) => {
                       return (
                         <td
                           key={col.key}
-                          className={`poa-cell-td${!puedeEditarCelda ? ' poa-cell-td-readonly' : ''}`}
+                          className={`poa-cell-td ${col.className || ''}${!puedeEditarCelda ? ' poa-cell-td-readonly' : ''}`}
                           onClick={() => puedeEditarCelda && openModal(fila, col.key)}
                         >
                           <span className="poa-cell-text">{getValor(fila, col.key) || (puedeEditarCelda ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
