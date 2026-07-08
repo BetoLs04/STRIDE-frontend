@@ -37,3 +37,6 @@ export const matrizIndicadores = (tipo, seccionId) =>
 
 export const seplade = (tipo, hojaId) =>
   `${PREFIX_BY_TYPE[tipo] || `/${tipo}`}/seplade/${hojaId}`;
+
+export const poa = (tipo, seccionId) =>
+  `${PREFIX_BY_TYPE[tipo] || `/${tipo}`}/poa/${seccionId}`;

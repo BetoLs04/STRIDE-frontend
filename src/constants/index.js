@@ -104,6 +104,13 @@ export const API_ROUTES = {
     ASIGNAR: '/api/university/smoa-asignar',
     COLUMNAS_ASIGNAR: '/api/university/smoa-columnas-asignar',
   },
+  POA: {
+    SECCIONES: '/api/university/poa-secciones',
+    ENCABEZADO: '/api/university/poa-encabezado',
+    COLUMNAS: '/api/university/poa-columnas',
+    FILAS: '/api/university/poa-filas',
+    USUARIOS: '/api/university/poa-usuarios',
+  },
   SEPLADE: {
     HOJAS: '/api/university/seplade-hojas',
     INDICADORES: '/api/university/seplade-indicadores',

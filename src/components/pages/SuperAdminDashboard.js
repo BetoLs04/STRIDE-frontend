@@ -11,6 +11,7 @@ import PanelComunicadosAdmin from '../shared/PanelComunicadosAdmin';
 import SuperAdminMatrizIndicadores from './SuperAdminMatrizIndicadores';
 import SuperAdminSMOA from './SuperAdminSMOA';
 import SuperAdminSeplade from './SuperAdminSeplade';
+import SuperAdminPOA from './SuperAdminPOA';
 import FormInput from '../shared/FormInput';
 import '../../styles/SuperAdminDashboard.css';
 import FormSelect from '../shared/FormSelect';
@@ -57,6 +58,10 @@ const SuperAdminDashboard = ({ admin }) => {
     }
     if (location.state?.tab === 'seplade') {
       setActiveTab('seplade');
+      window.history.replaceState({}, document.title);
+    }
+    if (location.state?.tab === 'poa') {
+      setActiveTab('poa');
       window.history.replaceState({}, document.title);
     }
     fetchData();
@@ -565,6 +570,7 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'matriz' ? 'active' : ''}`} onClick={() => setActiveTab('matriz')}>📊 Matriz de Indicadores</button>
         <button className={`tab-btn ${activeTab === 'smoa' ? 'active' : ''}`} onClick={() => setActiveTab('smoa')}>📈 SMOA</button>
         <button className={`tab-btn ${activeTab === 'seplade' ? 'active' : ''}`} onClick={() => setActiveTab('seplade')}>📋 SEPLADE</button>
+        <button className={`tab-btn ${activeTab === 'poa' ? 'active' : ''}`} onClick={() => setActiveTab('poa')}>📋 POA</button>
       </div>
 
       <div className="dashboard-main">
@@ -577,6 +583,7 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'matriz' && <SuperAdminMatrizIndicadores onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'smoa' && <SuperAdminSMOA onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'seplade' && <SuperAdminSeplade onClose={() => setActiveTab('dashboard')} />}
+        {activeTab === 'poa' && <SuperAdminPOA onClose={() => setActiveTab('dashboard')} />}
       </div>
 
       {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}

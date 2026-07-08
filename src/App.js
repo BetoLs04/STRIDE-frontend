@@ -16,6 +16,7 @@ import PersonalTareas from './components/pages/PersonalTareas';
 import MatrizIndicadoresPage from './components/pages/MatrizIndicadoresPage';
 import SMOAPage from './components/pages/SMOAPage';
 import SepladePage from './components/pages/SepladePage';
+import POAPage from './components/pages/POAPage';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import { ROUTES, getDashboardPath, matrizIndicadores, seplade } from './constants/routes';
 import { USER_TYPE_ARRAYS } from './constants/index';
@@ -134,6 +135,24 @@ function App() {
         <Route path="/personal/seplade/:hojaId" element={
           <ProtectedRoute user={user}>
             <SepladePage user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/poa/:seccionId" element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <POAPage user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/directivo/poa/:seccionId" element={
+          <ProtectedRoute user={user}>
+            <POAPage user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/personal/poa/:seccionId" element={
+          <ProtectedRoute user={user}>
+            <POAPage user={user} />
           </ProtectedRoute>
         } />
 
