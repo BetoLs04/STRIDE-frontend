@@ -76,18 +76,40 @@
   text-align: center;
 }
 
+.poa-table thead tr.poa-th-row-1 th.poa-th-datos {
+  background: #34495e;
+  font-weight: bold;
+}
+
+.poa-table thead tr.poa-th-row-2 th.poa-th-cuatri {
+  background: #3a5a7a;
+}
+
+.poa-table thead tr.poa-th-row-3 th {
+  background: #3d6b8a;
+}
+
+.poa-table thead tr.poa-th-row-3 th.poa-th-prog {
+  background: #4a7a9a;
+}
+
+.poa-table thead tr.poa-th-row-3 th.poa-th-alc {
+  background: #5a8aaa;
+}
+
 .poa-table tbody tr:nth-child(even) {
   background: #f2f2f2;
 }
 
 .poa-cell-actividad {
   max-width: 480px;
+  text-align: left;
 }
 
 .poa-cell-td {
   cursor: pointer;
   transition: background 0.15s;
-  min-width: 100px;
+  min-width: 90px;
 }
 
 .poa-cell-td:hover {
@@ -100,6 +122,11 @@
 
 .poa-cell-td-readonly:hover {
   background: inherit !important;
+}
+
+.poa-cell-cuatri {
+  min-width: 70px;
+  text-align: center;
 }
 
 .poa-cell-text {
@@ -121,7 +148,8 @@
   background: #2c3e50;
   color: #fff;
   text-align: center;
-  width: 50px;
+  width: 60px;
+  vertical-align: middle;
 }
 
 .poa-td-empty {

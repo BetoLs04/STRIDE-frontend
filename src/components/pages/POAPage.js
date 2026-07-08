@@ -7,14 +7,16 @@ import '../../styles/POAPage.css';
 import { handleApiError } from '../../utils/errorHandler';
 import useSocketEvent from '../../hooks/useSocketEvent';
 
-const COLUMNAS_POA = [
-  { key: 'actividad', label: 'ACTIVIDADES', alineacion: 'left', className: 'poa-cell-actividad' },
-  { key: 'unidad_medida', label: 'UNIDAD DE MEDIDA', alineacion: 'center' },
-  { key: 'meta', label: 'META CUATRIMESTRAL / ANUAL', alineacion: 'center' },
-  { key: 'prog_num', label: 'PROG #', alineacion: 'center' },
-  { key: 'prog_pct', label: 'PROG %', alineacion: 'center' },
-  { key: 'alc_num', label: 'ALC #', alineacion: 'center' },
-  { key: 'alc_pct', label: 'ALC %', alineacion: 'center' }
+const CUATRIMESTRES = [
+  { label: '1° CUATRIMESTRE', prefix: 'c1' },
+  { label: '2° CUATRIMESTRE', prefix: 'c2' },
+  { label: '3° CUATRIMESTRE', prefix: 'c3' }
+];
+
+const COLUMNAS_FIJAS = [
+  { key: 'actividad', label: 'ACTIVIDADES', className: 'poa-cell-actividad' },
+  { key: 'unidad_medida', label: 'UNIDAD DE MEDIDA' },
+  { key: 'meta', label: 'META CUATRIMESTRAL / ANUAL' }
 ];
 
 const POAPage = ({ user }) => {
@@ -35,6 +37,8 @@ const POAPage = ({ user }) => {
   const [modalKey, setModalKey] = useState('');
   const [modalValue, setModalValue] = useState('');
   const [modalSaving, setModalSaving] = useState(false);
+
+  const totalColumnas = COLUMNAS_FIJAS.length + CUATRIMESTRES.length * 4;
 
   const getValor = (fila, key) => {
     try {
@@ -201,41 +205,77 @@ const POAPage = ({ user }) => {
 
       <div className="poa-wrapper">
         <h1 className="poa-title">{encabezado?.direccion || 'DIRECCIÓN'}</h1>
-        <h2 className="poa-subtitle">Programa Operativo Anual (POA) {encabezado?.anio || ''}{encabezado?.cuatrimestre ? ` — ${encabezado.cuatrimestre}` : ''}</h2>
+        <h2 className="poa-subtitle">Programa Operativo Anual (POA) {encabezado?.anio || ''}</h2>
 
         <div className="poa-table-wrapper">
           <table className="poa-table">
             <thead>
-              <tr>
-                {COLUMNAS_POA.map((col, i) => (
-                  <th key={i} className={col.className || ''} style={{ textAlign: col.alineacion || 'center' }}>{col.label}</th>
+              <tr className="poa-th-row-1">
+                {COLUMNAS_FIJAS.map(col => (
+                  <th key={col.key} className={col.className || ''} rowSpan={4}>{col.label}</th>
                 ))}
-                {puedeEditar && <th className="poa-th-acciones">Acciones</th>}
+                <th className="poa-th-datos" colSpan={12}>DATOS {encabezado?.anio || ''} CUATRIMESTRAL</th>
+                {puedeEditar && <th className="poa-th-acciones" rowSpan={4}>Acciones</th>}
+              </tr>
+              <tr className="poa-th-row-2">
+                {CUATRIMESTRES.map(c => (
+                  <th key={c.prefix} className="poa-th-cuatri" colSpan={4}>{c.label}</th>
+                ))}
+              </tr>
+              <tr className="poa-th-row-3">
+                {CUATRIMESTRES.map(c => (
+                  <React.Fragment key={c.prefix}>
+                    <th className="poa-th-prog" colSpan={2}>PROG</th>
+                    <th className="poa-th-alc" colSpan={2}>ALC</th>
+                  </React.Fragment>
+                ))}
+              </tr>
+              <tr className="poa-th-row-4">
+                {CUATRIMESTRES.map(c => (
+                  <React.Fragment key={c.prefix}>
+                    <th>#</th>
+                    <th>%</th>
+                    <th>#</th>
+                    <th>%</th>
+                  </React.Fragment>
+                ))}
               </tr>
             </thead>
             <tbody>
               {filas.length === 0 ? (
                 <tr>
-                  <td colSpan={COLUMNAS_POA.length + (puedeEditar ? 1 : 0)} className="poa-td-empty">
+                  <td colSpan={totalColumnas + (puedeEditar ? 1 : 0)} className="poa-td-empty">
                     Sin actividades registradas. {puedeEditar ? 'Haz clic en "+ Agregar actividad"' : ''}
                   </td>
                 </tr>
               ) : (
                 filas.map(fila => (
                   <tr key={fila.id}>
-                    {COLUMNAS_POA.map(col => {
-                      const puedeEditarCol = puedeEditar;
-                      return (
-                        <td
-                          key={col.key}
-                          className={`poa-cell-td${!puedeEditarCol ? ' poa-cell-td-readonly' : ''}`}
-                          style={{ textAlign: col.alineacion || 'center' }}
-                          onClick={() => puedeEditarCol && openModal(fila, col.key)}
-                        >
-                          <span className="poa-cell-text">{getValor(fila, col.key) || (puedeEditarCol ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
-                        </td>
-                      );
-                    })}
+                    {COLUMNAS_FIJAS.map(col => (
+                      <td
+                        key={col.key}
+                        className={`poa-cell-td${!puedeEditar ? ' poa-cell-td-readonly' : ''}`}
+                        onClick={() => puedeEditar && openModal(fila, col.key)}
+                      >
+                        <span className="poa-cell-text">{getValor(fila, col.key) || (puedeEditar ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
+                      </td>
+                    ))}
+                    {CUATRIMESTRES.map(c => (
+                      <React.Fragment key={c.prefix}>
+                        {['prog_num', 'prog_pct', 'alc_num', 'alc_pct'].map(suf => {
+                          const key = `${c.prefix}_${suf}`;
+                          return (
+                            <td
+                              key={key}
+                              className={`poa-cell-td poa-cell-cuatri${!puedeEditar ? ' poa-cell-td-readonly' : ''}`}
+                              onClick={() => puedeEditar && openModal(fila, key)}
+                            >
+                              <span className="poa-cell-text">{getValor(fila, key) || (puedeEditar ? <span className="poa-cell-placeholder">—</span> : '')}</span>
+                            </td>
+                          );
+                        })}
+                      </React.Fragment>
+                    ))}
                     {puedeEditar && (
                       <td>
                         <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>🗑️</button>
