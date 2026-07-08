@@ -14,9 +14,9 @@ const CUATRIMESTRES = [
 ];
 
 const COLUMNAS_FIJAS = [
-  { key: 'actividad', label: 'ACTIVIDADES', className: 'poa-cell-actividad' },
-  { key: 'unidad_medida', label: 'UNIDAD DE MEDIDA' },
-  { key: 'meta', label: 'META CUATRIMESTRAL / ANUAL' }
+  { key: 'actividad', label: 'ACTIVIDADES', className: 'poa-col-actividad' },
+  { key: 'unidad_medida', label: 'UNIDAD DE MEDIDA', className: 'poa-col-angosta' },
+  { key: 'meta', label: 'META CUATRIMESTRAL / ANUAL', className: 'poa-col-angosta' }
 ];
 
 const POAPage = ({ user }) => {
@@ -37,6 +37,21 @@ const POAPage = ({ user }) => {
   const [modalKey, setModalKey] = useState('');
   const [modalValue, setModalValue] = useState('');
   const [modalSaving, setModalSaving] = useState(false);
+
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [noteModalFila, setNoteModalFila] = useState(null);
+  const [noteModalKey, setNoteModalKey] = useState('');
+  const [noteModalValue, setNoteModalValue] = useState('');
+  const [noteModalSaving, setNoteModalSaving] = useState(false);
+
+  const getNota = (fila, cellKey) => {
+    try {
+      const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
+      return valores[`_nota_${cellKey}`] || '';
+    } catch {
+      return '';
+    }
+  };
 
   const totalColumnas = COLUMNAS_FIJAS.length + CUATRIMESTRES.length * 4;
 
@@ -125,6 +140,36 @@ const POAPage = ({ user }) => {
       handleApiError(error, 'Error al guardar celda');
     } finally {
       setModalSaving(false);
+    }
+  };
+
+  const openNoteModal = (fila, cellKey) => {
+    setNoteModalFila(fila);
+    setNoteModalKey(cellKey);
+    setNoteModalValue(getNota(fila, cellKey));
+    setNoteModalOpen(true);
+  };
+
+  const closeNoteModal = () => {
+    setNoteModalOpen(false);
+    setNoteModalFila(null);
+    setNoteModalKey('');
+    setNoteModalValue('');
+  };
+
+  const handleSaveNote = async () => {
+    if (!noteModalFila) return;
+    setNoteModalSaving(true);
+    try {
+      const valores = typeof noteModalFila.valores === 'string' ? JSON.parse(noteModalFila.valores) : (noteModalFila.valores || {});
+      valores[`_nota_${noteModalKey}`] = noteModalValue;
+      await saveFila(noteModalFila, valores);
+      closeNoteModal();
+      toast.success('Nota guardada');
+    } catch (error) {
+      handleApiError(error, 'Error al guardar nota');
+    } finally {
+      setNoteModalSaving(false);
     }
   };
 
@@ -275,6 +320,16 @@ const POAPage = ({ user }) => {
                               onClick={() => puedeEditarCelda && openModal(fila, key)}
                             >
                               <span className="poa-cell-text">{getValor(fila, key) || (puedeEditarCelda ? <span className="poa-cell-placeholder">—</span> : '')}</span>
+                              {esALC && puedeEditar && (
+                                <div className="poa-cell-actions">
+                                  {getNota(fila, key) && <span className="poa-note-indicator" />}
+                                  <button
+                                    className="poa-note-btn"
+                                    title="Nota"
+                                    onClick={e => { e.stopPropagation(); openNoteModal(fila, key); }}
+                                  >📝</button>
+                                </div>
+                              )}
                             </td>
                           );
                         })}
@@ -292,6 +347,32 @@ const POAPage = ({ user }) => {
           </table>
         </div>
       </div>
+
+      {noteModalOpen && (
+        <div className="poa-modal-overlay" onClick={closeNoteModal}>
+          <div className="poa-modal" onClick={e => e.stopPropagation()}>
+            <div className="poa-modal-header">
+              <h3>Nota</h3>
+              <button className="close-btn" onClick={closeNoteModal}>×</button>
+            </div>
+            <div className="poa-modal-body">
+              <textarea
+                className="poa-modal-textarea"
+                value={noteModalValue}
+                onChange={e => setNoteModalValue(e.target.value)}
+                autoFocus
+                placeholder="Escribe una nota o justificación..."
+              />
+            </div>
+            <div className="poa-modal-footer">
+              <button className="btn btn-secondary" onClick={closeNoteModal}>Cancelar</button>
+              <button className="btn btn-primary" onClick={handleSaveNote} disabled={noteModalSaving}>
+                {noteModalSaving ? 'Guardando...' : '💾 Guardar nota'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalOpen && (
         <div className="poa-modal-overlay" onClick={closeModal}>
