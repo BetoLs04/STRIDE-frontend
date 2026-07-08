@@ -129,6 +129,18 @@
   text-align: center;
 }
 
+.poa-cell-prog {
+  background: #fff;
+}
+
+.poa-cell-alc {
+  background: #e6f7e6;
+}
+
+.poa-cell-alc:hover {
+  background: #d0f0d0 !important;
+}
+
 .poa-cell-text {
   display: block;
   font-size: 13px;

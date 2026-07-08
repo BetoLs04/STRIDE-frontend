@@ -204,8 +204,7 @@ const POAPage = ({ user }) => {
       </div>
 
       <div className="poa-wrapper">
-        <h1 className="poa-title">{encabezado?.direccion || 'DIRECCIÓN'}</h1>
-        <h2 className="poa-subtitle">Programa Operativo Anual (POA) {encabezado?.anio || ''}</h2>
+        <h1 className="poa-title">{seccion.nombre}</h1>
 
         <div className="poa-table-wrapper">
           <table className="poa-table">
@@ -214,7 +213,7 @@ const POAPage = ({ user }) => {
                 {COLUMNAS_FIJAS.map(col => (
                   <th key={col.key} className={col.className || ''} rowSpan={4}>{col.label}</th>
                 ))}
-                <th className="poa-th-datos" colSpan={12}>DATOS {encabezado?.anio || ''} CUATRIMESTRAL</th>
+                <th className="poa-th-datos" colSpan={12}>CALENDARIO {encabezado?.anio || ''} CUATRIMESTRAL</th>
                 {puedeEditar && <th className="poa-th-acciones" rowSpan={4}>Acciones</th>}
               </tr>
               <tr className="poa-th-row-2">
@@ -251,26 +250,31 @@ const POAPage = ({ user }) => {
               ) : (
                 filas.map(fila => (
                   <tr key={fila.id}>
-                    {COLUMNAS_FIJAS.map(col => (
-                      <td
-                        key={col.key}
-                        className={`poa-cell-td${!puedeEditar ? ' poa-cell-td-readonly' : ''}`}
-                        onClick={() => puedeEditar && openModal(fila, col.key)}
-                      >
-                        <span className="poa-cell-text">{getValor(fila, col.key) || (puedeEditar ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
-                      </td>
-                    ))}
+                    {COLUMNAS_FIJAS.map(col => {
+                      const puedeEditarCelda = user?.tipo === 'superadmin';
+                      return (
+                        <td
+                          key={col.key}
+                          className={`poa-cell-td${!puedeEditarCelda ? ' poa-cell-td-readonly' : ''}`}
+                          onClick={() => puedeEditarCelda && openModal(fila, col.key)}
+                        >
+                          <span className="poa-cell-text">{getValor(fila, col.key) || (puedeEditarCelda ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
+                        </td>
+                      );
+                    })}
                     {CUATRIMESTRES.map(c => (
                       <React.Fragment key={c.prefix}>
                         {['prog_num', 'prog_pct', 'alc_num', 'alc_pct'].map(suf => {
                           const key = `${c.prefix}_${suf}`;
+                          const esALC = suf.startsWith('alc');
+                          const puedeEditarCelda = esALC ? puedeEditar : (user?.tipo === 'superadmin');
                           return (
                             <td
                               key={key}
-                              className={`poa-cell-td poa-cell-cuatri${!puedeEditar ? ' poa-cell-td-readonly' : ''}`}
-                              onClick={() => puedeEditar && openModal(fila, key)}
+                              className={`poa-cell-td poa-cell-cuatri${esALC ? ' poa-cell-alc' : ' poa-cell-prog'}${!puedeEditarCelda ? ' poa-cell-td-readonly' : ''}`}
+                              onClick={() => puedeEditarCelda && openModal(fila, key)}
                             >
-                              <span className="poa-cell-text">{getValor(fila, key) || (puedeEditar ? <span className="poa-cell-placeholder">—</span> : '')}</span>
+                              <span className="poa-cell-text">{getValor(fila, key) || (puedeEditarCelda ? <span className="poa-cell-placeholder">—</span> : '')}</span>
                             </td>
                           );
                         })}

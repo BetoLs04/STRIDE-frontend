@@ -25,7 +25,7 @@ const SuperAdminPOA = ({ onClose }) => {
   const [selectedUsuarios, setSelectedUsuarios] = useState(new Set());
 
   const [encabezado, setEncabezado] = useState({
-    direccion: '', anio: '', cuatrimestre: ''
+    anio: ''
   });
   const [encabezadoLoading, setEncabezadoLoading] = useState(true);
   const [encabezadoSaving, setEncabezadoSaving] = useState(false);
@@ -279,7 +279,7 @@ const SuperAdminPOA = ({ onClose }) => {
         <div className="poa-admin-right">
           <div className="poa-encabezado-panel">
             <div className="poa-encabezado-header">
-              <h3>📋 Encabezado del POA</h3>
+              <h3>📋 Datos</h3>
               {!encabezadoLoading && (
                 <button className="poa-encabezado-edit-toggle" onClick={() => setEditingEncabezado(!editingEncabezado)} title={editingEncabezado ? 'Cancelar edición' : 'Editar'}>
                   {editingEncabezado ? '✕' : '✏️'}
@@ -290,9 +290,7 @@ const SuperAdminPOA = ({ onClose }) => {
               <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
             ) : editingEncabezado ? (
               <div className="poa-encabezado-form">
-                <FormInput label="DIRECCIÓN" name="poa-direccion" value={encabezado.direccion || ''} onChange={e => handleEncabezadoChange('direccion', e.target.value)} placeholder="Nombre de la dirección" className="poa-encabezado-field" />
                 <FormInput label="AÑO" name="poa-anio" value={encabezado.anio || ''} onChange={e => handleEncabezadoChange('anio', e.target.value)} placeholder="AAAA" className="poa-encabezado-field" />
-                <FormInput label="CUATRIMESTRE" name="poa-cuatrimestre" value={encabezado.cuatrimestre || ''} onChange={e => handleEncabezadoChange('cuatrimestre', e.target.value)} placeholder="Ej: 2° Cuatrimestre" className="poa-encabezado-field" />
                 <div className="poa-encabezado-form-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
@@ -303,16 +301,8 @@ const SuperAdminPOA = ({ onClose }) => {
             ) : (
               <div className="poa-encabezado-view">
                 <div className="poa-encabezado-row">
-                  <span className="poa-encabezado-label">DIRECCIÓN</span>
-                  <span className="poa-encabezado-value">{encabezado.direccion || '—'}</span>
-                </div>
-                <div className="poa-encabezado-row">
                   <span className="poa-encabezado-label">AÑO</span>
                   <span className="poa-encabezado-value">{encabezado.anio || '—'}</span>
-                </div>
-                <div className="poa-encabezado-row">
-                  <span className="poa-encabezado-label">CUATRIMESTRE</span>
-                  <span className="poa-encabezado-value">{encabezado.cuatrimestre || '—'}</span>
                 </div>
               </div>
             )}
