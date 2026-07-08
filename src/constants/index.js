@@ -107,7 +107,6 @@ export const API_ROUTES = {
   POA: {
     SECCIONES: '/api/university/poa-secciones',
     ENCABEZADO: '/api/university/poa-encabezado',
-    COLUMNAS: '/api/university/poa-columnas',
     FILAS: '/api/university/poa-filas',
     USUARIOS: '/api/university/poa-usuarios',
   },

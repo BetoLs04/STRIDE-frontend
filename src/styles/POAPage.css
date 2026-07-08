@@ -80,6 +80,10 @@
   background: #f2f2f2;
 }
 
+.poa-cell-actividad {
+  max-width: 480px;
+}
+
 .poa-cell-td {
   cursor: pointer;
   transition: background 0.15s;

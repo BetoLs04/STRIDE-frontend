@@ -7,16 +7,24 @@ import '../../styles/POAPage.css';
 import { handleApiError } from '../../utils/errorHandler';
 import useSocketEvent from '../../hooks/useSocketEvent';
 
+const COLUMNAS_POA = [
+  { key: 'actividad', label: 'ACTIVIDADES', alineacion: 'left', className: 'poa-cell-actividad' },
+  { key: 'unidad_medida', label: 'UNIDAD DE MEDIDA', alineacion: 'center' },
+  { key: 'meta', label: 'META CUATRIMESTRAL / ANUAL', alineacion: 'center' },
+  { key: 'prog_num', label: 'PROG #', alineacion: 'center' },
+  { key: 'prog_pct', label: 'PROG %', alineacion: 'center' },
+  { key: 'alc_num', label: 'ALC #', alineacion: 'center' },
+  { key: 'alc_pct', label: 'ALC %', alineacion: 'center' }
+];
+
 const POAPage = ({ user }) => {
   const { seccionId } = useParams();
   const navigate = useNavigate();
 
   const puedeEditar = ['superadmin', 'directivo', 'personal'].includes(user?.tipo);
-  const esSuperAdmin = user?.tipo === 'superadmin';
 
   const [seccion, setSeccion] = useState(null);
   const [encabezado, setEncabezado] = useState(null);
-  const [columnas, setColumnas] = useState([]);
   const [filas, setFilas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -27,9 +35,6 @@ const POAPage = ({ user }) => {
   const [modalKey, setModalKey] = useState('');
   const [modalValue, setModalValue] = useState('');
   const [modalSaving, setModalSaving] = useState(false);
-
-  const columnasActivas = columnas.filter(c => c.activa !== 0);
-  const totalColumnas = columnasActivas.length;
 
   const getValor = (fila, key) => {
     try {
@@ -55,15 +60,14 @@ const POAPage = ({ user }) => {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [secRes, encRes, colRes, filasRes] = await Promise.all([
+      const [secRes, encRes, filasRes] = await Promise.all([
         api.get('/api/university/poa-secciones'),
         api.get('/api/university/poa-encabezado'),
-        api.get('/api/university/poa-columnas'),
         api.get(`/api/university/poa-filas/${seccionId}`)
       ]);
 
       const found = (secRes.data.data || []).find(s => s.id === parseInt(seccionId));
-      if (found && !esSuperAdmin) {
+      if (found && user?.tipo !== 'superadmin') {
         const tieneAcceso = (found.usuarios || []).some(u => u.usuario_id === user?.id && u.usuario_tipo === user?.tipo);
         if (!tieneAcceso) {
           setDenied(true);
@@ -74,7 +78,6 @@ const POAPage = ({ user }) => {
       }
       setSeccion(found || null);
       setEncabezado(encRes.data.data || null);
-      setColumnas(colRes.data.data || []);
       setFilas(filasRes.data.data || []);
     } catch (error) {
       handleApiError(error, 'Error al cargar datos del POA');
@@ -129,22 +132,22 @@ const POAPage = ({ user }) => {
         valores: {}
       });
       setFilas(prev => [...prev, res.data.data]);
-      toast.success('Fila agregada');
+      toast.success('Actividad agregada');
     } catch (error) {
-      handleApiError(error, 'Error al agregar fila');
+      handleApiError(error, 'Error al agregar actividad');
     } finally {
       setAdding(false);
     }
   };
 
   const handleDeleteFila = async (fila) => {
-    if (!window.confirm('¿Eliminar esta fila?')) return;
+    if (!window.confirm('¿Eliminar esta actividad?')) return;
     try {
       await api.delete(`/api/university/poa-filas/${fila.id}`);
       setFilas(prev => prev.filter(f => f.id !== fila.id));
-      toast.success('Fila eliminada');
+      toast.success('Actividad eliminada');
     } catch (error) {
-      handleApiError(error, 'Error al eliminar fila');
+      handleApiError(error, 'Error al eliminar actividad');
     }
   };
 
@@ -204,8 +207,8 @@ const POAPage = ({ user }) => {
           <table className="poa-table">
             <thead>
               <tr>
-                {columnasActivas.map(col => (
-                  <th key={col.id} style={{ textAlign: col.alineacion || 'center' }}>{col.nombre}</th>
+                {COLUMNAS_POA.map((col, i) => (
+                  <th key={i} className={col.className || ''} style={{ textAlign: col.alineacion || 'center' }}>{col.label}</th>
                 ))}
                 {puedeEditar && <th className="poa-th-acciones">Acciones</th>}
               </tr>
@@ -213,25 +216,23 @@ const POAPage = ({ user }) => {
             <tbody>
               {filas.length === 0 ? (
                 <tr>
-                  <td colSpan={totalColumnas + (puedeEditar ? 1 : 0)} className="poa-td-empty">
+                  <td colSpan={COLUMNAS_POA.length + (puedeEditar ? 1 : 0)} className="poa-td-empty">
                     Sin actividades registradas. {puedeEditar ? 'Haz clic en "+ Agregar actividad"' : ''}
                   </td>
                 </tr>
               ) : (
                 filas.map(fila => (
                   <tr key={fila.id}>
-                    {columnasActivas.map((col, idx) => {
-                      const key = `d_${col.id}`;
-                      const colBloqueada = col.bloqueada;
-                      const puedeEditarCol = puedeEditar && (esSuperAdmin || !colBloqueada);
+                    {COLUMNAS_POA.map(col => {
+                      const puedeEditarCol = puedeEditar;
                       return (
                         <td
-                          key={col.id}
+                          key={col.key}
                           className={`poa-cell-td${!puedeEditarCol ? ' poa-cell-td-readonly' : ''}`}
                           style={{ textAlign: col.alineacion || 'center' }}
-                          onClick={() => puedeEditarCol && openModal(fila, key)}
+                          onClick={() => puedeEditarCol && openModal(fila, col.key)}
                         >
-                          <span className="poa-cell-text">{getValor(fila, key) || (puedeEditarCol ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
+                          <span className="poa-cell-text">{getValor(fila, col.key) || (puedeEditarCol ? <span className="poa-cell-placeholder">Escribir...</span> : '')}</span>
                         </td>
                       );
                     })}

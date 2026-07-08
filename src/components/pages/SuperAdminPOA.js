@@ -31,17 +31,9 @@ const SuperAdminPOA = ({ onClose }) => {
   const [encabezadoSaving, setEncabezadoSaving] = useState(false);
   const [editingEncabezado, setEditingEncabezado] = useState(false);
 
-  const [columnas, setColumnas] = useState([]);
-  const [columnasLoading, setColumnasLoading] = useState(true);
-  const [nuevaColumna, setNuevaColumna] = useState('');
-  const [editColumnaId, setEditColumnaId] = useState(null);
-  const [editColumnaNombre, setEditColumnaNombre] = useState('');
-  const [columnaSaving, setColumnaSaving] = useState(false);
-
   useEffect(() => {
     fetchData();
     fetchEncabezado();
-    fetchColumnas();
   }, []);
 
   const refreshRef = useRef();
@@ -58,7 +50,7 @@ const SuperAdminPOA = ({ onClose }) => {
       setSecciones(secRes.data.data || []);
       setUsuarios(usuRes.data.data || []);
     } catch (error) {
-      handleApiError(error, 'Error al cargar secciones');
+      handleApiError(error, 'Error al cargar hojas');
     } finally {
       setLoading(false);
     }
@@ -104,96 +96,6 @@ const SuperAdminPOA = ({ onClose }) => {
     setEditingEncabezado(false);
   };
 
-  const fetchColumnas = async () => {
-    setColumnasLoading(true);
-    try {
-      const res = await api.get('/api/university/poa-columnas');
-      setColumnas(res.data.data || []);
-    } catch (error) {
-      handleApiError(error, 'Error al cargar columnas');
-    } finally {
-      setColumnasLoading(false);
-    }
-  };
-
-  const handleAddColumna = async () => {
-    if (!nuevaColumna.trim()) {
-      toast.error('El nombre es requerido');
-      return;
-    }
-    setColumnaSaving(true);
-    try {
-      await api.post('/api/university/poa-columnas', { nombre: nuevaColumna.trim() });
-      toast.success('Columna creada');
-      setNuevaColumna('');
-      fetchColumnas();
-    } catch (error) {
-      handleApiError(error, 'Error al crear columna');
-    } finally {
-      setColumnaSaving(false);
-    }
-  };
-
-  const handleStartEditColumna = (columna) => {
-    setEditColumnaId(columna.id);
-    setEditColumnaNombre(columna.nombre);
-  };
-
-  const handleSaveEditColumna = async () => {
-    if (!editColumnaNombre.trim()) {
-      toast.error('El nombre es requerido');
-      return;
-    }
-    setColumnaSaving(true);
-    try {
-      await api.put(`/api/university/poa-columnas/${editColumnaId}`, { nombre: editColumnaNombre.trim() });
-      toast.success('Columna actualizada');
-      setEditColumnaId(null);
-      setEditColumnaNombre('');
-      fetchColumnas();
-    } catch (error) {
-      handleApiError(error, 'Error al actualizar columna');
-    } finally {
-      setColumnaSaving(false);
-    }
-  };
-
-  const handleCancelEditColumna = () => {
-    setEditColumnaId(null);
-    setEditColumnaNombre('');
-  };
-
-  const handleAlineacionColumna = async (columna, alineacion) => {
-    try {
-      const res = await api.put(`/api/university/poa-columnas/${columna.id}/alineacion`, { alineacion });
-      setColumnas(prev => prev.map(c => c.id === columna.id ? res.data.data : c));
-      toast.success(`Alineación: ${alineacion === 'left' ? 'Izquierda' : alineacion === 'right' ? 'Derecha' : 'Centro'}`);
-    } catch (error) {
-      handleApiError(error, 'Error al cambiar alineación');
-    }
-  };
-
-  const handleToggleColumna = async (columna) => {
-    try {
-      const res = await api.put(`/api/university/poa-columnas/${columna.id}/toggle`);
-      setColumnas(prev => prev.map(c => c.id === columna.id ? { ...c, bloqueada: res.data.bloqueada } : c));
-      toast.success(res.data.message);
-    } catch (error) {
-      handleApiError(error, 'Error al cambiar estado');
-    }
-  };
-
-  const handleDeleteColumna = async (columna) => {
-    if (!window.confirm(`¿Eliminar la columna "${columna.nombre}"?`)) return;
-    try {
-      await api.delete(`/api/university/poa-columnas/${columna.id}`);
-      toast.success('Columna eliminada');
-      fetchColumnas();
-    } catch (error) {
-      handleApiError(error, 'Error al eliminar columna');
-    }
-  };
-
   const handleOpenNew = () => {
     setEditId(null);
     setFormNombre('');
@@ -216,30 +118,30 @@ const SuperAdminPOA = ({ onClose }) => {
     try {
       if (editId) {
         await api.put(`/api/university/poa-secciones/${editId}`, { nombre: formNombre.trim() });
-        toast.success('Sección actualizada');
+        toast.success('Hoja actualizada');
       } else {
         await api.post('/api/university/poa-secciones', { nombre: formNombre.trim() });
-        toast.success('Sección creada');
+        toast.success('Hoja creada');
       }
       setShowForm(false);
       setEditId(null);
       setFormNombre('');
       fetchData();
     } catch (error) {
-      handleApiError(error, 'Error al guardar sección');
+      handleApiError(error, 'Error al guardar hoja');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (seccion) => {
-    if (!window.confirm(`¿Eliminar la sección "${seccion.nombre}"?\nTambién se eliminarán las asignaciones de usuarios.`)) return;
+    if (!window.confirm(`¿Eliminar la hoja "${seccion.nombre}"?\nTambién se eliminarán las asignaciones de usuarios.`)) return;
     try {
       await api.delete(`/api/university/poa-secciones/${seccion.id}`);
-      toast.success('Sección eliminada');
+      toast.success('Hoja eliminada');
       fetchData();
     } catch (error) {
-      handleApiError(error, 'Error al eliminar sección');
+      handleApiError(error, 'Error al eliminar hoja');
     }
   };
 
@@ -262,7 +164,7 @@ const SuperAdminPOA = ({ onClose }) => {
     });
   };
 
-  const toggleAllUsuariosMatriz = (value) => {
+  const toggleAllUsuarios = (value) => {
     const disponibles = getUsuariosDisponibles(showAsignarSeccion);
     setSelectedUsuarios(prev => {
       const next = new Set(prev);
@@ -302,7 +204,7 @@ const SuperAdminPOA = ({ onClose }) => {
   };
 
   const handleQuitarUsuario = async (seccionId, usuario) => {
-    if (!window.confirm(`¿Quitar a "${usuario.nombre}" de esta sección?`)) return;
+    if (!window.confirm(`¿Quitar a "${usuario.nombre}" de esta hoja?`)) return;
     try {
       await api.delete(`/api/university/poa-secciones/${seccionId}/usuarios/${usuario.usuario_id}/${usuario.usuario_tipo}`);
       toast.success('Usuario quitado');
@@ -390,7 +292,7 @@ const SuperAdminPOA = ({ onClose }) => {
               <div className="poa-encabezado-form">
                 <FormInput label="DIRECCIÓN" name="poa-direccion" value={encabezado.direccion || ''} onChange={e => handleEncabezadoChange('direccion', e.target.value)} placeholder="Nombre de la dirección" className="poa-encabezado-field" />
                 <FormInput label="AÑO" name="poa-anio" value={encabezado.anio || ''} onChange={e => handleEncabezadoChange('anio', e.target.value)} placeholder="AAAA" className="poa-encabezado-field" />
-                <FormInput label="CUATRIMESTRE" name="poa-cuatrimestre" value={encabezado.cuatrimestre || ''} onChange={e => handleEncabezadoChange('cuatrimestre', e.target.value)} placeholder="Ej: 1er Cuatrimestre" className="poa-encabezado-field" />
+                <FormInput label="CUATRIMESTRE" name="poa-cuatrimestre" value={encabezado.cuatrimestre || ''} onChange={e => handleEncabezadoChange('cuatrimestre', e.target.value)} placeholder="Ej: 2° Cuatrimestre" className="poa-encabezado-field" />
                 <div className="poa-encabezado-form-actions">
                   <button className="btn btn-secondary" onClick={handleCancelEncabezado} disabled={encabezadoSaving}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleSaveEncabezado} disabled={encabezadoSaving}>
@@ -416,83 +318,6 @@ const SuperAdminPOA = ({ onClose }) => {
             )}
           </div>
         </div>
-      </div>
-
-      <div className="poa-columnas-section">
-        <div className="poa-columnas-header">
-          <h3>📑 Columnas del POA</h3>
-        </div>
-        {columnasLoading ? (
-          <div className="loading" style={{ padding: '1rem' }}>Cargando columnas...</div>
-        ) : (
-          <div className="poa-columnas-content">
-            <div className="poa-columnas-add-form">
-              <input
-                type="text"
-                value={nuevaColumna}
-                onChange={e => setNuevaColumna(e.target.value)}
-                placeholder="Nombre de la nueva columna"
-                onKeyDown={e => { if (e.key === 'Enter') handleAddColumna(); }}
-              />
-              <button className="btn btn-primary btn-small" onClick={handleAddColumna} disabled={columnaSaving}>
-                {columnaSaving && !editColumnaId ? '...' : '+ Agregar'}
-              </button>
-            </div>
-            {columnas.length === 0 ? (
-              <p className="text-muted poa-columnas-empty">No hay columnas registradas</p>
-            ) : (
-              <div className="poa-columnas-list">
-                {columnas.map((columna, index) => (
-                  <div key={columna.id} className={`poa-columna-item ${columna.bloqueada ? 'poa-columna-bloqueada' : ''}`}>
-                    <span className="poa-columna-index">{index + 1}.</span>
-                    {editColumnaId === columna.id ? (
-                      <div className="poa-columna-edit-inline">
-                        <input
-                          type="text"
-                          value={editColumnaNombre}
-                          onChange={e => setEditColumnaNombre(e.target.value)}
-                          onKeyDown={e => { if (e.key === 'Enter') handleSaveEditColumna(); if (e.key === 'Escape') handleCancelEditColumna(); }}
-                          autoFocus
-                        />
-                        <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>💾</button>
-                        <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>✕</button>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="poa-columna-nombre">{columna.nombre}</span>
-                        {columna.bloqueada && <span className="poa-columna-badge-bloqueada">Bloqueada</span>}
-                        <div className="poa-columna-alineacion">
-                          <button
-                            className={`btn-alineacion${columna.alineacion === 'left' ? ' active' : ''}`}
-                            onClick={() => handleAlineacionColumna(columna, 'left')}
-                            title="Izquierda"
-                          >≡</button>
-                          <button
-                            className={`btn-alineacion${columna.alineacion === 'center' ? ' active' : ''}`}
-                            onClick={() => handleAlineacionColumna(columna, 'center')}
-                            title="Centro"
-                          >≡</button>
-                          <button
-                            className={`btn-alineacion${columna.alineacion === 'right' ? ' active' : ''}`}
-                            onClick={() => handleAlineacionColumna(columna, 'right')}
-                            title="Derecha"
-                          >≡</button>
-                        </div>
-                        <div className="poa-columna-actions">
-                          <button className="btn btn-warning btn-small" onClick={() => handleToggleColumna(columna)}>
-                            {columna.bloqueada ? '🔓 Desbloquear' : '🔒 Bloquear'}
-                          </button>
-                          <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>✏️</button>
-                          <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>🗑️</button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {showForm && (
@@ -531,7 +356,7 @@ const SuperAdminPOA = ({ onClose }) => {
                     onClick={() => {
                       const disponibles = getUsuariosDisponibles(showAsignarSeccion);
                       const allSelected = disponibles.every(u => selectedUsuarios.has(`${u.id}_${u.tipo}`));
-                      toggleAllUsuariosMatriz(!allSelected);
+                      toggleAllUsuarios(!allSelected);
                     }}
                   >
                     {getUsuariosDisponibles(showAsignarSeccion).every(u => selectedUsuarios.has(`${u.id}_${u.tipo}`)) ? 'Deseleccionar todos' : 'Seleccionar todos'}
