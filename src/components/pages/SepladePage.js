@@ -76,11 +76,14 @@ const SepladePage = ({ user }) => {
   const fetchHoja = useCallback(async () => {
     setLoading(true);
     try {
-      const [hojaRes, usuariosRes, hojasRes] = await Promise.all([
+      const calls = [
         api.get(`/api/university/seplade-hojas/${hojaId}`),
-        api.get('/api/university/seplade-usuarios'),
         api.get('/api/university/seplade-hojas')
-      ]);
+      ];
+      if (esSuperAdmin) {
+        calls.push(api.get('/api/university/seplade-usuarios'));
+      }
+      const [hojaRes, hojasRes, usuariosRes] = await Promise.all(calls);
       if (hojaRes.data.success && hojaRes.data.data) {
         setHoja(hojaRes.data.data);
         setIndicadores(hojaRes.data.data.indicadores || []);
@@ -88,7 +91,7 @@ const SepladePage = ({ user }) => {
         setNotas(hojaRes.data.data.notas || []);
         setUsuariosAsignados(hojaRes.data.data.usuarios_asignados || []);
       }
-      if (usuariosRes.data.success) {
+      if (usuariosRes?.data?.success) {
         setUsuariosDisponibles(usuariosRes.data.data || []);
       }
         if (hojasRes.data.success) {
