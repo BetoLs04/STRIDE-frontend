@@ -600,7 +600,7 @@ const SuperAdminActividades = ({ admin }) => {
               onClick={() => toggleLectura(actividad.id)}
               title={leido ? 'Marcar como No leído' : 'Marcar como Leído'}
             >
-              {leido ? '✅ Leído' : '🔴 No leído'}
+              {leido ? 'Leído' : 'No leído'}
             </button>
             <button 
               className="btn btn-primary btn-small"
@@ -752,7 +752,7 @@ const SuperAdminActividades = ({ admin }) => {
               onClick={confirmarAbrirPeriodo}
               disabled={abriendoPeriodo}
             >
-              {abriendoPeriodo ? '⏳ Abriendo...' : '▶ Abrir siguiente cuatrimestre'}
+              {abriendoPeriodo ? 'Abriendo...' : 'Abrir siguiente cuatrimestre'}
             </button>
           </div>
         </div>
