@@ -28,6 +28,9 @@ const SuperAdminActividades = ({ admin }) => {
   });
   const [direcciones, setDirecciones] = useState([]);
   const [tiposActividad, setTiposActividad] = useState([]);
+  const [lectura, setLectura] = useState({});
+  const [periodos, setPeriodos] = useState([]);
+  const [abriendoPeriodo, setAbriendoPeriodo] = useState(false);
 
   // Estado para controlar expansión de años y períodos
   const [expansiones, setExpansiones] = useState({
@@ -67,6 +70,8 @@ const SuperAdminActividades = ({ admin }) => {
     
     fetchDirecciones();
     fetchTodasActividades();
+    fetchLectura();
+    fetchPeriodos();
   }, [admin, navigate]);
 
   // ✅ Función para construir la URL correcta de imágenes
@@ -165,6 +170,77 @@ const SuperAdminActividades = ({ admin }) => {
         setLoading(false);
       }
     };
+
+  const fetchLectura = async () => {
+    try {
+      const res = await api.get('/api/university/actividades/lectura');
+      if (res.data.success) {
+        const mapa = {};
+        res.data.data.forEach(item => { mapa[item.actividad_id] = !!item.leido; });
+        setLectura(mapa);
+      }
+    } catch (error) {
+      handleApiError(error, 'Error al cargar estados de lectura');
+    }
+  };
+
+  const toggleLectura = async (actividadId) => {
+    try {
+      const res = await api.put(`/api/university/actividades/${actividadId}/lectura`);
+      if (res.data.success) {
+        setLectura(prev => ({ ...prev, [actividadId]: res.data.leido }));
+      }
+    } catch (error) {
+      handleApiError(error, 'Error al alternar lectura');
+    }
+  };
+
+  const fetchPeriodos = async () => {
+    try {
+      const res = await api.get('/api/university/actividades/periodos');
+      if (res.data.success) {
+        setPeriodos(res.data.data);
+      }
+    } catch (error) {
+      handleApiError(error, 'Error al cargar periodos');
+    }
+  };
+
+  const confirmarAbrirPeriodo = () => {
+    const ultimoPeriodo = periodos.filter(p => p.activo).sort((a, b) => 
+      b.anio - a.anio || ['enero-abril','mayo-agosto','septiembre-diciembre'].indexOf(b.periodo) - ['enero-abril','mayo-agosto','septiembre-diciembre'].indexOf(a.periodo)
+    )[0];
+    let siguiente = '';
+    const PERIODOS = ['enero-abril', 'mayo-agosto', 'septiembre-diciembre'];
+    const LABELS = { 'enero-abril': 'Enero - Abril', 'mayo-agosto': 'Mayo - Agosto', 'septiembre-diciembre': 'Septiembre - Diciembre' };
+    if (ultimoPeriodo) {
+      const idx = PERIODOS.indexOf(ultimoPeriodo.periodo);
+      if (idx < 2) siguiente = `${LABELS[PERIODOS[idx + 1]]} ${ultimoPeriodo.anio}`;
+      else siguiente = `${LABELS[PERIODOS[0]]} ${ultimoPeriodo.anio + 1}`;
+    } else {
+      const { anio, periodo } = periodoActual;
+      siguiente = `${LABELS[periodo]} ${anio}`;
+    }
+    mostrarConfirm(
+      'Abrir siguiente cuatrimestre',
+      `¿Estás seguro de abrir el cuatrimestre de ${siguiente}?\n\nUna vez abierto, las nuevas actividades se asignarán a este período.`,
+      async () => {
+        setAbriendoPeriodo(true);
+        try {
+          const res = await api.post('/api/university/actividades/periodos/abrir-siguiente');
+          if (res.data.success) {
+            toast.success(`✅ ${res.data.message}`);
+            fetchPeriodos();
+          }
+        } catch (error) {
+          handleApiError(error, 'Error al abrir siguiente periodo');
+        } finally {
+          setAbriendoPeriodo(false);
+        }
+      },
+      'warning'
+    );
+  };
 
     // ========== FUNCIONES PARA AGRUPAR POR AÑO Y PERÍODO ==========
   
@@ -491,8 +567,9 @@ const SuperAdminActividades = ({ admin }) => {
 
   // Componente simplificado para la tarjeta de actividad
   const TarjetaActividadMinimalista = ({ actividad, mostrarEliminar = false }) => {
+    const leido = lectura[actividad.id];
     return (
-      <div className="actividad-minimalista-card">
+      <div className={`actividad-minimalista-card ${leido ? 'actividad-leida' : 'actividad-no-leida'}`}>
         <div className="actividad-minimalista-content">
           <div className="actividad-minimalista-info">
             <h3>{actividad.titulo}</h3>
@@ -503,7 +580,6 @@ const SuperAdminActividades = ({ admin }) => {
                   {actividad.creado_por_tipo === 'personal' ? '👤 Personal' : '👔 Directivo'}
                 </span>
               </span>
-              {/* ✅ Fix zona horaria en tarjeta */}
               <span className="actividad-minimalista-fecha">
                 📅 {parseFecha(actividad.fecha_inicio)?.toLocaleDateString('es-ES', { 
                   day: '2-digit', 
@@ -519,6 +595,13 @@ const SuperAdminActividades = ({ admin }) => {
           </div>
           
           <div className="actividad-minimalista-actions">
+            <button
+              className={`btn btn-small btn-lectura ${leido ? 'btn-leido' : 'btn-no-leido'}`}
+              onClick={() => toggleLectura(actividad.id)}
+              title={leido ? 'Marcar como No leído' : 'Marcar como Leído'}
+            >
+              {leido ? '✅ Leído' : '🔴 No leído'}
+            </button>
             <button 
               className="btn btn-primary btn-small"
               onClick={() => abrirModalActividad(actividad)}
@@ -601,6 +684,8 @@ const SuperAdminActividades = ({ admin }) => {
   useSocketEvent('actividad:updated', () => refreshRef.current());
   useSocketEvent('actividad:deleted', () => refreshRef.current());
   useSocketEvent('actividad:estado-changed', () => refreshRef.current());
+  useSocketEvent('actividad:lectura-changed', () => fetchLectura());
+  useSocketEvent('actividad:periodo-abierto', () => fetchPeriodos());
 
   if (!admin) {
     return (
@@ -662,6 +747,13 @@ const SuperAdminActividades = ({ admin }) => {
                 </p>
               </div>
             </div>
+            <button
+              className="btn btn-small btn-abrir-periodo"
+              onClick={confirmarAbrirPeriodo}
+              disabled={abriendoPeriodo}
+            >
+              {abriendoPeriodo ? '⏳ Abriendo...' : '▶ Abrir siguiente cuatrimestre'}
+            </button>
           </div>
         </div>
 
@@ -1143,7 +1235,23 @@ const SuperAdminActividades = ({ admin }) => {
                 </div>
               )}
               
-              <div className="modal-fechas">
+              <div className="modal-lectura-status">
+                <h4>📖 Estado de Lectura</h4>
+                <div className={`lectura-badge-modal ${lectura[actividadSeleccionada.id] ? 'leido' : 'no-leido'}`}>
+                  <span className="lectura-icon">{lectura[actividadSeleccionada.id] ? '✅' : '🔴'}</span>
+                  <span className="lectura-texto">
+                    {lectura[actividadSeleccionada.id] ? 'Leído' : 'No leído'}
+                  </span>
+                </div>
+                <button
+                  className="btn btn-small btn-lectura-modal"
+                  onClick={() => toggleLectura(actividadSeleccionada.id)}
+                >
+                  {lectura[actividadSeleccionada.id] ? 'Marcar como No leído' : 'Marcar como Leído'}
+                </button>
+              </div>
+
+            <div className="modal-fechas">
                 <h4>📅 Información de Fechas</h4>
                 <div className="modal-fechas-grid">
                   <div className="modal-fecha-item">
