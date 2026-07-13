@@ -249,14 +249,15 @@ const SuperAdminActividades = ({ admin }) => {
     
     // ✅ Fix zona horaria
     const fechaActividad = parseFecha(fecha);
-    const anio = fechaActividad.getFullYear();
     const mes = fechaActividad.getMonth() + 1;
+    const anioOriginal = fechaActividad.getFullYear();
     
     let periodo;
-    if (mes >= 1 && mes <= 4) periodo = 'enero-abril';
-    else if (mes >= 5 && mes <= 8) periodo = 'mayo-agosto';
-    else if (mes >= 9 && mes <= 12) periodo = 'septiembre-diciembre';
-    else periodo = 'sin-periodo';
+    let anio = anioOriginal;
+    if (mes >= 2 && mes <= 5) periodo = 'enero-abril';
+    else if (mes >= 6 && mes <= 9) periodo = 'mayo-agosto';
+    else if (mes >= 10 && mes <= 12) { periodo = 'septiembre-diciembre'; }
+    else { periodo = 'septiembre-diciembre'; anio = anioOriginal - 1; }
     
     return { 
       anio: anio.toString(), 
@@ -280,30 +281,26 @@ const SuperAdminActividades = ({ admin }) => {
           periodos: {
             'enero-abril': { 
               actividades: [], 
-              label: '❄️ Enero - Abril', 
+              label: 'Enero - Abril', 
               color: '#4A90E2',
-              emoji: '❄️',
               orden: 1
             },
             'mayo-agosto': { 
               actividades: [], 
-              label: '🌸 Mayo - Agosto', 
+              label: 'Mayo - Agosto', 
               color: '#50C878',
-              emoji: '🌸',
               orden: 2
             },
             'septiembre-diciembre': { 
               actividades: [], 
-              label: '🍂 Septiembre - Diciembre', 
+              label: 'Septiembre - Diciembre', 
               color: '#FF7F50',
-              emoji: '🍂',
               orden: 3
             },
             'sin-fecha': { 
               actividades: [], 
-              label: '📅 Sin fecha definida', 
+              label: 'Sin fecha definida', 
               color: '#A0A0A0',
-              emoji: '📅',
               orden: 4
             }
           }
@@ -335,10 +332,9 @@ const SuperAdminActividades = ({ admin }) => {
     const mesActual = hoy.getMonth() + 1;
     
     let periodoActual;
-    if (mesActual >= 1 && mesActual <= 4) periodoActual = 'enero-abril';
-    else if (mesActual >= 5 && mesActual <= 8) periodoActual = 'mayo-agosto';
-    else if (mesActual >= 9 && mesActual <= 12) periodoActual = 'septiembre-diciembre';
-    else periodoActual = 'enero-abril';
+    if (mesActual >= 2 && mesActual <= 5) periodoActual = 'enero-abril';
+    else if (mesActual >= 6 && mesActual <= 9) periodoActual = 'mayo-agosto';
+    else periodoActual = 'septiembre-diciembre';
     
     return { anio: anioActual.toString(), periodo: periodoActual };
   };
@@ -734,16 +730,12 @@ const SuperAdminActividades = ({ admin }) => {
           
           <div className="banner-right">
             <div className="periodo-actual-banner">
-              <span className="periodo-emoji-banner">
-                {periodoActual.periodo === 'enero-abril' ? '❄️' : 
-                 periodoActual.periodo === 'mayo-agosto' ? '🌸' : '🍂'}
-              </span>
               <div className="periodo-text-banner">
-                <h4>📅 PERÍODO ACTUAL</h4>
+                <h4>PERÍODO ACTUAL</h4>
                 <p>
                   Año {periodoActual.anio} • 
-                  {periodoActual.periodo === 'enero-abril' ? ' Enero - Abril' : 
-                   periodoActual.periodo === 'mayo-agosto' ? ' Mayo - Agosto' : ' Septiembre - Diciembre'}
+                  {periodoActual.periodo === 'enero-abril' ? 'Enero - Abril' : 
+                   periodoActual.periodo === 'mayo-agosto' ? 'Mayo - Agosto' : 'Septiembre - Diciembre'}
                 </p>
               </div>
             </div>
@@ -957,7 +949,6 @@ const SuperAdminActividades = ({ admin }) => {
                               style={{ borderLeftColor: periodoData.color }}
                             >
                               <div className="periodo-acordeon-title">
-                                <span className="periodo-emoji">{periodoData.emoji}</span>
                                 <h4>{periodoData.label}</h4>
                                 {añoData.anio === periodoActual.anio && periodoKey === periodoActual.periodo && (
                                   <span className="periodo-actual-badge">PERÍODO ACTUAL</span>
