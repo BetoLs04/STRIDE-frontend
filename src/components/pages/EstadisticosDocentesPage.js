@@ -66,6 +66,7 @@ const EstadisticosDocentesPage = ({ user }) => {
   const [secciones, setSecciones] = useState([]);
   const [filasPorSeccion, setFilasPorSeccion] = useState({});
   const [seccionesLoading, setSeccionesLoading] = useState(false);
+  const [globalNotas, setGlobalNotas] = useState('');
 
   const [editingCelda, setEditingCelda] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -100,7 +101,10 @@ const EstadisticosDocentesPage = ({ user }) => {
     } catch (e) { handleApiError(e, 'Error al cargar'); } finally { setSeccionesLoading(false); }
   };
 
-  const handleSelectHoja = (hoja) => { setSelectedHoja(hoja); setEditingCelda(null); cargarSecciones(hoja.id); };
+  const handleSelectHoja = (hoja) => {
+    setSelectedHoja(hoja); setEditingCelda(null); cargarSecciones(hoja.id);
+    api.get('/api/university/estadisticos-docentes-notas').then(r => setGlobalNotas(r.data.data?.contenido || '')).catch(() => {});
+  };
 
   const getValor = (fila, key) => { try { const v = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {}); return v[key] ?? ''; } catch { return ''; } };
 
@@ -208,7 +212,7 @@ const EstadisticosDocentesPage = ({ user }) => {
               </div>
             );
           })}</div>}
-        {selectedHoja.notas && <div className="edp-notas"><strong>Notas:</strong><p>{selectedHoja.notas}</p></div>}
+        {globalNotas && <div className="edp-notas"><p>{globalNotas}</p></div>}
         <div className="edp-nav">{hojasFiltradas.map(hoja => (
           <button key={hoja.id} className={`edp-nav-btn ${selectedHoja.id === hoja.id ? 'active' : ''}`} onClick={() => handleSelectHoja(hoja)}>
             {hoja.cuatrimestre || 'Sin nombre'}</button>

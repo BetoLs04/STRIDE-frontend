@@ -70,11 +70,15 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const [selectedAnio, setSelectedAnio] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [globalNotas, setGlobalNotas] = useState('');
+  const [globalNotasLoading, setGlobalNotasLoading] = useState(false);
+  const [globalNotasSaving, setGlobalNotasSaving] = useState(false);
+  const [editingNotas, setEditingNotas] = useState(false);
+
   const [showFormHoja, setShowFormHoja] = useState(false);
   const [editHojaId, setEditHojaId] = useState(null);
   const [formCuatrimestre, setFormCuatrimestre] = useState('');
   const [formAnio, setFormAnio] = useState('');
-  const [formNotas, setFormNotas] = useState('');
   const [savingHoja, setSavingHoja] = useState(false);
 
   const [selectedHoja, setSelectedHoja] = useState(null);
@@ -92,10 +96,22 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const [editValue, setEditValue] = useState('');
   const inputRef = useRef(null);
 
-  useEffect(() => { fetchAnios(); fetchHojas(); }, []);
+  useEffect(() => { fetchAnios(); fetchHojas(); fetchGlobalNotas(); }, []);
 
   const refreshRef = useRef();
   useSocketEvent('estadisticos-docentes:updated', () => refreshRef.current?.());
+  const fetchGlobalNotas = async () => {
+    setGlobalNotasLoading(true);
+    try { const r = await api.get('/api/university/estadisticos-docentes-notas'); setGlobalNotas(r.data.data?.contenido || ''); }
+    catch (e) { console.warn(e.message); } finally { setGlobalNotasLoading(false); }
+  };
+
+  const handleSaveGlobalNotas = async () => {
+    setGlobalNotasSaving(true);
+    try { await api.put('/api/university/estadisticos-docentes-notas', { contenido: globalNotas }); toast.success('Notas guardadas'); setEditingNotas(false); }
+    catch (e) { handleApiError(e, 'Error al guardar notas'); } finally { setGlobalNotasSaving(false); }
+  };
+
   useEffect(() => { refreshRef.current = () => { fetchHojas(selectedAnio); fetchAnios(); }; });
 
   const fetchAnios = async () => {
@@ -111,14 +127,14 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
 
   const handleSelectAnio = (anio) => { setSelectedAnio(anio); setSelectedHoja(null); fetchHojas(anio); };
 
-  const handleOpenNewHoja = () => { setEditHojaId(null); setFormCuatrimestre(''); setFormAnio(selectedAnio || ''); setFormNotas(''); setShowFormHoja(true); };
-  const handleOpenEditHoja = (hoja) => { setEditHojaId(hoja.id); setFormCuatrimestre(hoja.cuatrimestre || ''); setFormAnio(hoja.anio || ''); setFormNotas(hoja.notas || ''); setShowFormHoja(true); };
+  const handleOpenNewHoja = () => { setEditHojaId(null); setFormCuatrimestre(''); setFormAnio(selectedAnio || ''); setShowFormHoja(true); };
+  const handleOpenEditHoja = (hoja) => { setEditHojaId(hoja.id); setFormCuatrimestre(hoja.cuatrimestre || ''); setFormAnio(hoja.anio || ''); setShowFormHoja(true); };
 
   const handleSaveHoja = async (e) => {
     e.preventDefault(); setSavingHoja(true);
     try {
-      if (editHojaId) { await api.put(`/api/university/estadisticos-docentes-hojas/${editHojaId}`, { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim(), notas: formNotas.trim() }); toast.success('Hoja actualizada'); }
-      else { await api.post('/api/university/estadisticos-docentes-hojas', { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim(), notas: formNotas.trim() }); toast.success('Hoja creada'); }
+      if (editHojaId) { await api.put(`/api/university/estadisticos-docentes-hojas/${editHojaId}`, { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim() }); toast.success('Hoja actualizada'); }
+      else { await api.post('/api/university/estadisticos-docentes-hojas', { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim() }); toast.success('Hoja creada'); }
       setShowFormHoja(false); setEditHojaId(null); fetchHojas(selectedAnio); fetchAnios();
     } catch (e) { handleApiError(e, 'Error al guardar hoja'); } finally { setSavingHoja(false); }
   };
@@ -327,12 +343,31 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           </div>
         )}
 
-        {selectedHoja.notas && (
+        {globalNotas && (
           <div className="ed-notas">
-            <strong>Notas:</strong>
-            <p>{selectedHoja.notas}</p>
+            <p>{globalNotas}</p>
           </div>
         )}
+
+        <div className="ed-notas-editor" style={{ marginTop: '2rem' }}>
+          <div className="ed-usuarios-header">
+            <h3>Notas generales</h3>
+            <button className="btn btn-outline btn-small" onClick={() => setEditingNotas(!editingNotas)}>
+              {editingNotas ? 'Cancelar' : 'Editar'}
+            </button>
+          </div>
+          {globalNotasLoading ? <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
+            : editingNotas ? (
+              <div style={{ padding: '1rem 1.25rem' }}>
+                <textarea className="ed-notas-textarea" value={globalNotas} onChange={e => setGlobalNotas(e.target.value)} rows={4} />
+                <div className="form-actions" style={{ marginTop: '0.5rem' }}>
+                  <button className="btn btn-primary btn-small" onClick={handleSaveGlobalNotas} disabled={globalNotasSaving}>
+                    {globalNotasSaving ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </div>
+              </div>
+            ) : <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>{globalNotas || 'Sin notas'}</p>}
+        </div>
 
         <div className="ed-usuarios-panel">
           <div className="ed-usuarios-header"><h3>Usuarios con acceso a esta hoja</h3>
@@ -436,7 +471,6 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
             <form onSubmit={handleSaveHoja} style={{ padding: '20px 30px 30px' }}>
               <FormInput label="Cuatrimestre *" name="form-cuatrimestre" value={formCuatrimestre} onChange={e => setFormCuatrimestre(e.target.value)} placeholder="Ej: Mayo - Agosto" required />
               <FormInput label="Año *" name="form-anio" value={formAnio} onChange={e => setFormAnio(e.target.value)} placeholder="Ej: 2025" required />
-              <FormInput label="Notas" name="form-notas" value={formNotas} onChange={e => setFormNotas(e.target.value)} placeholder="Notas al pie (opcional)" />
               <div className="form-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowFormHoja(false)}>Cancelar</button>
                 <button type="submit" className="btn btn-primary" disabled={savingHoja}>{savingHoja ? 'Guardando...' : '💾 Guardar'}</button>

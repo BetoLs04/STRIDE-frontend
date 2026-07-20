@@ -42,6 +42,8 @@
 
 .estadisticos-docentes .ed-notas { max-width: 100%; margin-top: 1.5rem; font-size: 11.5px; color: #475569; background: #fff; border-radius: 8px; padding: 10px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .estadisticos-docentes .ed-notas p { margin: 4px 0; }
+.estadisticos-docentes .ed-notas-editor { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; }
+.estadisticos-docentes .ed-notas-textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; resize: vertical; box-sizing: border-box; }
 
 .estadisticos-docentes .ed-usuarios-panel { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 1.5rem; }
 .estadisticos-docentes .ed-usuarios-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid #e5e7eb; }
