@@ -65,6 +65,10 @@ const SuperAdminDashboard = ({ admin }) => {
       setActiveTab('poa');
       window.history.replaceState({}, document.title);
     }
+    if (location.state?.tab === 'estadisticos-genero') {
+      setActiveTab('estadisticos-genero');
+      window.history.replaceState({}, document.title);
+    }
     fetchData();
   }, [admin, navigate, location.state]);
 

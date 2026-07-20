@@ -129,6 +129,30 @@ const Home = () => {
     }
   };
 
+  const handleEstadisticosGeneroClick = async () => {
+    if (!isLoggedIn) {
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+      return;
+    }
+    const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
+    if (userData?.tipo === USER_TYPES.SUPERADMIN) {
+      navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'estadisticos-genero' } });
+      return;
+    }
+    try {
+      const res = await api.get(`/api/university/estadisticos-genero-mis-hojas?usuario_id=${userData.id}&usuario_tipo=${userData.tipo}`);
+      const hojas = res.data.data || [];
+      if (hojas.length === 0) {
+        toast.error('🚫 Permiso denegado. No tienes acceso a Estadísticos por Género.');
+        return;
+      }
+      const prefix = getRoutePrefix(userData.tipo);
+      navigate(`${prefix}/estadisticos-genero`);
+    } catch (error) {
+      handleApiError(error, 'Error al cargar datos');
+    }
+  };
+
   const handlePOAClick = async () => {
     if (!isLoggedIn) {
       toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
@@ -520,6 +544,15 @@ const Home = () => {
         >
           <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
           <h3 style={{ marginBottom: 0 }}>SMOA</h3>
+        </div>
+
+        <div
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          onClick={handleEstadisticosGeneroClick}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>ESTADÍSTICOS POR GÉNERO</h3>
         </div>
       </div>
     </div>
