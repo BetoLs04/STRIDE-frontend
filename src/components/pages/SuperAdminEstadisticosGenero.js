@@ -313,7 +313,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
 
   if (selectedHoja) {
     return (
-      <div className="tab-content estadisticos-genero">
+      <><div className="tab-content estadisticos-genero">
         <div className="tab-header">
           <div>
             <h2>Información Estadística por Género</h2>
@@ -505,7 +505,8 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
           </div>
         </div>
       )}
-    );
+    </>
+  );
   }
 
   return (
