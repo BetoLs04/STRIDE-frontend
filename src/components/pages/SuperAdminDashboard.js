@@ -12,6 +12,7 @@ import SuperAdminMatrizIndicadores from './SuperAdminMatrizIndicadores';
 import SuperAdminSMOA from './SuperAdminSMOA';
 import SuperAdminSeplade from './SuperAdminSeplade';
 import SuperAdminPOA from './SuperAdminPOA';
+import SuperAdminEstadisticosGenero from './SuperAdminEstadisticosGenero';
 import FormInput from '../shared/FormInput';
 import '../../styles/SuperAdminDashboard.css';
 import FormSelect from '../shared/FormSelect';
@@ -572,6 +573,9 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'seplade' ? 'active' : ''}`} onClick={() => setActiveTab('seplade')}>📋 SEPLADE</button>
         <button className={`tab-btn ${activeTab === 'poa' ? 'active' : ''}`} onClick={() => setActiveTab('poa')}>📋 POA</button>
       </div>
+      <div className="dashboard-tabs-row">
+        <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-genero')}>📊 Estadísticos por Género</button>
+      </div>
 
       <div className="dashboard-main">
         {activeTab === 'dashboard' && renderDashboard()}
@@ -584,6 +588,7 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'smoa' && <SuperAdminSMOA onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'seplade' && <SuperAdminSeplade onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'poa' && <SuperAdminPOA onClose={() => setActiveTab('dashboard')} />}
+        {activeTab === 'estadisticos-genero' && <SuperAdminEstadisticosGenero onClose={() => setActiveTab('dashboard')} />}
       </div>
 
       {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}

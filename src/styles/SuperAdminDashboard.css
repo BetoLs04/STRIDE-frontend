@@ -101,6 +101,12 @@
   padding-bottom: 1rem;
 }
 
+.dashboard-tabs-row {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0 1rem;
+}
+
 .tab-btn {
   padding: 0.8rem 1.5rem;
   border: none;
