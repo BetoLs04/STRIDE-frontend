@@ -117,6 +117,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const handleSelectHoja = (hoja) => {
     setSelectedHoja(hoja);
     fetchFilas(hoja.id);
+    fetchHojas();
   };
 
   const getValor = (fila, key) => {
@@ -279,6 +280,21 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                 </table>
               </div>
             )}
+          </div>
+        </div>
+
+        <div className="eg-navegador">
+          <span className="eg-navegador-label">Hojas:</span>
+          <div className="eg-navegador-lista">
+            {hojas.map(hoja => (
+              <button
+                key={hoja.id}
+                className={`eg-navegador-btn ${selectedHoja.id === hoja.id ? 'active' : ''}`}
+                onClick={() => handleSelectHoja(hoja)}
+              >
+                {hoja.nombre || 'Sin nombre'}
+              </button>
+            ))}
           </div>
         </div>
 

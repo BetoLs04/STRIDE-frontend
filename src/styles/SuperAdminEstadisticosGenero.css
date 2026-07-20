@@ -162,3 +162,49 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
+
+.estadisticos-genero .eg-navegador {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.estadisticos-genero .eg-navegador-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.estadisticos-genero .eg-navegador-lista {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.estadisticos-genero .eg-navegador-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #374151;
+  transition: all 0.15s;
+}
+
+.estadisticos-genero .eg-navegador-btn:hover {
+  background: #e5e7eb;
+}
+
+.estadisticos-genero .eg-navegador-btn.active {
+  background: var(--primary-blue);
+  color: #fff;
+  border-color: var(--primary-blue);
+}
