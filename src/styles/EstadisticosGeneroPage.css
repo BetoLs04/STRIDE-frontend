@@ -168,6 +168,19 @@
   font-weight: 600;
 }
 
+.eg-page-table .tr-total td {
+  background: #e5e7eb !important;
+  font-weight: 700;
+  color: #1f2937;
+  border-top: 2px solid #9ca3af;
+}
+
+.eg-page-table .celda-total {
+  background: #e5e7eb;
+  font-weight: 700;
+  color: #1f2937;
+}
+
 .eg-page-table .editable-cell {
   cursor: pointer;
   transition: background 0.12s;

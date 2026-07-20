@@ -32,6 +32,33 @@ const computeTotals = (valores) => {
   return next;
 };
 
+const computeTotalesGenerales = (filas, getValorFn) => {
+  const total = { grupos: 0, cant_total: 0, cant_hombres: 0, cant_mujeres: 0, aprov_hombres: [], aprov_mujeres: [], aprov_total: [] };
+  for (const f of filas) {
+    total.grupos += parseNum(getValorFn(f, 'grupos'));
+    total.cant_total += parseNum(getValorFn(f, 'cant_total'));
+    total.cant_hombres += parseNum(getValorFn(f, 'cant_hombres'));
+    total.cant_mujeres += parseNum(getValorFn(f, 'cant_mujeres'));
+    const ah = parseNum(getValorFn(f, 'aprov_hombres'));
+    const am = parseNum(getValorFn(f, 'aprov_mujeres'));
+    const at = parseNum(getValorFn(f, 'aprov_total'));
+    if (ah > 0) total.aprov_hombres.push(ah);
+    if (am > 0) total.aprov_mujeres.push(am);
+    if (at > 0) total.aprov_total.push(at);
+  }
+  const avg = (arr) => arr.length > 0 ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2) : '';
+  return {
+    programa: 'Total',
+    grupos: String(total.grupos),
+    cant_total: String(total.cant_total),
+    cant_hombres: String(total.cant_hombres),
+    cant_mujeres: String(total.cant_mujeres),
+    aprov_hombres: avg(total.aprov_hombres),
+    aprov_mujeres: avg(total.aprov_mujeres),
+    aprov_total: avg(total.aprov_total)
+  };
+};
+
 const EstadisticosGeneroPage = ({ user }) => {
   const navigate = useNavigate();
   const [misHojas, setMisHojas] = useState([]);
@@ -214,6 +241,16 @@ const EstadisticosGeneroPage = ({ user }) => {
                   </tr>
                 ))}
               </tbody>
+              {filas.length > 0 && (
+                <tfoot>
+                  <tr className="tr-total">
+                    {['programa', 'grupos', 'cant_total', 'cant_hombres', 'cant_mujeres', 'aprov_hombres', 'aprov_mujeres', 'aprov_total'].map(key => {
+                      const tg = computeTotalesGenerales(filas, getValor);
+                      return <td key={key} className="celda-total">{tg[key] ?? ''}</td>;
+                    })}
+                  </tr>
+                </tfoot>
+              )}
             </table>
           )}
         </div>

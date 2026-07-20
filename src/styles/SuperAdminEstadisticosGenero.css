@@ -184,6 +184,19 @@
   min-width: 80px;
 }
 
+.estadisticos-genero .tr-total td {
+  background: #e5e7eb !important;
+  font-weight: 700;
+  color: #1f2937;
+  border-top: 2px solid #9ca3af;
+}
+
+.estadisticos-genero .celda-total {
+  background: #e5e7eb;
+  font-weight: 700;
+  color: #1f2937;
+}
+
 .estadisticos-genero .editable-cell:hover {
   background: #eef2ff;
 }
