@@ -13,6 +13,7 @@ import SuperAdminSMOA from './SuperAdminSMOA';
 import SuperAdminSeplade from './SuperAdminSeplade';
 import SuperAdminPOA from './SuperAdminPOA';
 import SuperAdminEstadisticosGenero from './SuperAdminEstadisticosGenero';
+import SuperAdminEstadisticosDocentes from './SuperAdminEstadisticosDocentes';
 import FormInput from '../shared/FormInput';
 import '../../styles/SuperAdminDashboard.css';
 import FormSelect from '../shared/FormSelect';
@@ -67,6 +68,10 @@ const SuperAdminDashboard = ({ admin }) => {
     }
     if (location.state?.tab === 'estadisticos-genero') {
       setActiveTab('estadisticos-genero');
+      window.history.replaceState({}, document.title);
+    }
+    if (location.state?.tab === 'estadisticos-docentes') {
+      setActiveTab('estadisticos-docentes');
       window.history.replaceState({}, document.title);
     }
     fetchData();
@@ -579,6 +584,7 @@ const SuperAdminDashboard = ({ admin }) => {
       </div>
       <div className="dashboard-tabs-row">
         <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-genero')}>📊 Estadísticos por Género</button>
+        <button className={`tab-btn ${activeTab === 'estadisticos-docentes' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-docentes')}>📊 Datos Estadísticos - Docentes</button>
       </div>
 
       <div className="dashboard-main">
@@ -593,6 +599,7 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'seplade' && <SuperAdminSeplade onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'poa' && <SuperAdminPOA onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'estadisticos-genero' && <SuperAdminEstadisticosGenero onClose={() => setActiveTab('dashboard')} />}
+        {activeTab === 'estadisticos-docentes' && <SuperAdminEstadisticosDocentes onClose={() => setActiveTab('dashboard')} />}
       </div>
 
       {showFormDireccion && <FormNuevaDireccion onClose={() => setShowFormDireccion(false)} onSuccess={fetchData} />}

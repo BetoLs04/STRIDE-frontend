@@ -1,0 +1,60 @@
+.estadisticos-docentes .ed-info-bar { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+.estadisticos-docentes .ed-info-bar h3 { margin: 0 0 0.25rem; color: #1f2937; }
+.estadisticos-docentes .ed-info-bar p { margin: 0; color: #6b7280; font-size: 0.9rem; }
+.estadisticos-docentes .ed-anios-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.75rem 1.25rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; }
+.estadisticos-docentes .ed-anios-label { font-size: 0.85rem; font-weight: 600; color: #6b7280; white-space: nowrap; }
+.estadisticos-docentes .ed-anios-lista { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.estadisticos-docentes .ed-anio-btn { padding: 0.4rem 1.2rem; border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb; cursor: pointer; font-size: 0.9rem; color: #374151; }
+.estadisticos-docentes .ed-anio-btn:hover { background: #e5e7eb; }
+.estadisticos-docentes .ed-anio-btn.active { background: var(--primary-blue); color: #fff; border-color: var(--primary-blue); }
+.estadisticos-docentes .ed-hojas-list { display: flex; flex-direction: column; gap: 1rem; }
+.estadisticos-docentes .ed-hoja-card { display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem 1.5rem; }
+.estadisticos-docentes .ed-hoja-info h3 { margin: 0; font-size: 1.05rem; color: #1f2937; }
+.estadisticos-docentes .ed-hoja-actions { display: flex; gap: 0.5rem; align-items: center; }
+.estadisticos-docentes .ed-empty { text-align: center; padding: 3rem; color: #6b7280; }
+
+.estadisticos-docentes .ed-secciones-wrap { display: flex; flex-direction: column; gap: 20px; }
+.estadisticos-docentes .ed-panel { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+.estadisticos-docentes .ed-panel h2 { color: white; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; margin: 0; padding: 10px 14px; }
+.estadisticos-docentes .ed-panel-green h2 { background: #15803d; }
+.estadisticos-docentes .ed-panel-blue h2 { background: #4338ca; }
+.estadisticos-docentes .ed-panel-red h2 { background: #991b1b; }
+.estadisticos-docentes .ed-panel-orange h2 { background: #b45309; }
+.estadisticos-docentes .ed-panel-gray h2 { background: #6b7280; }
+
+.estadisticos-docentes .ed-tabla { width: 100%; border-collapse: collapse; font-size: 12px; }
+.estadisticos-docentes .ed-tabla th, .estadisticos-docentes .ed-tabla td { padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; }
+.estadisticos-docentes .ed-tabla thead th { font-weight: 600; }
+.estadisticos-docentes .ed-tabla thead tr:first-child th { background: #dcfce7; color: #14532d; }
+.estadisticos-docentes .ed-panel-blue .ed-tabla thead tr:first-child th { background: #e0e7ff; color: #312e81; }
+.estadisticos-docentes .ed-panel-red .ed-tabla thead tr:first-child th { background: #fecaca; color: #991b1b; }
+.estadisticos-docentes .ed-panel-orange .ed-tabla thead tr:first-child th { background: #fed7aa; color: #b45309; }
+.estadisticos-docentes .ed-tabla thead tr:last-child th { background: #f8fafc; color: #475569; font-weight: normal; }
+.estadisticos-docentes .ed-rowlabel { text-align: left; font-weight: 600; background: #f8fafc; white-space: nowrap; }
+.estadisticos-docentes .ed-total-row td { background: #bbf7d0 !important; font-weight: 700; color: #14532d; }
+.estadisticos-docentes .ed-panel-blue .ed-total-row td { background: #c7d2fe !important; color: #312e81; }
+.estadisticos-docentes .ed-panel-red .ed-total-row td { background: #fecaca !important; color: #991b1b; }
+.estadisticos-docentes .ed-panel-orange .ed-total-row td { background: #fed7aa !important; color: #b45309; }
+.estadisticos-docentes .ed-celda-readonly { background: #f3f4f6; font-weight: 600; min-width: 40px; }
+.estadisticos-docentes .ed-celda-edit { cursor: pointer; transition: background 0.12s; min-width: 40px; }
+.estadisticos-docentes .ed-celda-edit:hover { background: #eef2ff; }
+.estadisticos-docentes .ed-input { width: 100%; padding: 0.2rem 0.3rem; border: 2px solid #3b82f6; border-radius: 3px; font-size: 11px; outline: none; box-sizing: border-box; background: #fff; text-align: center; }
+
+.estadisticos-docentes .ed-notas { max-width: 100%; margin-top: 1.5rem; font-size: 11.5px; color: #475569; background: #fff; border-radius: 8px; padding: 10px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.estadisticos-docentes .ed-notas p { margin: 4px 0; }
+
+.estadisticos-docentes .ed-usuarios-panel { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 1.5rem; }
+.estadisticos-docentes .ed-usuarios-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid #e5e7eb; }
+.estadisticos-docentes .ed-usuarios-header h3 { margin: 0; font-size: 1rem; color: #1f2937; }
+.estadisticos-docentes .ed-usuarios-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; }
+.estadisticos-docentes .ed-usuario-tag { display: inline-flex; align-items: center; gap: 0.4rem; background: #e0f2fe; color: #0369a1; padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.85rem; }
+.estadisticos-docentes .ed-usuario-tag small { opacity: 0.7; }
+.estadisticos-docentes .ed-usuario-tag .tag-remove { background: none; border: none; cursor: pointer; font-size: 1rem; line-height: 1; color: #0369a1; padding: 0 0 0 0.25rem; }
+.estadisticos-docentes .ed-usuario-tag .tag-remove:hover { color: #dc2626; }
+
+.estadisticos-docentes .ed-navegador { display: flex; align-items: center; gap: 0.75rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem 1.25rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.estadisticos-docentes .ed-navegador-label { font-size: 0.85rem; font-weight: 600; color: #6b7280; white-space: nowrap; }
+.estadisticos-docentes .ed-navegador-lista { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.estadisticos-docentes .ed-navegador-btn { padding: 0.4rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb; cursor: pointer; font-size: 0.85rem; color: #374151; }
+.estadisticos-docentes .ed-navegador-btn:hover { background: #e5e7eb; }
+.estadisticos-docentes .ed-navegador-btn.active { background: var(--primary-blue); color: #fff; border-color: var(--primary-blue); }
