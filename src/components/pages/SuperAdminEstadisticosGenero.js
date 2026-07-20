@@ -207,18 +207,18 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                 <table className="eg-preview-table">
                   <thead>
                     <tr>
-                      <th rowSpan="2">Programa</th>
-                      <th rowSpan="2">Grupos</th>
-                      <th colSpan="3">Cantidad</th>
-                      <th colSpan="3">Aprovechamiento</th>
+                      <th className="th-blue" rowSpan="2">Programa</th>
+                      <th className="th-blue" rowSpan="2">Grupos</th>
+                      <th className="th-orange" colSpan="3">Cantidad</th>
+                      <th className="th-green" colSpan="3">Aprovechamiento</th>
                     </tr>
                     <tr>
-                      <th>Total</th>
-                      <th>Hombres</th>
-                      <th>Mujeres</th>
-                      <th>Hombres</th>
-                      <th>Mujeres</th>
-                      <th>Total</th>
+                      <th className="th-orange">Total</th>
+                      <th className="th-orange">Hombres</th>
+                      <th className="th-orange">Mujeres</th>
+                      <th className="th-green">Hombres</th>
+                      <th className="th-green">Mujeres</th>
+                      <th className="th-green">Total</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -77,30 +77,46 @@
   font-size: 0.9rem;
 }
 
-.estadisticos-genero .eg-preview-table thead tr:first-child th {
-  background: #2c3e50;
-  color: #fff;
+.estadisticos-genero .eg-preview-table {
+  border-collapse: collapse;
+}
+
+.estadisticos-genero .eg-preview-table th,
+.estadisticos-genero .eg-preview-table td {
+  border: 2px solid #fff;
   padding: 0.6rem 0.75rem;
   text-align: center;
+}
+
+.estadisticos-genero .eg-preview-table .th-blue {
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+}
+
+.estadisticos-genero .eg-preview-table .th-orange {
+  background: #f59e0b;
+  color: #fff;
+  font-weight: 600;
+}
+
+.estadisticos-genero .eg-preview-table .th-green {
+  background: #10b981;
+  color: #fff;
   font-weight: 600;
 }
 
 .estadisticos-genero .eg-preview-table thead tr:last-child th {
-  background: #34495e;
-  color: #fff;
-  padding: 0.5rem 0.75rem;
-  text-align: center;
   font-weight: normal;
+  padding: 0.5rem 0.75rem;
 }
 
 .estadisticos-genero .eg-preview-table td {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  text-align: center;
+  border: 1px solid #d1d5db;
 }
 
 .estadisticos-genero .eg-preview-table tbody tr:nth-child(even) {
-  background: #f9f9f9;
+  background: #f9fafb;
 }
 
 .estadisticos-genero .eg-filas-section {
