@@ -9,13 +9,26 @@ import useSocketEvent from '../../hooks/useSocketEvent';
 const COLUMNAS_FIJAS = [
   { key: 'programa', label: 'Programa', tipo: 'texto' },
   { key: 'grupos', label: 'Grupos', tipo: 'numero' },
-  { key: 'cant_total', label: 'Cantidad Total', tipo: 'numero' },
+  { key: 'cant_total', label: 'Cantidad Total', tipo: 'numero', readOnly: true },
   { key: 'cant_hombres', label: 'Cantidad Hombres', tipo: 'numero' },
   { key: 'cant_mujeres', label: 'Cantidad Mujeres', tipo: 'numero' },
   { key: 'aprov_hombres', label: 'Aprovechamiento Hombres', tipo: 'decimal' },
   { key: 'aprov_mujeres', label: 'Aprovechamiento Mujeres', tipo: 'decimal' },
-  { key: 'aprov_total', label: 'Aprovechamiento Total', tipo: 'decimal' }
+  { key: 'aprov_total', label: 'Aprovechamiento Total', tipo: 'decimal', readOnly: true }
 ];
+
+const parseNum = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+
+const computeTotals = (valores) => {
+  const next = { ...valores };
+  const h = parseNum(next.cant_hombres);
+  const m = parseNum(next.cant_mujeres);
+  next.cant_total = String(h + m);
+  const ah = parseNum(next.aprov_hombres);
+  const am = parseNum(next.aprov_mujeres);
+  next.aprov_total = (ah + am) > 0 ? ((ah + am) / 2).toFixed(2) : '';
+  return next;
+};
 
 const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const [hojas, setHojas] = useState([]);
@@ -169,11 +182,25 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     if (!editingCelda) return;
     const { filaId, key } = editingCelda;
     try {
-      await api.patch(`/api/university/estadisticos-genero-filas/${filaId}/celda`, { key, value: editValue });
+      const updated = {};
+      updated[key] = editValue;
+      const filaActual = filas.find(f => f.id === filaId);
+      const valsActual = filaActual ? (typeof filaActual.valores === 'string' ? JSON.parse(filaActual.valores) : (filaActual.valores || {})) : {};
+      const conTotales = computeTotals({ ...valsActual, [key]: editValue });
+      for (const k of ['cant_total', 'aprov_total']) {
+        if (conTotales[k] !== (valsActual[k] ?? '')) {
+          updated[k] = conTotales[k];
+        }
+      }
+      for (const [k, v] of Object.entries(updated)) {
+        await api.patch(`/api/university/estadisticos-genero-filas/${filaId}/celda`, { key: k, value: v });
+      }
       setFilas(prev => prev.map(f => {
         if (f.id !== filaId) return f;
         const valores = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-        valores[key] = editValue;
+        for (const [k, v] of Object.entries(updated)) {
+          valores[k] = v;
+        }
         return { ...f, valores };
       }));
     } catch (error) {
@@ -181,7 +208,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     }
     setEditingCelda(null);
     setEditValue('');
-  }, [editingCelda, editValue]);
+  }, [editingCelda, editValue, filas]);
 
   const handleCeldaKeyDown = (e) => {
     if (e.key === 'Enter') { e.preventDefault(); saveCelda(); }
@@ -192,8 +219,8 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const handleAddFila = async () => {
     if (!selectedHoja) return;
     try {
-      const initial = {};
-      COLUMNAS_FIJAS.forEach(c => { initial[c.key] = ''; });
+      const initial = computeTotals({});
+      COLUMNAS_FIJAS.forEach(c => { if (!(c.key in initial)) initial[c.key] = ''; });
       const res = await api.post('/api/university/estadisticos-genero-filas', {
         valores: initial,
         hoja_id: selectedHoja.id
@@ -274,6 +301,13 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                           const cellKey = `${fila.id}_${col.key}`;
                           const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === col.key;
                           const val = getValor(fila, col.key);
+                          if (col.readOnly) {
+                            return (
+                              <td key={cellKey} className="celda-readonly">
+                                <span className="celda-valor">{val}</span>
+                              </td>
+                            );
+                          }
                           return (
                             <td
                               key={cellKey}
