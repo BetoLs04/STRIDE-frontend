@@ -1,0 +1,194 @@
+.eg-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.eg-page-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.eg-page-header h2 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.eg-page-header p {
+  margin: 0.25rem 0 0;
+  color: #6b7280;
+}
+
+.eg-page-anios {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.eg-page-anio-btn {
+  padding: 0.4rem 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.eg-page-anio-btn:hover {
+  background: #e5e7eb;
+}
+
+.eg-page-anio-btn.active {
+  background: var(--primary-blue);
+  color: #fff;
+  border-color: var(--primary-blue);
+}
+
+.eg-page-hojas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.eg-page-hoja-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.eg-page-hoja-card:hover {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.eg-page-hoja-card h3 {
+  margin: 0 0 0.25rem;
+  color: #1f2937;
+}
+
+.eg-page-hoja-card p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.eg-page-table-wrap {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.eg-page-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.eg-page-table th,
+.eg-page-table td {
+  border: 2px solid #fff;
+  padding: 0.6rem 0.75rem;
+  text-align: center;
+}
+
+.eg-page-table .th-blue {
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+}
+
+.eg-page-table .th-orange {
+  background: #f59e0b;
+  color: #fff;
+  font-weight: 600;
+}
+
+.eg-page-table .th-green {
+  background: #10b981;
+  color: #fff;
+  font-weight: 600;
+}
+
+.eg-page-table thead tr:last-child th {
+  font-weight: normal;
+}
+
+.eg-page-table td {
+  border: 1px solid #d1d5db;
+}
+
+.eg-page-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.eg-page-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.eg-page-nav-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.eg-page-nav-btn:hover {
+  background: #e5e7eb;
+}
+
+.eg-page-nav-btn.active {
+  background: var(--primary-blue);
+  color: #fff;
+  border-color: var(--primary-blue);
+}
+
+.eg-page-table .celda-readonly {
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+
+.eg-page-table .editable-cell {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.eg-page-table .editable-cell:hover {
+  background: #eef2ff;
+}
+
+.eg-page-table .celda-valor {
+  display: block;
+  min-height: 1.4em;
+}
+
+.eg-page-table .celda-input {
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  outline: none;
+  box-sizing: border-box;
+  background: #fff;
+}

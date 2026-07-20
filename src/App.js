@@ -17,6 +17,7 @@ import MatrizIndicadoresPage from './components/pages/MatrizIndicadoresPage';
 import SMOAPage from './components/pages/SMOAPage';
 import SepladePage from './components/pages/SepladePage';
 import POAPage from './components/pages/POAPage';
+import EstadisticosGeneroPage from './components/pages/EstadisticosGeneroPage';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import { ROUTES, getDashboardPath, matrizIndicadores, seplade } from './constants/routes';
 import { USER_TYPE_ARRAYS } from './constants/index';
@@ -153,6 +154,24 @@ function App() {
         <Route path="/personal/poa/:seccionId" element={
           <ProtectedRoute user={user}>
             <POAPage user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/estadisticos-genero" element={
+          <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
+            <EstadisticosGeneroPage user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/directivo/estadisticos-genero" element={
+          <ProtectedRoute user={user}>
+            <EstadisticosGeneroPage user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/personal/estadisticos-genero" element={
+          <ProtectedRoute user={user}>
+            <EstadisticosGeneroPage user={user} />
           </ProtectedRoute>
         } />
 

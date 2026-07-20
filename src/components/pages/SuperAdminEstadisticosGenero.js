@@ -46,6 +46,11 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
 
   const [filas, setFilas] = useState([]);
   const [filasLoading, setFilasLoading] = useState(false);
+
+  const [usuariosAsignados, setUsuariosAsignados] = useState([]);
+  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+  const [showAsignarUsuarios, setShowAsignarUsuarios] = useState(false);
+  const [selectedAsignar, setSelectedAsignar] = useState(new Set());
   const [editingCelda, setEditingCelda] = useState(null);
   const [editValue, setEditValue] = useState('');
 
@@ -161,6 +166,66 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     } finally {
       setFilasLoading(false);
     }
+  };
+
+  const fetchUsuariosHoja = async (hojaId) => {
+    try {
+      const [asigRes, dispRes] = await Promise.all([
+        api.get(`/api/university/estadisticos-genero-hojas/${hojaId}/usuarios`),
+        api.get('/api/university/estadisticos-genero-usuarios-disponibles')
+      ]);
+      setUsuariosAsignados(asigRes.data.data || []);
+      setUsuariosDisponibles(dispRes.data.data || []);
+    } catch (error) {
+      handleApiError(error, 'Error al cargar usuarios');
+    }
+  };
+
+  useEffect(() => {
+    if (selectedHoja) fetchUsuariosHoja(selectedHoja.id);
+  }, [selectedHoja]);
+
+  const toggleAsignarUsuario = (usuario) => {
+    const key = `${usuario.id}_${usuario.tipo}`;
+    setSelectedAsignar(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  const handleConfirmarAsignacion = async () => {
+    if (selectedAsignar.size === 0) { toast.error('Selecciona al menos un usuario'); return; }
+    try {
+      for (const key of selectedAsignar) {
+        const [id, tipo] = key.split('_');
+        await api.post('/api/university/estadisticos-genero-usuarios', {
+          hoja_id: selectedHoja.id, usuario_id: parseInt(id), usuario_tipo: tipo
+        });
+      }
+      toast.success(`${selectedAsignar.size} usuario(s) asignado(s)`);
+      setShowAsignarUsuarios(false);
+      setSelectedAsignar(new Set());
+      fetchUsuariosHoja(selectedHoja.id);
+    } catch (error) {
+      handleApiError(error, 'Error al asignar usuarios');
+    }
+  };
+
+  const handleQuitarUsuario = async (asignacion) => {
+    if (!window.confirm('¿Quitar este usuario de la hoja?')) return;
+    try {
+      await api.delete(`/api/university/estadisticos-genero-usuarios/${asignacion.asignacion_id}`);
+      toast.success('Usuario quitado');
+      fetchUsuariosHoja(selectedHoja.id);
+    } catch (error) {
+      handleApiError(error, 'Error al quitar usuario');
+    }
+  };
+
+  const getUsuariosDisponibles = () => {
+    const asignadosKey = new Set(usuariosAsignados.map(u => `${u.usuario_id}_${u.usuario_tipo}`));
+    return usuariosDisponibles.filter(u => !asignadosKey.has(`${u.id}_${u.tipo}`));
   };
 
   const getValor = (fila, key) => {
@@ -343,6 +408,25 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
           </div>
         </div>
 
+        <div className="eg-usuarios-panel">
+          <div className="eg-usuarios-header">
+            <h3>Usuarios con acceso</h3>
+            <button className="btn btn-outline btn-small" onClick={() => { setSelectedAsignar(new Set()); setShowAsignarUsuarios(true); }}>+ Asignar</button>
+          </div>
+          {usuariosAsignados.length === 0 ? (
+            <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>Sin usuarios asignados</p>
+          ) : (
+            <div className="eg-usuarios-tags">
+              {usuariosAsignados.map(u => (
+                <span key={u.asignacion_id} className="eg-usuario-tag">
+                  {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
+                  <button className="tag-remove" onClick={() => handleQuitarUsuario(u)}>×</button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="eg-navegador">
           <span className="eg-navegador-label">Hojas:</span>
           <div className="eg-navegador-lista">
@@ -358,6 +442,69 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
           </div>
         </div>
       </div>
+
+      {showAsignarUsuarios && (
+        <div className="form-modal" onClick={() => setShowAsignarUsuarios(false)}>
+          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            <div className="form-header">
+              <h2>Asignar usuarios a: {nombreHoja(selectedHoja)}</h2>
+              <button className="close-btn" onClick={() => setShowAsignarUsuarios(false)}>×</button>
+            </div>
+            <div className="asignar-modal-body">
+              <div className="asignar-columnas">
+                <div className="asignar-seccion">
+                  <h4>Directivos</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponibles().filter(u => u.tipo === 'directivo').length === 0 ? (
+                      <p className="text-muted">No hay directivos disponibles</p>
+                    ) : (
+                      getUsuariosDisponibles().filter(u => u.tipo === 'directivo').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedAsignar.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Directivo</span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+                <div className="asignar-divider-vertical"></div>
+                <div className="asignar-seccion">
+                  <h4>Personal</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponibles().filter(u => u.tipo === 'personal').length === 0 ? (
+                      <p className="text-muted">No hay personal disponible</p>
+                    ) : (
+                      getUsuariosDisponibles().filter(u => u.tipo === 'personal').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedAsignar.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Personal</span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="asignar-footer">
+                <span className="asignar-seleccionados">{selectedAsignar.size} seleccionado(s)</span>
+                <div className="asignar-footer-actions">
+                  <button className="btn btn-secondary" onClick={() => setShowAsignarUsuarios(false)}>Cancelar</button>
+                  <button className="btn btn-primary" onClick={handleConfirmarAsignacion} disabled={selectedAsignar.size === 0}>
+                    Confirmar asignación
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     );
   }
 
