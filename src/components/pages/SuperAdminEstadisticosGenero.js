@@ -19,6 +19,8 @@ const COLUMNAS_FIJAS = [
 
 const parseNum = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
+const round2 = (v) => { const n = parseFloat(v); return isNaN(n) ? v : n.toFixed(2); };
+
 const computeTotals = (valores) => {
   const next = { ...valores };
   const h = parseNum(next.cant_hombres);
@@ -270,15 +272,18 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
+  const CAMPOS_DECIMALES = new Set(['aprov_hombres', 'aprov_mujeres', 'aprov_total']);
+
   const saveCelda = useCallback(async () => {
     if (!editingCelda) return;
     const { filaId, key } = editingCelda;
     try {
       const updated = {};
-      updated[key] = editValue;
       const filaActual = filas.find(f => f.id === filaId);
       const valsActual = filaActual ? (typeof filaActual.valores === 'string' ? JSON.parse(filaActual.valores) : (filaActual.valores || {})) : {};
-      const conTotales = computeTotals({ ...valsActual, [key]: editValue });
+      const valorFinal = CAMPOS_DECIMALES.has(key) ? round2(editValue) : editValue;
+      updated[key] = valorFinal;
+      const conTotales = computeTotals({ ...valsActual, [key]: valorFinal });
       for (const k of ['cant_total', 'aprov_total']) {
         if (conTotales[k] !== (valsActual[k] ?? '')) {
           updated[k] = conTotales[k];
