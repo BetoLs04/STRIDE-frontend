@@ -135,6 +135,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const handleSelectHoja = (hoja) => {
     setSelectedHoja(hoja);
     fetchFilas(hoja.id);
+    fetchHojas(selectedAnio);
   };
 
   const fetchFilas = async (hojaId) => {
