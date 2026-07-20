@@ -53,8 +53,9 @@ const COLUMNAS_POR_TIPO = {
   ]
 };
 
-const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 const getInfoTipo = (tipo) => TIPOS_SECCION.find(t => t.value === tipo) || { label: tipo, color: 'gray' };
+
+const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
 const EstadisticosDocentesPage = ({ user }) => {
   const [misHojas, setMisHojas] = useState([]);
@@ -62,6 +63,10 @@ const EstadisticosDocentesPage = ({ user }) => {
   const [selectedAnio, setSelectedAnio] = useState(null);
   const [selectedHoja, setSelectedHoja] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [carreras, setCarreras] = useState([]);
+  const [carrerasLoading, setCarrerasLoading] = useState(false);
+  const [selectedCarrera, setSelectedCarrera] = useState(null);
 
   const [secciones, setSecciones] = useState([]);
   const [filasPorSeccion, setFilasPorSeccion] = useState({});
@@ -76,44 +81,41 @@ const EstadisticosDocentesPage = ({ user }) => {
 
   const fetchMisHojas = async () => {
     setLoading(true);
-    try {
-      const r = await api.get(`/api/university/estadisticos-docentes-mis-hojas?usuario_id=${user.id}&usuario_tipo=${user.tipo}`);
-      const h = r.data.data || [];
-      setMisHojas(h);
-      const anios = [...new Set(h.map(x => x.anio).filter(Boolean))].sort((a, b) => b - a);
-      setAniosDisponibles(anios);
-      if (anios.length > 0) setSelectedAnio(anios[0]);
-    } catch (e) { handleApiError(e, 'Error al cargar'); } finally { setLoading(false); }
+    try { const r = await api.get(`/api/university/estadisticos-docentes-mis-hojas?usuario_id=${user.id}&usuario_tipo=${user.tipo}`); const h = r.data.data || []; setMisHojas(h); const anios = [...new Set(h.map(x => x.anio).filter(Boolean))].sort((a, b) => b - a); setAniosDisponibles(anios); if (anios.length > 0) setSelectedAnio(anios[0]); }
+    catch (e) { handleApiError(e, 'Error'); } finally { setLoading(false); }
   };
 
-  const cargarSecciones = async (hojaId) => {
+  const handleSelectHoja = async (hoja) => {
+    setSelectedHoja(hoja); setSelectedCarrera(null); setEditingCelda(null);
+    fetchCarreras(hoja.id);
+    api.get('/api/university/estadisticos-docentes-notas').then(r => setGlobalNotas(r.data.data?.contenido || '')).catch(() => {});
+  };
+
+  const fetchCarreras = async (hojaId) => {
+    setCarrerasLoading(true);
+    try { const r = await api.get(`/api/university/estadisticos-docentes-carreras?hoja_id=${hojaId}`); setCarreras(r.data.data || []); }
+    catch (e) { handleApiError(e, 'Error'); } finally { setCarrerasLoading(false); }
+  };
+
+  const handleSelectCarrera = async (carrera) => {
+    setSelectedCarrera(carrera); setEditingCelda(null);
+    await cargarSecciones(carrera.id);
+  };
+
+  const cargarSecciones = async (carreraId) => {
     setSeccionesLoading(true);
     try {
-      const r = await api.get(`/api/university/estadisticos-docentes-secciones?hoja_id=${hojaId}`);
-      const secs = r.data.data || [];
-      setSecciones(secs);
+      const r = await api.get(`/api/university/estadisticos-docentes-secciones?carrera_id=${carreraId}`);
+      const secs = r.data.data || []; setSecciones(secs);
       const fm = {};
-      for (const sec of secs) {
-        const fr = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
-        fm[sec.id] = fr.data.data || [];
-      }
+      for (const sec of secs) { const fr = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`); fm[sec.id] = fr.data.data || []; }
       setFilasPorSeccion(fm);
-    } catch (e) { handleApiError(e, 'Error al cargar'); } finally { setSeccionesLoading(false); }
-  };
-
-  const handleSelectHoja = (hoja) => {
-    setSelectedHoja(hoja); setEditingCelda(null); cargarSecciones(hoja.id);
-    api.get('/api/university/estadisticos-docentes-notas').then(r => setGlobalNotas(r.data.data?.contenido || '')).catch(() => {});
+    } catch (e) { handleApiError(e, 'Error'); } finally { setSeccionesLoading(false); }
   };
 
   const getValor = (fila, key) => { try { const v = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {}); return v[key] ?? ''; } catch { return ''; } };
 
-  const startEditCelda = (fila, key, val) => {
-    if (fila.nombre_fila === 'Total Acumulado') return;
-    setEditingCelda({ filaId: fila.id, key });
-    setEditValue(val);
-    setTimeout(() => inputRef.current?.focus(), 0);
-  };
+  const startEditCelda = (fila, key, val) => { if (fila.nombre_fila === 'Total Acumulado') return; setEditingCelda({ filaId: fila.id, key }); setEditValue(val); setTimeout(() => inputRef.current?.focus(), 0); };
 
   const saveCelda = useCallback(async () => {
     if (!editingCelda) return;
@@ -123,57 +125,40 @@ const EstadisticosDocentesPage = ({ user }) => {
       setFilasPorSeccion(prev => {
         const next = { ...prev };
         for (const sid of Object.keys(next)) {
-          next[sid] = next[sid].map(f => {
-            if (f.id !== filaId) return f;
-            const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            vals[key] = editValue;
-            return { ...f, valores: vals };
-          });
+          next[sid] = next[sid].map(f => { if (f.id !== filaId) return f; const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {}); vals[key] = editValue; return { ...f, valores: vals }; });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
           const asig = next[sid].find(f => f.nombre_fila === 'Asignatura');
           const total = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
           if (ptc && asig && total) {
             const pv = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
             const av = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
-            const tv = {};
-            const ks = [...new Set([...Object.keys(pv), ...Object.keys(av)])];
+            const tv = {}; const ks = [...new Set([...Object.keys(pv), ...Object.keys(av)])];
             for (const k of ks) tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
-            next[sid] = next[sid].map(f => {
-              if (f.nombre_fila !== 'Total Acumulado') return f;
-              const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-              for (const [k, v] of Object.entries(tv)) vals[k] = v;
-              return { ...f, valores: vals };
-            });
+            next[sid] = next[sid].map(f => { if (f.nombre_fila !== 'Total Acumulado') return f; const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {}); for (const [k, v] of Object.entries(tv)) vals[k] = v; return { ...f, valores: vals }; });
             const tf = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
             if (tf) for (const [k, v] of Object.entries(tv)) api.patch(`/api/university/estadisticos-docentes-filas/${tf.id}/celda`, { key: k, value: v }).catch(() => {});
           }
         }
         return next;
       });
-    } catch (e) { handleApiError(e, 'Error al guardar'); }
-    setEditingCelda(null);
-    setEditValue('');
+    } catch (e) { handleApiError(e, 'Error'); }
+    setEditingCelda(null); setEditValue('');
   }, [editingCelda, editValue]);
 
-  const handleCeldaKeyDown = (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); saveCelda(); }
-    if (e.key === 'Escape') { setEditingCelda(null); setEditValue(''); }
-    if (e.key === 'Tab') { e.preventDefault(); saveCelda(); }
-  };
+  const handleCeldaKeyDown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveCelda(); } if (e.key === 'Escape') { setEditingCelda(null); setEditValue(''); } if (e.key === 'Tab') { e.preventDefault(); saveCelda(); } };
 
   const hojasFiltradas = misHojas.filter(h => !selectedAnio || h.anio === selectedAnio);
 
-  if (selectedHoja) {
+  if (selectedCarrera) {
     return (
       <div className="edp-container">
         <div className="edp-header">
-          <button className="btn btn-secondary" onClick={() => { setSelectedHoja(null); setSecciones([]); setEditingCelda(null); }}>← Volver</button>
-          <div><h2>Datos Estadísticos - Docentes</h2><p className="text-muted">{selectedHoja.cuatrimestre} - {selectedHoja.anio}</p></div>
+          <button className="btn btn-secondary" onClick={() => { setSelectedCarrera(null); setSecciones([]); setEditingCelda(null); }}>← Volver</button>
+          <div><h2>{selectedCarrera.nombre}</h2><p className="text-muted">{selectedHoja.cuatrimestre} - {selectedHoja.anio}</p></div>
         </div>
         {seccionesLoading ? <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>
           : <div className="edp-secciones">{secciones.map(sec => {
-            const info = getInfoTipo(sec.tipo);
-            const cols = COLUMNAS_POR_TIPO[sec.tipo] || [];
+            const info = getInfoTipo(sec.tipo); const cols = COLUMNAS_POR_TIPO[sec.tipo] || [];
             const filas = filasPorSeccion[sec.id] || [];
             const total = filas.find(f => f.nombre_fila === 'Total Acumulado');
             const ptc = filas.find(f => f.nombre_fila === 'PTC');
@@ -197,12 +182,10 @@ const EstadisticosDocentesPage = ({ user }) => {
                             const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
                             const val = getValor(fila, key);
                             if (esTotal) return <td key={ck} className="edp-readonly">{val || ''}</td>;
-                            return (
-                              <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
-                                {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
-                                  : <span>{val || ''}</span>}
-                              </td>
-                            );
+                            return <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
+                              {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
+                                : <span>{val || ''}</span>}
+                            </td>;
                           }))}
                         </tr>
                       );
@@ -213,17 +196,32 @@ const EstadisticosDocentesPage = ({ user }) => {
             );
           })}</div>}
         {globalNotas && <div className="edp-notas"><p>{globalNotas}</p></div>}
-        <div className="edp-nav">{hojasFiltradas.map(hoja => (
-          <button key={hoja.id} className={`edp-nav-btn ${selectedHoja.id === hoja.id ? 'active' : ''}`} onClick={() => handleSelectHoja(hoja)}>
-            {hoja.cuatrimestre || 'Sin nombre'}</button>
-        ))}</div>
+      </div>
+    );
+  }
+
+  if (selectedHoja) {
+    return (
+      <div className="edp-container">
+        <div className="edp-header">
+          <button className="btn btn-secondary" onClick={() => { setSelectedHoja(null); setCarreras([]); }}>← Volver</button>
+          <div><h2>{selectedHoja.cuatrimestre} - {selectedHoja.anio}</h2><p className="text-muted">Carreras</p></div>
+        </div>
+        {carrerasLoading ? <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>
+          : carreras.length === 0 ? <p className="text-muted" style={{ padding: '3rem', textAlign: 'center' }}>Sin carreras disponibles.</p>
+            : <div className="edp-hojas">{carreras.map(c => (
+              <div key={c.id} className="edp-hoja-card" onClick={() => handleSelectCarrera(c)}>
+                <h3>{c.nombre || 'Sin nombre'}</h3>
+              </div>
+            ))}</div>}
+        {globalNotas && <div className="edp-notas" style={{ marginTop: '1.5rem' }}><p>{globalNotas}</p></div>}
       </div>
     );
   }
 
   return (
     <div className="edp-container">
-      <div className="edp-header"><h2>Datos Estadísticos - Docentes</h2><p className="text-muted">Selecciona un año y una hoja.</p></div>
+      <div className="edp-header"><h2>Datos Estadísticos - Docentes</h2><p className="text-muted">Selecciona un año y un cuatrimestre.</p></div>
       {loading ? <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>
         : misHojas.length === 0 ? <p className="text-muted" style={{ padding: '3rem', textAlign: 'center' }}>No tienes hojas asignadas.</p>
           : <><div className="edp-anios">{aniosDisponibles.map(anio => (

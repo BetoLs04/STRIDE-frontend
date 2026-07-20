@@ -56,12 +56,6 @@ const COLUMNAS_POR_TIPO = {
   ]
 };
 
-const NOMBRES_FILA = ['Total Acumulado', 'PTC', 'Asignatura'];
-
-const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
-
-const sumarFilas = (filas, key) => filas.reduce((s, f) => s + parseNum(f.valores?.[key]), 0);
-
 const getInfoTipo = (tipo) => TIPOS_SECCION.find(t => t.value === tipo) || { label: tipo, color: 'gray' };
 
 const SuperAdminEstadisticosDocentes = ({ onClose }) => {
@@ -70,11 +64,6 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const [selectedAnio, setSelectedAnio] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [globalNotas, setGlobalNotas] = useState('');
-  const [globalNotasLoading, setGlobalNotasLoading] = useState(false);
-  const [globalNotasSaving, setGlobalNotasSaving] = useState(false);
-  const [editingNotas, setEditingNotas] = useState(false);
-
   const [showFormHoja, setShowFormHoja] = useState(false);
   const [editHojaId, setEditHojaId] = useState(null);
   const [formCuatrimestre, setFormCuatrimestre] = useState('');
@@ -82,10 +71,27 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const [savingHoja, setSavingHoja] = useState(false);
 
   const [selectedHoja, setSelectedHoja] = useState(null);
+  const [carreras, setCarreras] = useState([]);
+  const [carrerasLoading, setCarrerasLoading] = useState(false);
+
+  const [showFormCarrera, setShowFormCarrera] = useState(false);
+  const [editCarreraId, setEditCarreraId] = useState(null);
+  const [formCarreraNombre, setFormCarreraNombre] = useState('');
+  const [savingCarrera, setSavingCarrera] = useState(false);
+
+  const [selectedCarrera, setSelectedCarrera] = useState(null);
+  const [showConcentrado, setShowConcentrado] = useState(false);
+  const [concentradoData, setConcentradoData] = useState(null);
+  const [concentradoLoading, setConcentradoLoading] = useState(false);
 
   const [secciones, setSecciones] = useState([]);
   const [filasPorSeccion, setFilasPorSeccion] = useState({});
   const [seccionesLoading, setSeccionesLoading] = useState(false);
+
+  const [globalNotas, setGlobalNotas] = useState('');
+  const [globalNotasLoading, setGlobalNotasLoading] = useState(false);
+  const [globalNotasSaving, setGlobalNotasSaving] = useState(false);
+  const [editingNotas, setEditingNotas] = useState(false);
 
   const [usuariosAsignados, setUsuariosAsignados] = useState([]);
   const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
@@ -97,127 +103,136 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const inputRef = useRef(null);
 
   useEffect(() => { fetchAnios(); fetchHojas(); fetchGlobalNotas(); }, []);
-
   const refreshRef = useRef();
   useSocketEvent('estadisticos-docentes:updated', () => refreshRef.current?.());
-  const fetchGlobalNotas = async () => {
-    setGlobalNotasLoading(true);
-    try { const r = await api.get('/api/university/estadisticos-docentes-notas'); setGlobalNotas(r.data.data?.contenido || ''); }
-    catch (e) { console.warn(e.message); } finally { setGlobalNotasLoading(false); }
-  };
-
-  const handleSaveGlobalNotas = async () => {
-    setGlobalNotasSaving(true);
-    try { await api.put('/api/university/estadisticos-docentes-notas', { contenido: globalNotas }); toast.success('Notas guardadas'); setEditingNotas(false); }
-    catch (e) { handleApiError(e, 'Error al guardar notas'); } finally { setGlobalNotasSaving(false); }
-  };
-
   useEffect(() => { refreshRef.current = () => { fetchHojas(selectedAnio); fetchAnios(); }; });
 
-  const fetchAnios = async () => {
-    try { const r = await api.get('/api/university/estadisticos-docentes-hojas-anios'); setAniosDisponibles(r.data.data || []); }
-    catch (e) { console.warn(e.message); }
-  };
+  const fetchAnios = async () => { try { const r = await api.get('/api/university/estadisticos-docentes-hojas-anios'); setAniosDisponibles(r.data.data || []); } catch (e) { console.warn(e.message); } };
+  const fetchHojas = async (anio) => { setLoading(true); try { const p = anio ? `?anio=${encodeURIComponent(anio)}` : ''; const r = await api.get(`/api/university/estadisticos-docentes-hojas${p}`); setHojas(r.data.data || []); } catch (e) { handleApiError(e, 'Error'); } finally { setLoading(false); } };
+  const fetchGlobalNotas = async () => { setGlobalNotasLoading(true); try { const r = await api.get('/api/university/estadisticos-docentes-notas'); setGlobalNotas(r.data.data?.contenido || ''); } catch (e) { console.warn(e.message); } finally { setGlobalNotasLoading(false); } };
 
-  const fetchHojas = async (anio) => {
-    setLoading(true);
-    try { const p = anio ? `?anio=${encodeURIComponent(anio)}` : ''; const r = await api.get(`/api/university/estadisticos-docentes-hojas${p}`); setHojas(r.data.data || []); }
-    catch (e) { handleApiError(e, 'Error al cargar hojas'); } finally { setLoading(false); }
-  };
-
-  const handleSelectAnio = (anio) => { setSelectedAnio(anio); setSelectedHoja(null); fetchHojas(anio); };
-
+  const handleSelectAnio = (anio) => { setSelectedAnio(anio); setSelectedHoja(null); setSelectedCarrera(null); fetchHojas(anio); };
   const handleOpenNewHoja = () => { setEditHojaId(null); setFormCuatrimestre(''); setFormAnio(selectedAnio || ''); setShowFormHoja(true); };
   const handleOpenEditHoja = (hoja) => { setEditHojaId(hoja.id); setFormCuatrimestre(hoja.cuatrimestre || ''); setFormAnio(hoja.anio || ''); setShowFormHoja(true); };
 
   const handleSaveHoja = async (e) => {
     e.preventDefault(); setSavingHoja(true);
-    try {
-      if (editHojaId) { await api.put(`/api/university/estadisticos-docentes-hojas/${editHojaId}`, { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim() }); toast.success('Hoja actualizada'); }
-      else { await api.post('/api/university/estadisticos-docentes-hojas', { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim() }); toast.success('Hoja creada'); }
-      setShowFormHoja(false); setEditHojaId(null); fetchHojas(selectedAnio); fetchAnios();
-    } catch (e) { handleApiError(e, 'Error al guardar hoja'); } finally { setSavingHoja(false); }
+    try { if (editHojaId) { await api.put(`/api/university/estadisticos-docentes-hojas/${editHojaId}`, { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim() }); toast.success('Hoja actualizada'); } else { await api.post('/api/university/estadisticos-docentes-hojas', { cuatrimestre: formCuatrimestre.trim(), anio: formAnio.trim() }); toast.success('Hoja creada'); } setShowFormHoja(false); setEditHojaId(null); fetchHojas(selectedAnio); fetchAnios(); }
+    catch (e) { handleApiError(e, 'Error'); } finally { setSavingHoja(false); }
   };
 
   const handleDeleteHoja = async (hoja) => {
     const n = [hoja.cuatrimestre, hoja.anio].filter(Boolean).join(' - ') || 'Sin nombre';
-    if (!window.confirm(`¿Eliminar "${n}"?\nSe eliminarán secciones y filas.`)) return;
-    try { await api.delete(`/api/university/estadisticos-docentes-hojas/${hoja.id}`); toast.success('Hoja eliminada'); if (selectedHoja?.id === hoja.id) setSelectedHoja(null); fetchHojas(selectedAnio); fetchAnios(); }
-    catch (e) { handleApiError(e, 'Error al eliminar'); }
+    if (!window.confirm(`¿Eliminar "${n}"?`)) return;
+    try { await api.delete(`/api/university/estadisticos-docentes-hojas/${hoja.id}`); toast.success('Eliminada'); if (selectedHoja?.id === hoja.id) { setSelectedHoja(null); setSelectedCarrera(null); } fetchHojas(selectedAnio); fetchAnios(); }
+    catch (e) { handleApiError(e, 'Error'); }
   };
 
   const handleSelectHoja = async (hoja) => {
-    setSelectedHoja(hoja);
-    setEditingCelda(null);
+    setSelectedHoja(hoja); setSelectedCarrera(null); setEditingCelda(null);
     fetchHojas(selectedAnio);
-    fetchUsuariosHoja(hoja.id);
-    await cargarSecciones(hoja.id);
+    await fetchCarreras(hoja.id);
   };
 
-  const cargarSecciones = async (hojaId) => {
+  const fetchCarreras = async (hojaId) => {
+    setCarrerasLoading(true);
+    try { const r = await api.get(`/api/university/estadisticos-docentes-carreras?hoja_id=${hojaId}`); setCarreras(r.data.data || []); }
+    catch (e) { handleApiError(e, 'Error'); } finally { setCarrerasLoading(false); }
+  };
+
+  const cargarConcentrado = async (hojaId) => {
+    setConcentradoLoading(true);
+    try {
+      const r = await api.get(`/api/university/estadisticos-docentes-carreras?hoja_id=${hojaId}`);
+      const carreras = r.data.data || [];
+      const TIPOS = ['ultimo_grado', 'solo_utma', 'laboral', 'edad', 'investigadores'];
+      const NFS = ['Total Acumulado', 'PTC', 'Asignatura'];
+      const resultado = {};
+
+      for (const tipo of TIPOS) {
+        const allFilas = {};
+        for (const nf of NFS) allFilas[nf] = {};
+
+        for (const c of carreras) {
+          const sR = await api.get(`/api/university/estadisticos-docentes-secciones?carrera_id=${c.id}`);
+          const secciones = sR.data.data || [];
+          const sec = secciones.find(s => s.tipo === tipo);
+          if (!sec) continue;
+          const fR = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
+          const filas = fR.data.data || [];
+          for (const nf of NFS) {
+            const fila = filas.find(f => f.nombre_fila === nf);
+            if (!fila) continue;
+            const vals = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
+            for (const [key, val] of Object.entries(vals)) {
+              if (!allFilas[nf][key]) allFilas[nf][key] = 0;
+              allFilas[nf][key] += parseFloat(val) || 0;
+            }
+          }
+        }
+
+        resultado[tipo] = {};
+        for (const nf of NFS) {
+          const vals = {};
+          for (const [key, sum] of Object.entries(allFilas[nf])) {
+            vals[key] = String(sum);
+          }
+          resultado[tipo][nf] = vals;
+        }
+      }
+      setConcentradoData(resultado);
+      setShowConcentrado(true);
+    } catch (e) { handleApiError(e, 'Error al cargar concentrado'); }
+    finally { setConcentradoLoading(false); }
+  };
+
+  const handleOpenNewCarrera = () => { setEditCarreraId(null); setFormCarreraNombre(''); setShowFormCarrera(true); };
+  const handleOpenEditCarrera = (c) => { setEditCarreraId(c.id); setFormCarreraNombre(c.nombre || ''); setShowFormCarrera(true); };
+
+  const handleSaveCarrera = async (e) => {
+    e.preventDefault(); setSavingCarrera(true);
+    try { if (editCarreraId) { await api.put(`/api/university/estadisticos-docentes-carreras/${editCarreraId}`, { nombre: formCarreraNombre.trim() }); toast.success('Carrera actualizada'); } else { await api.post('/api/university/estadisticos-docentes-carreras', { hoja_id: selectedHoja.id, nombre: formCarreraNombre.trim() }); toast.success('Carrera creada'); } setShowFormCarrera(false); setEditCarreraId(null); fetchCarreras(selectedHoja.id); }
+    catch (e) { handleApiError(e, 'Error'); } finally { setSavingCarrera(false); }
+  };
+
+  const handleDeleteCarrera = async (c) => {
+    if (!window.confirm(`¿Eliminar "${c.nombre}"?\nSe eliminarán sus datos.`)) return;
+    try { await api.delete(`/api/university/estadisticos-docentes-carreras/${c.id}`); toast.success('Carrera eliminada'); if (selectedCarrera?.id === c.id) setSelectedCarrera(null); fetchCarreras(selectedHoja.id); }
+    catch (e) { handleApiError(e, 'Error'); }
+  };
+
+  const handleSelectCarrera = async (carrera) => {
+    setSelectedCarrera(carrera); setEditingCelda(null);
+    await cargarSecciones(carrera.id);
+    fetchUsuariosCarrera(carrera.id);
+  };
+
+  const cargarSecciones = async (carreraId) => {
     setSeccionesLoading(true);
     try {
-      const r = await api.get(`/api/university/estadisticos-docentes-secciones?hoja_id=${hojaId}`);
-      let secs = r.data.data || [];
-      if (secs.length === 0) {
-        for (const t of TIPOS_SECCION) {
-          await api.post('/api/university/estadisticos-docentes-secciones', { hoja_id: hojaId, nombre: t.label, tipo: t.value });
-        }
-        const r2 = await api.get(`/api/university/estadisticos-docentes-secciones?hoja_id=${hojaId}`);
-        secs = r2.data.data || [];
-      }
+      const r = await api.get(`/api/university/estadisticos-docentes-secciones?carrera_id=${carreraId}`);
+      const secs = r.data.data || [];
       setSecciones(secs);
-      const filasMap = {};
+      const fm = {};
       for (const sec of secs) {
-        const fRes = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
-        let filas = fRes.data.data || [];
-        if (filas.length === 0) {
-          for (const nf of NOMBRES_FILA) {
-            await api.post('/api/university/estadisticos-docentes-filas', { seccion_id: sec.id, nombre_fila: nf, valores: {} });
-          }
-          const fRes2 = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
-          filas = fRes2.data.data || [];
-        }
-        filasMap[sec.id] = filas;
+        const fr = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
+        fm[sec.id] = fr.data.data || [];
       }
-      setFilasPorSeccion(filasMap);
-    } catch (e) { handleApiError(e, 'Error al cargar secciones'); } finally { setSeccionesLoading(false); }
+      setFilasPorSeccion(fm);
+    } catch (e) { handleApiError(e, 'Error'); } finally { setSeccionesLoading(false); }
   };
 
-  const fetchUsuariosHoja = async (hojaId) => {
-    try { const [a, d] = await Promise.all([api.get(`/api/university/estadisticos-docentes-hojas/${hojaId}/usuarios`), api.get('/api/university/estadisticos-docentes-usuarios-disponibles')]); setUsuariosAsignados(a.data.data || []); setUsuariosDisponibles(d.data.data || []); }
-    catch (e) { handleApiError(e, 'Error al cargar usuarios'); }
-  };
+  const fetchUsuariosCarrera = async (carreraId) => { try { const [a, d] = await Promise.all([api.get(`/api/university/estadisticos-docentes-carreras/${carreraId}/usuarios`), api.get('/api/university/estadisticos-docentes-usuarios-disponibles')]); setUsuariosAsignados(a.data.data || []); setUsuariosDisponibles(d.data.data || []); } catch (e) { handleApiError(e, 'Error'); } };
 
-  const toggleAsignarUsuario = (u) => {
-    const k = `${u.id}_${u.tipo}`;
-    setSelectedAsignar(p => { const n = new Set(p); if (n.has(k)) n.delete(k); else n.add(k); return n; });
-  };
-
-  const handleConfirmarAsignacion = async () => {
-    if (selectedAsignar.size === 0) { toast.error('Selecciona al menos un usuario'); return; }
-    try { for (const k of selectedAsignar) { const [id, tipo] = k.split('_'); await api.post('/api/university/estadisticos-docentes-usuarios', { hoja_id: selectedHoja.id, usuario_id: parseInt(id), usuario_tipo: tipo }); } toast.success(`${selectedAsignar.size} usuario(s) asignado(s)`); setShowAsignarUsuarios(false); setSelectedAsignar(new Set()); fetchUsuariosHoja(selectedHoja.id); }
-    catch (e) { handleApiError(e, 'Error al asignar'); }
-  };
-
-  const handleQuitarUsuario = async (a) => {
-    if (!window.confirm('¿Quitar este usuario de la hoja?')) return;
-    try { await api.delete(`/api/university/estadisticos-docentes-usuarios/${a.asignacion_id}`); toast.success('Usuario quitado'); fetchUsuariosHoja(selectedHoja.id); }
-    catch (e) { handleApiError(e, 'Error al quitar'); }
-  };
-
+  const toggleAsignarUsuario = (u) => { const k = `${u.id}_${u.tipo}`; setSelectedAsignar(p => { const n = new Set(p); if (n.has(k)) n.delete(k); else n.add(k); return n; }); };
+  const handleConfirmarAsignacion = async () => { if (selectedAsignar.size === 0) { toast.error('Selecciona al menos uno'); return; } try { for (const k of selectedAsignar) { const [id, tipo] = k.split('_'); await api.post('/api/university/estadisticos-docentes-usuarios', { carrera_id: selectedCarrera.id, usuario_id: parseInt(id), usuario_tipo: tipo }); } toast.success(`${selectedAsignar.size} asignado(s)`); setShowAsignarUsuarios(false); setSelectedAsignar(new Set()); fetchUsuariosCarrera(selectedCarrera.id); } catch (e) { handleApiError(e, 'Error'); } };
+  const handleQuitarUsuario = async (a) => { if (!window.confirm('¿Quitar usuario?')) return; try { await api.delete(`/api/university/estadisticos-docentes-usuarios/${a.asignacion_id}`); toast.success('Quitado'); fetchUsuariosCarrera(selectedCarrera.id); } catch (e) { handleApiError(e, 'Error'); } };
   const getUsuariosDisponibles = () => { const a = new Set(usuariosAsignados.map(u => `${u.usuario_id}_${u.usuario_tipo}`)); return usuariosDisponibles.filter(u => !a.has(`${u.id}_${u.tipo}`)); };
 
   const getValor = (fila, key) => { try { const v = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {}); return v[key] ?? ''; } catch { return ''; } };
+  const startEditCelda = (fila, key, val) => { if (fila.nombre_fila === 'Total Acumulado') return; setEditingCelda({ filaId: fila.id, key }); setEditValue(val); setTimeout(() => inputRef.current?.focus(), 0); };
 
-  const CAMPOS_EDITABLES = new Set(['ptc', 'asignatura']);
-
-  const startEditCelda = (fila, key, currentValue) => {
-    if (fila.nombre_fila === 'Total Acumulado') return;
-    setEditingCelda({ filaId: fila.id, key, filaNombre: fila.nombre_fila });
-    setEditValue(currentValue);
-    setTimeout(() => inputRef.current?.focus(), 0);
-  };
+  const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
   const saveCelda = useCallback(async () => {
     if (!editingCelda) return;
@@ -226,154 +241,93 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
       await api.patch(`/api/university/estadisticos-docentes-filas/${filaId}/celda`, { key, value: editValue });
       setFilasPorSeccion(prev => {
         const next = { ...prev };
-        for (const secId of Object.keys(next)) {
-          next[secId] = next[secId].map(f => {
+        for (const sid of Object.keys(next)) {
+          next[sid] = next[sid].map(f => {
             if (f.id !== filaId) return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            vals[key] = editValue;
-            const updatedFila = { ...f, valores: vals };
-            return updatedFila;
+            vals[key] = editValue; return { ...f, valores: vals };
           });
-          const filas = next[secId];
-          const ptc = filas.find(f => f.nombre_fila === 'PTC');
-          const asig = filas.find(f => f.nombre_fila === 'Asignatura');
-          const total = filas.find(f => f.nombre_fila === 'Total Acumulado');
+          const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
+          const asig = next[sid].find(f => f.nombre_fila === 'Asignatura');
+          const total = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
           if (ptc && asig && total) {
-            const ptcVals = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
-            const asigVals = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
-            const totalVals = {};
-            const allKeys = [...new Set([...Object.keys(ptcVals), ...Object.keys(asigVals)])];
-            for (const k of allKeys) {
-              totalVals[k] = String(parseNum(ptcVals[k]) + parseNum(asigVals[k]));
-            }
-            next[secId] = next[secId].map(f => {
-              if (f.nombre_fila === 'Total Acumulado') {
-                const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-                for (const [k, v] of Object.entries(totalVals)) vals[k] = v;
-                return { ...f, valores: vals };
-              }
-              return f;
+            const pv = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
+            const av = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
+            const tv = {}; const ks = [...new Set([...Object.keys(pv), ...Object.keys(av)])];
+            for (const k of ks) tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
+            next[sid] = next[sid].map(f => {
+              if (f.nombre_fila !== 'Total Acumulado') return f;
+              const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
+              for (const [k, v] of Object.entries(tv)) vals[k] = v;
+              return { ...f, valores: vals };
             });
-            const totalFila = next[secId].find(f => f.nombre_fila === 'Total Acumulado');
-            if (totalFila) {
-              const vals = typeof totalFila.valores === 'string' ? JSON.parse(totalFila.valores) : (totalFila.valores || {});
-              for (const [k, v] of Object.entries(totalVals)) {
-                api.patch(`/api/university/estadisticos-docentes-filas/${totalFila.id}/celda`, { key: k, value: v }).catch(() => {});
-              }
-            }
+            const tf = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
+            if (tf) for (const [k, v] of Object.entries(tv)) api.patch(`/api/university/estadisticos-docentes-filas/${tf.id}/celda`, { key: k, value: v }).catch(() => {});
           }
         }
         return next;
       });
     } catch (e) { handleApiError(e, 'Error al guardar'); }
-    setEditingCelda(null);
-    setEditValue('');
+    setEditingCelda(null); setEditValue('');
   }, [editingCelda, editValue]);
 
-  const handleCeldaKeyDown = (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); saveCelda(); }
-    if (e.key === 'Escape') { setEditingCelda(null); setEditValue(''); }
-    if (e.key === 'Tab') { e.preventDefault(); saveCelda(); }
-  };
+  const handleCeldaKeyDown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveCelda(); } if (e.key === 'Escape') { setEditingCelda(null); setEditValue(''); } if (e.key === 'Tab') { e.preventDefault(); saveCelda(); } };
 
   const nombreHoja = (hoja) => [hoja.cuatrimestre, hoja.anio].filter(Boolean).join(' - ');
 
-  if (selectedHoja) {
+  // === CARRERA VIEW ===
+  if (selectedCarrera) {
     return (
       <div className="tab-content estadisticos-docentes">
         <div className="tab-header">
-          <div><h2>Datos Estadísticos - Docentes</h2><p className="text-muted" style={{ margin: 0 }}>{nombreHoja(selectedHoja)}</p></div>
-          <div className="tab-actions"><button className="btn btn-secondary" onClick={() => setSelectedHoja(null)}>← Volver</button></div>
+          <div><h2>Datos Estadísticos - Docentes</h2><p className="text-muted" style={{ margin: 0 }}>{selectedCarrera.nombre} — {nombreHoja(selectedHoja)}</p></div>
+          <div className="tab-actions"><button className="btn btn-secondary" onClick={() => setSelectedCarrera(null)}>← Volver a carreras</button></div>
         </div>
-
-        {seccionesLoading ? (
-          <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando secciones...</div>
-        ) : (
-          <div className="ed-secciones-wrap">
-            {secciones.map(sec => {
-              const info = getInfoTipo(sec.tipo);
-              const columnas = COLUMNAS_POR_TIPO[sec.tipo] || [];
-              const filas = filasPorSeccion[sec.id] || [];
-              const ptc = filas.find(f => f.nombre_fila === 'PTC');
-              const asig = filas.find(f => f.nombre_fila === 'Asignatura');
-              const total = filas.find(f => f.nombre_fila === 'Total Acumulado');
-              return (
-                <div key={sec.id} className={`ed-panel ed-panel-${info.color}`}>
-                  <h2>{sec.nombre}</h2>
-                  <table className="ed-tabla">
-                    <thead>
-                      <tr>
-                        <th></th>
-                        {columnas.map(col => <th key={col.keys[0]} colSpan={2}>{col.label}</th>)}
-                      </tr>
-                      <tr>
-                        <th></th>
-                        {columnas.map(col => <React.Fragment key={col.keys[0]}><th>H</th><th>M</th></React.Fragment>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[total, ptc, asig].filter(Boolean).map(fila => {
-                        const esTotal = fila.nombre_fila === 'Total Acumulado';
-                        return (
-                          <tr key={fila.id} className={esTotal ? 'ed-total-row' : ''}>
-                            <td className="ed-rowlabel">{fila.nombre_fila}</td>
-                            {columnas.map(col => col.keys.map(key => {
-                              const cellKey = `${fila.id}_${key}`;
-                              const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
-                              const val = getValor(fila, key);
-                              if (esTotal) return <td key={cellKey} className="ed-celda-readonly">{val || ''}</td>;
-                              return (
-                                <td key={cellKey} className="ed-celda-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
-                                  {isEditing ? (
-                                    <input ref={inputRef} type="number" value={editValue}
-                                      onChange={e => setEditValue(e.target.value)}
-                                      onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="ed-input" />
-                                  ) : <span>{val || ''}</span>}
-                                </td>
-                              );
-                            }))}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {globalNotas && (
-          <div className="ed-notas">
-            <p>{globalNotas}</p>
-          </div>
-        )}
-
-        <div className="ed-notas-editor" style={{ marginTop: '2rem' }}>
-          <div className="ed-usuarios-header">
-            <h3>Notas generales</h3>
-            <button className="btn btn-outline btn-small" onClick={() => setEditingNotas(!editingNotas)}>
-              {editingNotas ? 'Cancelar' : 'Editar'}
-            </button>
-          </div>
-          {globalNotasLoading ? <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
-            : editingNotas ? (
-              <div style={{ padding: '1rem 1.25rem' }}>
-                <textarea className="ed-notas-textarea" value={globalNotas} onChange={e => setGlobalNotas(e.target.value)} rows={4} />
-                <div className="form-actions" style={{ marginTop: '0.5rem' }}>
-                  <button className="btn btn-primary btn-small" onClick={handleSaveGlobalNotas} disabled={globalNotasSaving}>
-                    {globalNotasSaving ? 'Guardando...' : 'Guardar'}
-                  </button>
-                </div>
+        {seccionesLoading ? <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>
+          : <div className="ed-secciones-wrap">{secciones.map(sec => {
+            const info = getInfoTipo(sec.tipo);
+            const cols = COLUMNAS_POR_TIPO[sec.tipo] || [];
+            const filas = filasPorSeccion[sec.id] || [];
+            const total = filas.find(f => f.nombre_fila === 'Total Acumulado');
+            const ptc = filas.find(f => f.nombre_fila === 'PTC');
+            const asig = filas.find(f => f.nombre_fila === 'Asignatura');
+            return (
+              <div key={sec.id} className={`ed-panel ed-panel-${info.color}`}>
+                <h2>{sec.nombre}</h2>
+                <table className="ed-tabla">
+                  <thead>
+                    <tr><th></th>{cols.map(c => <th key={c.keys[0]} colSpan={2}>{c.label}</th>)}</tr>
+                    <tr><th></th>{cols.map(c => <React.Fragment key={c.keys[0]}><th>H</th><th>M</th></React.Fragment>)}</tr>
+                  </thead>
+                  <tbody>
+                    {[total, ptc, asig].filter(Boolean).map(fila => {
+                      const esTotal = fila.nombre_fila === 'Total Acumulado';
+                      return (
+                        <tr key={fila.id} className={esTotal ? 'ed-total-row' : ''}>
+                          <td className="ed-rowlabel">{fila.nombre_fila}</td>
+                          {cols.map(c => c.keys.map(key => {
+                            const ck = `${fila.id}_${key}`;
+                            const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
+                            const val = getValor(fila, key);
+                            if (esTotal) return <td key={ck} className="ed-celda-readonly">{val || ''}</td>;
+                            return <td key={ck} className="ed-celda-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
+                              {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="ed-input" />
+                                : <span>{val || ''}</span>}
+                            </td>;
+                          }))}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            ) : <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>{globalNotas || 'Sin notas'}</p>}
-        </div>
-
+            );
+          })}</div>}
         <div className="ed-usuarios-panel">
-          <div className="ed-usuarios-header"><h3>Usuarios con acceso a esta hoja</h3>
+          <div className="ed-usuarios-header"><h3>Usuarios con acceso</h3>
             <button className="btn btn-outline btn-small" onClick={() => { setSelectedAsignar(new Set()); setShowAsignarUsuarios(true); }}>+ Asignar</button>
           </div>
-          {usuariosAsignados.length === 0 ? <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>Sin usuarios asignados</p>
+          {usuariosAsignados.length === 0 ? <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>Sin usuarios</p>
             : <div className="ed-usuarios-tags">{usuariosAsignados.map(u => (
               <span key={u.asignacion_id} className="ed-usuario-tag">{u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
                 <button className="tag-remove" onClick={() => handleQuitarUsuario(u)}>×</button>
@@ -381,49 +335,39 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
             ))}</div>}
         </div>
 
-        <div className="ed-navegador">
-          <span className="ed-navegador-label">Hojas:</span>
-          <div className="ed-navegador-lista">{hojas.map(hoja => (
-            <button key={hoja.id} className={`ed-navegador-btn ${selectedHoja.id === hoja.id ? 'active' : ''}`}
-              onClick={() => handleSelectHoja(hoja)}>{nombreHoja(hoja) || 'Sin nombre'}</button>
-          ))}</div>
-        </div>
+        {globalNotas && <div className="ed-notas"><p>{globalNotas}</p></div>}
 
         {showAsignarUsuarios && (
           <div className="form-modal" onClick={() => setShowAsignarUsuarios(false)}>
             <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
-              <div className="form-header"><h2>Asignar usuarios a: {nombreHoja(selectedHoja)}</h2>
-                <button className="close-btn" onClick={() => setShowAsignarUsuarios(false)}>×</button>
-              </div>
+              <div className="form-header"><h2>Asignar usuarios</h2><button className="close-btn" onClick={() => setShowAsignarUsuarios(false)}>×</button></div>
               <div className="asignar-modal-body">
                 <div className="asignar-columnas">
-                  <div className="asignar-seccion"><h4>Directivos</h4>
-                    <div className="asignar-lista">{getUsuariosDisponibles().filter(u => u.tipo === 'directivo').length === 0 ? <p className="text-muted">No hay directivos disponibles</p>
+                  <div className="asignar-seccion"><h4>Directivos</h4><div className="asignar-lista">
+                    {getUsuariosDisponibles().filter(u => u.tipo === 'directivo').length === 0 ? <p className="text-muted">No hay</p>
                       : getUsuariosDisponibles().filter(u => u.tipo === 'directivo').map(u => { const k = `${u.id}_${u.tipo}`; return (
                         <button key={k} className={`asignar-btn-usuario${selectedAsignar.has(k) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
                           <span className="asignar-check">{selectedAsignar.has(k) ? '✓' : ''}</span>
                           <span className="asignar-usuario-nombre">{u.nombre}</span>
                           <span className="asignar-usuario-tipo">Directivo</span>
                         </button>); })}
-                    </div>
-                  </div>
+                  </div></div>
                   <div className="asignar-divider-vertical"></div>
-                  <div className="asignar-seccion"><h4>Personal</h4>
-                    <div className="asignar-lista">{getUsuariosDisponibles().filter(u => u.tipo === 'personal').length === 0 ? <p className="text-muted">No hay personal disponible</p>
+                  <div className="asignar-seccion"><h4>Personal</h4><div className="asignar-lista">
+                    {getUsuariosDisponibles().filter(u => u.tipo === 'personal').length === 0 ? <p className="text-muted">No hay</p>
                       : getUsuariosDisponibles().filter(u => u.tipo === 'personal').map(u => { const k = `${u.id}_${u.tipo}`; return (
                         <button key={k} className={`asignar-btn-usuario${selectedAsignar.has(k) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
                           <span className="asignar-check">{selectedAsignar.has(k) ? '✓' : ''}</span>
                           <span className="asignar-usuario-nombre">{u.nombre}</span>
                           <span className="asignar-usuario-tipo">Personal</span>
                         </button>); })}
-                    </div>
-                  </div>
+                  </div></div>
                 </div>
                 <div className="asignar-footer">
-                  <span className="asignar-seleccionados">{selectedAsignar.size} seleccionado(s)</span>
+                  <span>{selectedAsignar.size} seleccionado(s)</span>
                   <div className="asignar-footer-actions">
                     <button className="btn btn-secondary" onClick={() => setShowAsignarUsuarios(false)}>Cancelar</button>
-                    <button className="btn btn-primary" onClick={handleConfirmarAsignacion} disabled={selectedAsignar.size === 0}>Confirmar asignación</button>
+                    <button className="btn btn-primary" onClick={handleConfirmarAsignacion} disabled={selectedAsignar.size === 0}>Confirmar</button>
                   </div>
                 </div>
               </div>
@@ -434,42 +378,146 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
     );
   }
 
+  // === HOJA VIEW (CARRERAS LIST) ===
+  if (selectedHoja) {
+    return (
+      <div className="tab-content estadisticos-docentes">
+        <div className="tab-header">
+          <div><h2>Datos Estadísticos - Docentes</h2><p className="text-muted" style={{ margin: 0 }}>{nombreHoja(selectedHoja)}</p></div>
+          <div className="tab-actions"><button className="btn btn-secondary" onClick={() => setSelectedHoja(null)}>← Volver</button></div>
+        </div>
+        <div className="ed-info-bar"><h3>Carreras</h3><p>Selecciona una carrera para ver sus datos.</p></div>
+        {carrerasLoading ? <div className="loading" style={{ padding: '2rem' }}>Cargando...</div>
+          : carreras.length === 0 ? <div className="ed-empty"><p>No hay carreras. Crea la primera.</p><button className="btn btn-primary" onClick={handleOpenNewCarrera}>+ Nueva Carrera</button></div>
+            : <div className="ed-hojas-list">{carreras.map(c => (
+              <div key={c.id} className="ed-hoja-card">
+                <div className="ed-hoja-info"><h3>{c.nombre || 'Sin nombre'}</h3></div>
+                <div className="ed-hoja-actions">
+                  <button className="btn btn-success" onClick={() => handleSelectCarrera(c)}>Entrar</button>
+                  <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditCarrera(c)}>✏️</button>
+                  <button className="btn btn-danger btn-small" onClick={() => handleDeleteCarrera(c)}>🗑️</button>
+                </div>
+              </div>
+            ))}</div>}
+
+        <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={handleOpenNewCarrera}>+ Nueva Carrera</button>
+
+        <button className="btn btn-outline" style={{ marginTop: '1rem', marginLeft: '0.5rem' }} onClick={() => cargarConcentrado(selectedHoja.id)} disabled={concentradoLoading}>
+          {concentradoLoading ? 'Cargando...' : '📊 Ver concentrado'}
+        </button>
+
+        {globalNotas && <div className="ed-notas" style={{ marginTop: '1.5rem' }}><p>{globalNotas}</p></div>}
+
+        {showFormCarrera && (
+          <div className="form-modal" onClick={() => setShowFormCarrera(false)}>
+            <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px' }}>
+              <div className="form-header"><h2>{editCarreraId ? 'Editar Carrera' : 'Nueva Carrera'}</h2>
+                <button className="close-btn" onClick={() => setShowFormCarrera(false)}>×</button>
+              </div>
+              <form onSubmit={handleSaveCarrera} style={{ padding: '20px 30px 30px' }}>
+                <FormInput label="Nombre de la carrera *" name="carrera-nombre" value={formCarreraNombre}
+                  onChange={e => setFormCarreraNombre(e.target.value)} placeholder="Ej: TSU OLCE" required />
+                <div className="form-actions">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowFormCarrera(false)}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" disabled={savingCarrera}>{savingCarrera ? 'Guardando...' : '💾 Guardar'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+      </div>
+    );
+  }
+
+  // === CONCENTRADO VIEW ===
+  if (showConcentrado && concentradoData) {
+    return (
+      <div className="tab-content estadisticos-docentes">
+        <div className="tab-header">
+          <div><h2>Concentrado — {nombreHoja(selectedHoja)}</h2></div>
+          <div className="tab-actions"><button className="btn btn-secondary" onClick={() => setShowConcentrado(false)}>← Volver</button></div>
+        </div>
+        <div className="ed-secciones-wrap">{TIPOS_SECCION.map(({ value: tipo, label, color }) => {
+          const cols = COLUMNAS_POR_TIPO[tipo] || [];
+          const data = concentradoData[tipo];
+          if (!data) return null;
+          return (
+            <div key={tipo} className={`ed-panel ed-panel-${color}`}>
+              <h2>{label}</h2>
+              <table className="ed-tabla">
+                <thead>
+                  <tr><th></th>{cols.map(c => <th key={c.keys[0]} colSpan={2}>{c.label}</th>)}</tr>
+                  <tr><th></th>{cols.map(c => <React.Fragment key={c.keys[0]}><th>H</th><th>M</th></React.Fragment>)}</tr>
+                </thead>
+                <tbody>
+                  {['Total Acumulado', 'PTC', 'Asignatura'].map(nf => {
+                    const vals = data[nf] || {};
+                    return (
+                      <tr key={nf} className={nf === 'Total Acumulado' ? 'ed-total-row' : ''}>
+                        <td className="ed-rowlabel">{nf}</td>
+                        {cols.map(c => c.keys.map(key => <td key={key} className={nf === 'Total Acumulado' ? 'ed-celda-readonly' : ''}>{vals[key] || ''}</td>))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}</div>
+      </div>
+    );
+  }
+
+  // === MAIN LIST VIEW ===
   return (
     <div className="tab-content estadisticos-docentes">
       <div className="tab-header">
         <h2>📊 Datos Estadísticos - Docentes</h2>
-        <div className="tab-actions">
-          <button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
-          <button className="btn btn-primary" onClick={handleOpenNewHoja}>+ Nueva Hoja</button>
-        </div>
+        <div className="tab-actions"><button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
+          <button className="btn btn-primary" onClick={handleOpenNewHoja}>+ Nueva Hoja</button></div>
       </div>
-      <div className="ed-info-bar"><h3>Datos Estadísticos - Docentes</h3><p>Selecciona un año y luego una hoja.</p></div>
-      <div className="ed-anios-bar">{aniosDisponibles.length === 0 ? <span className="text-muted">Sin años registrados</span>
+      <div className="ed-info-bar"><h3>Datos Estadísticos - Docentes</h3><p>Selecciona un año y un cuatrimestre.</p></div>
+      <div className="ed-anios-bar">{aniosDisponibles.length === 0 ? <span className="text-muted">Sin años</span>
         : <><span className="ed-anios-label">Años:</span><div className="ed-anios-lista">{aniosDisponibles.map(anio => (
           <button key={anio} className={`ed-anio-btn ${selectedAnio === anio ? 'active' : ''}`} onClick={() => handleSelectAnio(anio)}>{anio}</button>
         ))}</div></>}
       </div>
       {selectedAnio && (<>{loading ? <div className="loading" style={{ padding: '2rem' }}>Cargando...</div>
-        : hojas.length === 0 ? <div className="ed-empty"><p>No hay hojas para {selectedAnio}</p><button className="btn btn-primary" onClick={handleOpenNewHoja}>Crear Primera Hoja</button></div>
+        : hojas.length === 0 ? <div className="ed-empty"><p>No hay hojas para {selectedAnio}</p><button className="btn btn-primary" onClick={handleOpenNewHoja}>Crear</button></div>
           : <div className="ed-hojas-list">{hojas.map(hoja => (
             <div key={hoja.id} className="ed-hoja-card">
               <div className="ed-hoja-info"><h3>{nombreHoja(hoja) || 'Sin nombre'}</h3></div>
               <div className="ed-hoja-actions">
                 <button className="btn btn-success" onClick={() => handleSelectHoja(hoja)}>Entrar</button>
-                <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditHoja(hoja)}>✏️ Editar</button>
-                <button className="btn btn-danger btn-small" onClick={() => handleDeleteHoja(hoja)}>🗑️ Eliminar</button>
+                <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditHoja(hoja)}>✏️</button>
+                <button className="btn btn-danger btn-small" onClick={() => handleDeleteHoja(hoja)}>🗑️</button>
               </div>
             </div>
           ))}</div>}
       </>)}
+      <div className="ed-notas-editor" style={{ marginTop: '2rem' }}>
+        <div className="ed-usuarios-header"><h3>Notas generales</h3>
+          <button className="btn btn-outline btn-small" onClick={() => setEditingNotas(!editingNotas)}>{editingNotas ? 'Cancelar' : 'Editar'}</button>
+        </div>
+        {globalNotasLoading ? <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
+          : editingNotas ? (
+            <div style={{ padding: '1rem 1.25rem' }}>
+              <textarea className="ed-notas-textarea" value={globalNotas} onChange={e => setGlobalNotas(e.target.value)} rows={4} />
+              <div className="form-actions" style={{ marginTop: '0.5rem' }}>
+                <button className="btn btn-primary btn-small" onClick={async () => { setGlobalNotasSaving(true); try { await api.put('/api/university/estadisticos-docentes-notas', { contenido: globalNotas }); toast.success('Notas guardadas'); setEditingNotas(false); } catch (e) { handleApiError(e, 'Error'); } finally { setGlobalNotasSaving(false); } }} disabled={globalNotasSaving}>{globalNotasSaving ? '...' : 'Guardar'}</button>
+              </div>
+            </div>
+          ) : <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>{globalNotas || 'Sin notas'}</p>}
+      </div>
       {showFormHoja && (
         <div className="form-modal" onClick={() => setShowFormHoja(false)}>
-          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
+          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <div className="form-header"><h2>{editHojaId ? 'Editar Hoja' : 'Nueva Hoja'}</h2>
               <button className="close-btn" onClick={() => setShowFormHoja(false)}>×</button>
             </div>
             <form onSubmit={handleSaveHoja} style={{ padding: '20px 30px 30px' }}>
-              <FormInput label="Cuatrimestre *" name="form-cuatrimestre" value={formCuatrimestre} onChange={e => setFormCuatrimestre(e.target.value)} placeholder="Ej: Mayo - Agosto" required />
+              <FormInput label="Cuatrimestre *" name="form-cuatrimestre" value={formCuatrimestre} onChange={e => setFormCuatrimestre(e.target.value)} placeholder="Ej: Enero - Abril" required />
               <FormInput label="Año *" name="form-anio" value={formAnio} onChange={e => setFormAnio(e.target.value)} placeholder="Ej: 2025" required />
               <div className="form-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowFormHoja(false)}>Cancelar</button>
