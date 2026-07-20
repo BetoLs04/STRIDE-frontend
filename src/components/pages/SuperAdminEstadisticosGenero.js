@@ -6,6 +6,17 @@ import FormInput from '../shared/FormInput';
 import { handleApiError } from '../../utils/errorHandler';
 import useSocketEvent from '../../hooks/useSocketEvent';
 
+const COLUMNAS_FIJAS = [
+  { key: 'programa', label: 'Programa', tipo: 'texto' },
+  { key: 'grupos', label: 'Grupos', tipo: 'numero' },
+  { key: 'cant_total', label: 'Cantidad Total', tipo: 'numero' },
+  { key: 'cant_hombres', label: 'Cantidad Hombres', tipo: 'numero' },
+  { key: 'cant_mujeres', label: 'Cantidad Mujeres', tipo: 'numero' },
+  { key: 'aprov_hombres', label: 'Aprovechamiento Hombres', tipo: 'decimal' },
+  { key: 'aprov_mujeres', label: 'Aprovechamiento Mujeres', tipo: 'decimal' },
+  { key: 'aprov_total', label: 'Aprovechamiento Total', tipo: 'decimal' }
+];
+
 const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const [hojas, setHojas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,15 +26,6 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const [savingHoja, setSavingHoja] = useState(false);
 
   const [selectedHoja, setSelectedHoja] = useState(null);
-
-  const [columnas, setColumnas] = useState([]);
-  const [columnasLoading, setColumnasLoading] = useState(false);
-  const [nuevaColumna, setNuevaColumna] = useState('');
-  const [nuevaColumnaTipo, setNuevaColumnaTipo] = useState('texto');
-  const [editColumnaId, setEditColumnaId] = useState(null);
-  const [editColumnaNombre, setEditColumnaNombre] = useState('');
-  const [editColumnaTipo, setEditColumnaTipo] = useState('texto');
-  const [columnaSaving, setColumnaSaving] = useState(false);
 
   const [filas, setFilas] = useState([]);
   const [filasLoading, setFilasLoading] = useState(false);
@@ -55,17 +57,14 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     refreshRef.current = fetchHojas;
   });
 
-  const fetchHojaData = async (hojaId) => {
-    setColumnasLoading(true);
+  const fetchFilas = async (hojaId) => {
     setFilasLoading(true);
     try {
-      const res = await api.get(`/api/university/estadisticos-genero-hojas/${hojaId}`);
-      setColumnas(res.data.data.columnas || []);
-      setFilas(res.data.data.filas || []);
+      const res = await api.get(`/api/university/estadisticos-genero-filas?hoja_id=${hojaId}`);
+      setFilas(res.data.data || []);
     } catch (error) {
-      handleApiError(error, 'Error al cargar datos de la hoja');
+      handleApiError(error, 'Error al cargar filas');
     } finally {
-      setColumnasLoading(false);
       setFilasLoading(false);
     }
   };
@@ -104,7 +103,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   };
 
   const handleDeleteHoja = async (hoja) => {
-    if (!window.confirm(`¿Eliminar la hoja "${hoja.nombre || 'Sin nombre'}"?\nTambién se eliminarán sus columnas y filas.`)) return;
+    if (!window.confirm(`¿Eliminar la hoja "${hoja.nombre || 'Sin nombre'}"?\nTambién se eliminarán sus filas.`)) return;
     try {
       await api.delete(`/api/university/estadisticos-genero-hojas/${hoja.id}`);
       toast.success('Hoja eliminada');
@@ -117,75 +116,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
 
   const handleSelectHoja = (hoja) => {
     setSelectedHoja(hoja);
-    fetchHojaData(hoja.id);
-  };
-
-  const handleAddColumna = async () => {
-    if (!nuevaColumna.trim()) {
-      toast.error('El nombre es requerido');
-      return;
-    }
-    setColumnaSaving(true);
-    try {
-      await api.post('/api/university/estadisticos-genero-columnas', {
-        nombre: nuevaColumna.trim(),
-        tipo_dato: nuevaColumnaTipo,
-        hoja_id: selectedHoja.id
-      });
-      toast.success('Columna creada');
-      setNuevaColumna('');
-      setNuevaColumnaTipo('texto');
-      fetchHojaData(selectedHoja.id);
-    } catch (error) {
-      handleApiError(error, 'Error al crear columna');
-    } finally {
-      setColumnaSaving(false);
-    }
-  };
-
-  const handleStartEditColumna = (columna) => {
-    setEditColumnaId(columna.id);
-    setEditColumnaNombre(columna.nombre);
-    setEditColumnaTipo(columna.tipo_dato || 'texto');
-  };
-
-  const handleSaveEditColumna = async () => {
-    if (!editColumnaNombre.trim()) {
-      toast.error('El nombre es requerido');
-      return;
-    }
-    setColumnaSaving(true);
-    try {
-      await api.put(`/api/university/estadisticos-genero-columnas/${editColumnaId}`, {
-        nombre: editColumnaNombre.trim(),
-        tipo_dato: editColumnaTipo
-      });
-      toast.success('Columna actualizada');
-      setEditColumnaId(null);
-      setEditColumnaNombre('');
-      fetchHojaData(selectedHoja.id);
-    } catch (error) {
-      handleApiError(error, 'Error al actualizar columna');
-    } finally {
-      setColumnaSaving(false);
-    }
-  };
-
-  const handleCancelEditColumna = () => {
-    setEditColumnaId(null);
-    setEditColumnaNombre('');
-    setEditColumnaTipo('texto');
-  };
-
-  const handleDeleteColumna = async (columna) => {
-    if (!window.confirm(`¿Eliminar la columna "${columna.nombre}"?`)) return;
-    try {
-      await api.delete(`/api/university/estadisticos-genero-columnas/${columna.id}`);
-      toast.success('Columna eliminada');
-      fetchHojaData(selectedHoja.id);
-    } catch (error) {
-      handleApiError(error, 'Error al eliminar columna');
-    }
+    fetchFilas(hoja.id);
   };
 
   const getValor = (fila, key) => {
@@ -200,7 +131,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const handleOpenNewFila = () => {
     setEditFilaId(null);
     const initial = {};
-    columnas.forEach(c => { initial[`c_${c.id}`] = ''; });
+    COLUMNAS_FIJAS.forEach(c => { initial[c.key] = ''; });
     setFilaValores(initial);
     setShowFormFila(true);
   };
@@ -208,8 +139,8 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const handleOpenEditFila = (fila) => {
     setEditFilaId(fila.id);
     const vals = {};
-    columnas.forEach(c => {
-      vals[`c_${c.id}`] = getValor(fila, `c_${c.id}`);
+    COLUMNAS_FIJAS.forEach(c => {
+      vals[c.key] = getValor(fila, c.key);
     });
     setFilaValores(vals);
     setShowFormFila(true);
@@ -229,7 +160,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
       setShowFormFila(false);
       setEditFilaId(null);
       setFilaValores({});
-      fetchHojaData(selectedHoja.id);
+      fetchFilas(selectedHoja.id);
     } catch (error) {
       handleApiError(error, 'Error al guardar fila');
     } finally {
@@ -238,12 +169,12 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   };
 
   const handleDeleteFila = async (fila) => {
-    const nombre = getValor(fila, 'c_1') || `Fila #${fila.id}`;
+    const nombre = getValor(fila, 'programa') || `Fila #${fila.id}`;
     if (!window.confirm(`¿Eliminar la fila "${nombre}"?`)) return;
     try {
       await api.delete(`/api/university/estadisticos-genero-filas/${fila.id}`);
       toast.success('Fila eliminada');
-      fetchHojaData(selectedHoja.id);
+      fetchFilas(selectedHoja.id);
     } catch (error) {
       handleApiError(error, 'Error al eliminar fila');
     }
@@ -262,155 +193,93 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
           </div>
         </div>
 
-        <div className="eg-main-layout">
-          <div className="eg-left">
-            <div className="eg-panel">
-              <div className="eg-panel-header">
-                <h3>Columnas</h3>
-              </div>
-              {columnasLoading ? (
-                <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
-              ) : (
-                <div className="eg-columnas-content">
-                  <div className="eg-columnas-add-form">
-                    <input
-                      type="text"
-                      value={nuevaColumna}
-                      onChange={e => setNuevaColumna(e.target.value)}
-                      placeholder="Nombre de la columna"
-                      onKeyDown={e => { if (e.key === 'Enter') handleAddColumna(); }}
-                    />
-                    <select value={nuevaColumnaTipo} onChange={e => setNuevaColumnaTipo(e.target.value)}>
-                      <option value="texto">Texto</option>
-                      <option value="numero">Número</option>
-                      <option value="decimal">Decimal</option>
-                    </select>
-                    <button className="btn btn-primary btn-small" onClick={handleAddColumna} disabled={columnaSaving}>
-                      {columnaSaving ? '...' : '+ Agregar'}
-                    </button>
-                  </div>
-                  {columnas.length === 0 ? (
-                    <p className="text-muted" style={{ padding: '0.5rem' }}>No hay columnas registradas</p>
-                  ) : (
-                    <div className="eg-columnas-list">
-                      {columnas.map((columna, index) => (
-                        <div key={columna.id} className="eg-columna-item">
-                          <span className="eg-columna-index">{index + 1}.</span>
-                          {editColumnaId === columna.id ? (
-                            <div className="eg-columna-edit-inline">
-                              <input
-                                type="text"
-                                value={editColumnaNombre}
-                                onChange={e => setEditColumnaNombre(e.target.value)}
-                                onKeyDown={e => { if (e.key === 'Enter') handleSaveEditColumna(); if (e.key === 'Escape') handleCancelEditColumna(); }}
-                                autoFocus
-                              />
-                              <select value={editColumnaTipo} onChange={e => setEditColumnaTipo(e.target.value)}>
-                                <option value="texto">Texto</option>
-                                <option value="numero">Número</option>
-                                <option value="decimal">Decimal</option>
-                              </select>
-                              <button className="btn btn-primary btn-small" onClick={handleSaveEditColumna} disabled={columnaSaving}>Guardar</button>
-                              <button className="btn btn-secondary btn-small" onClick={handleCancelEditColumna}>Cancelar</button>
-                            </div>
-                          ) : (
-                            <>
-                              <span className="eg-columna-nombre">{columna.nombre}</span>
-                              <span className="eg-columna-tipo-badge">{columna.tipo_dato === 'numero' ? 'Número' : columna.tipo_dato === 'decimal' ? 'Decimal' : 'Texto'}</span>
-                              <div className="eg-columna-actions">
-                                <button className="btn btn-secondary btn-small" onClick={() => handleStartEditColumna(columna)}>Editar</button>
-                                <button className="btn btn-danger btn-small" onClick={() => handleDeleteColumna(columna)}>Eliminar</button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="eg-right">
-            <div className="eg-panel">
-              <div className="eg-panel-header">
-                <h3>Vista previa</h3>
-              </div>
-              <div className="eg-preview-content">
-                <h4 style={{ textAlign: 'center', margin: '0.5rem 0' }}>Información Estadística por Género</h4>
-                <p style={{ textAlign: 'center', color: '#6b7280', margin: '0 0 1rem' }}>{selectedHoja.nombre}</p>
-                {filasLoading ? (
-                  <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
-                ) : filas.length === 0 ? (
-                  <p className="text-muted" style={{ padding: '1rem', textAlign: 'center' }}>Sin filas aún</p>
-                ) : (
-                  <div style={{ overflowX: 'auto' }}>
-                    <table className="eg-preview-table">
-                      <thead>
-                        <tr>
-                          {columnas.map(col => (
-                            <th key={col.id}>{col.nombre}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filas.map((fila, index) => (
-                          <tr key={fila.id}>
-                            {columnas.map(col => (
-                              <td key={col.id}>{getValor(fila, `c_${col.id}`)}</td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="eg-filas-section">
-          <div className="eg-filas-header">
-            <h3>Filas (Programas)</h3>
-            <button className="btn btn-primary" onClick={handleOpenNewFila}>+ Nueva Fila</button>
-          </div>
-          {filasLoading ? (
-            <div className="loading" style={{ padding: '1rem' }}>Cargando filas...</div>
-          ) : filas.length === 0 ? (
-            <p className="text-muted" style={{ padding: '1rem' }}>No hay filas registradas. Agrega la primera.</p>
-          ) : (
-            <div className="eg-filas-preview">
-              <table className="eg-filas-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    {columnas.map(col => (
-                      <th key={col.id}>{col.nombre}</th>
-                    ))}
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filas.map((fila, index) => (
-                    <tr key={fila.id}>
-                      <td>{index + 1}</td>
-                      {columnas.map(col => (
-                        <td key={col.id}>{getValor(fila, `c_${col.id}`)}</td>
-                      ))}
-                      <td>
-                        <div className="eg-fila-actions">
-                          <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditFila(fila)}>Editar</button>
-                          <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>Eliminar</button>
-                        </div>
-                      </td>
+        <div className="eg-hoja-view">
+          <div className="eg-vista-previa">
+            <h3 style={{ textAlign: 'center', margin: 0 }}>Información Estadística por Género</h3>
+            <p style={{ textAlign: 'center', color: '#6b7280', margin: '0.25rem 0 1rem' }}>{selectedHoja.nombre}</p>
+            {filasLoading ? (
+              <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>
+            ) : filas.length === 0 ? (
+              <p className="text-muted" style={{ padding: '2rem', textAlign: 'center' }}>Sin filas aún</p>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table className="eg-preview-table">
+                  <thead>
+                    <tr>
+                      <th rowSpan="2">Programa</th>
+                      <th rowSpan="2">Grupos</th>
+                      <th colSpan="3">Cantidad</th>
+                      <th colSpan="3">Aprovechamiento</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <tr>
+                      <th>Total</th>
+                      <th>Hombres</th>
+                      <th>Mujeres</th>
+                      <th>Hombres</th>
+                      <th>Mujeres</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filas.map((fila, index) => (
+                      <tr key={fila.id}>
+                        <td style={{ textAlign: 'left', fontWeight: 'bold' }}>{getValor(fila, 'programa')}</td>
+                        <td>{getValor(fila, 'grupos')}</td>
+                        <td>{getValor(fila, 'cant_total')}</td>
+                        <td>{getValor(fila, 'cant_hombres')}</td>
+                        <td>{getValor(fila, 'cant_mujeres')}</td>
+                        <td>{getValor(fila, 'aprov_hombres')}</td>
+                        <td>{getValor(fila, 'aprov_mujeres')}</td>
+                        <td>{getValor(fila, 'aprov_total')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className="eg-filas-section">
+            <div className="eg-filas-header">
+              <h3>Filas (Programas)</h3>
+              <button className="btn btn-primary" onClick={handleOpenNewFila}>+ Nueva Fila</button>
             </div>
-          )}
+            {filasLoading ? (
+              <div className="loading" style={{ padding: '1rem' }}>Cargando...</div>
+            ) : filas.length === 0 ? (
+              <p className="text-muted" style={{ padding: '1rem' }}>No hay filas registradas. Agrega la primera.</p>
+            ) : (
+              <div className="eg-filas-preview">
+                <table className="eg-filas-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      {COLUMNAS_FIJAS.map(col => (
+                        <th key={col.key}>{col.label}</th>
+                      ))}
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filas.map((fila, index) => (
+                      <tr key={fila.id}>
+                        <td>{index + 1}</td>
+                        {COLUMNAS_FIJAS.map(col => (
+                          <td key={col.key}>{getValor(fila, col.key)}</td>
+                        ))}
+                        <td>
+                          <div className="eg-fila-actions">
+                            <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditFila(fila)}>Editar</button>
+                            <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)}>Eliminar</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
 
         {showFormFila && (
@@ -422,15 +291,15 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
               </div>
               <form onSubmit={handleSaveFila} style={{ padding: '20px 30px 30px' }}>
                 <div className="eg-fila-form-grid">
-                  {columnas.map(col => (
+                  {COLUMNAS_FIJAS.map(col => (
                     <FormInput
-                      key={col.id}
-                      label={col.nombre}
-                      name={`fila-c-${col.id}`}
-                      value={filaValores[`c_${col.id}`] || ''}
-                      onChange={e => setFilaValores(prev => ({ ...prev, [`c_${col.id}`]: e.target.value }))}
-                      type={col.tipo_dato === 'numero' ? 'number' : col.tipo_dato === 'decimal' ? 'number' : 'text'}
-                      step={col.tipo_dato === 'decimal' ? '0.01' : undefined}
+                      key={col.key}
+                      label={col.label}
+                      name={`fila-${col.key}`}
+                      value={filaValores[col.key] || ''}
+                      onChange={e => setFilaValores(prev => ({ ...prev, [col.key]: e.target.value }))}
+                      type={col.tipo === 'numero' ? 'number' : col.tipo === 'decimal' ? 'number' : 'text'}
+                      step={col.tipo === 'decimal' ? '0.01' : undefined}
                     />
                   ))}
                 </div>
@@ -460,7 +329,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
 
       <div className="eg-info-bar">
         <h3>Información Estadística por Género</h3>
-        <p>Selecciona una hoja para administrar sus columnas y filas.</p>
+        <p>Selecciona una hoja para ver y administrar sus programas.</p>
       </div>
 
       {loading ? (
@@ -479,7 +348,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
               </div>
               <div className="eg-hoja-actions">
                 <button className="btn btn-success" onClick={() => handleSelectHoja(hoja)}>
-                  Administrar hoja
+                  Entrar
                 </button>
                 <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditHoja(hoja)}>✏️ Editar</button>
                 <button className="btn btn-danger btn-small" onClick={() => handleDeleteHoja(hoja)}>🗑️ Eliminar</button>
