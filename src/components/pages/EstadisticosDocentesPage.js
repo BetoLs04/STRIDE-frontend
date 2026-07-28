@@ -223,6 +223,8 @@ const EstadisticosDocentesPage = ({ user }) => {
                           const ck = `${fila.id}_${key}`;
                           const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
                           const val = getValor(fila, key);
+                          const esTotal = c.keys[0] === 'total_h';
+                          if (esTotal) return <td key={ck} className="edp-readonly">{val || ''}</td>;
                           return <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
                             {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
                               : <span>{val || ''}</span>}
