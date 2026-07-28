@@ -228,25 +228,33 @@ const EstadisticosDocentesPage = ({ user }) => {
                     <tr><th></th>{cols.map(c => <React.Fragment key={c.keys[0]}><th>H</th><th>M</th></React.Fragment>)}</tr>
                   </thead>
                   <tbody>
-                    {filasVisibles.map(fila => (
+                    {filasVisibles.map(fila => {
+                      const colsNormales = cols.filter(c => !isTotalKey(c.keys[0]));
+                      const colTotal = cols.find(c => isTotalKey(c.keys[0]));
+                      return (
                       <tr key={fila.id}>
                         <td className="edp-rowlabel">{fila.nombre_fila}</td>
-                        {cols.map(c => c.keys.map(key => {
+                        {colsNormales.map(c => c.keys.map(key => {
                           const ck = `${fila.id}_${key}`;
                           const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
                           const val = getValor(fila, key);
-                          if (isTotalKey(key)) return <td key={ck} className="edp-readonly">{val || ''}</td>;
                           return <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
                             {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
                               : <span>{val || ''}</span>}
                           </td>;
                         }))}
+                        {colTotal && colTotal.keys.map(key => (
+                          <td key={`${fila.id}_${key}`} className="edp-readonly">{getValor(fila, key) || ''}</td>
+                        ))}
                       </tr>
-                    ))}
+                    );})}
                     {Object.keys(totalRow).length > 0 && (
                       <tr className="edp-total-row">
                         <td className="edp-rowlabel">Total</td>
-                        {cols.map(c => c.keys.map(key => {
+                        {cols.filter(c => !isTotalKey(c.keys[0])).map(c => c.keys.map(key => {
+                          return <td key={`total_${key}`} className="edp-readonly">{totalRow[key] || ''}</td>;
+                        }))}
+                        {cols.filter(c => isTotalKey(c.keys[0])).map(c => c.keys.map(key => {
                           return <td key={`total_${key}`} className="edp-readonly">{totalRow[key] || ''}</td>;
                         }))}
                       </tr>
