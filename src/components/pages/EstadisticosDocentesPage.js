@@ -109,6 +109,19 @@ const EstadisticosDocentesPage = ({ user }) => {
       const secs = r.data.data || []; setSecciones(secs);
       const fm = {};
       for (const sec of secs) { const fr = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`); fm[sec.id] = fr.data.data || []; }
+      // Auto-calcular totales de cada fila al cargar
+      for (const sid of Object.keys(fm)) {
+        const secMeta = secs.find(s => s.id === parseInt(sid));
+        const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
+        fm[sid] = fm[sid].map(f => {
+          if (f.nombre_fila === 'Total Acumulado') return f;
+          const ft = computeFilaTotals(f, cols);
+          const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
+          vals.total_h = ft.total_h;
+          vals.total_m = ft.total_m;
+          return { ...f, valores: vals };
+        });
+      }
       setFilasPorSeccion(fm);
     } catch (e) { handleApiError(e, 'Error'); } finally { setSeccionesLoading(false); }
   };
