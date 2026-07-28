@@ -64,6 +64,11 @@ const Home = () => {
       navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'matriz' } });
       return;
     }
+    // Si es delegado, ir al panel de gestión de matriz
+    if (userData?.isDelegado) {
+      navigate('/admin/matriz-panel');
+      return;
+    }
     try {
       const res = await api.get('/api/university/matriz-secciones');
       const secciones = (res.data.data || []).filter(s =>

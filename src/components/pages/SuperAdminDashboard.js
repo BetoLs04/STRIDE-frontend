@@ -47,6 +47,9 @@ const SuperAdminDashboard = ({ admin }) => {
   const [estadisticas, setEstadisticas] = useState({ usuarios: 0, direcciones: 0, directivos: 0, personal: 0, comunicados: 0 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [delegado, setDelegado] = useState(null);
+  const [delegadoLoading, setDelegadoLoading] = useState(false);
+  const [asignandoDelegado, setAsignandoDelegado] = useState(false);
 
   useEffect(() => {
     if (!admin) { navigate(ROUTES.LOGIN); return; }
@@ -110,6 +113,11 @@ const SuperAdminDashboard = ({ admin }) => {
         const comunicados = comRes.data.data || [];
         setEstadisticas(prev => ({ ...prev, comunicados: comunicados.length }));
       } catch (e) { console.warn('Error comunicados:', e.message); }
+
+      try {
+        const delRes = await api.get('/api/university/superadmin-delegado');
+        setDelegado(delRes.data.data || null);
+      } catch (e) { console.warn('Error delegado:', e.message); }
 
     } catch (error) {
       handleApiError(error, 'Error al cargar datos del sistema');
@@ -222,11 +230,127 @@ const SuperAdminDashboard = ({ admin }) => {
     }
   };
 
+  const handleAsignarDelegado = async (usuarioId, usuarioTipo) => {
+    setAsignandoDelegado(true);
+    try {
+      const res = await api.put('/api/university/superadmin-delegado', {
+        usuario_id: usuarioId,
+        usuario_tipo: usuarioTipo
+      });
+      toast.success(res.data.message || 'Delegado asignado correctamente');
+      setDelegado(res.data.data);
+      setActiveTab('delegado');
+    } catch (error) {
+      const msg = error.response?.data?.error || 'Error al asignar delegado';
+      toast.error(msg);
+    } finally {
+      setAsignandoDelegado(false);
+    }
+  };
+
+  const handleRemoverDelegado = async () => {
+    if (!window.confirm('¿Estás seguro de remover al delegado?')) return;
+    try {
+      await api.delete('/api/university/superadmin-delegado');
+      toast.success('Delegado removido');
+      setDelegado(null);
+    } catch (error) {
+      toast.error('Error al remover delegado');
+    }
+  };
+
+  const renderDelegado = () => (
+    <div className="tab-content">
+      <div className="tab-header">
+        <h2>👤 Delegado de Super Admin</h2>
+        <div className="tab-actions">
+          <button className="btn btn-secondary" onClick={() => setActiveTab('dashboard')}>← Volver al Dashboard</button>
+        </div>
+      </div>
+      <div className="delegado-section" style={{ padding: '20px' }}>
+        {delegado ? (
+          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+            <h3 style={{ color: '#166534', marginBottom: '10px' }}>✅ Delegado actual</h3>
+            <p style={{ fontSize: '1.1rem', marginBottom: '5px' }}>
+              <strong>{delegado.nombre}</strong>
+              <span style={{ marginLeft: '10px', background: '#166534', color: 'white', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>
+                {delegado.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'}
+              </span>
+            </p>
+            <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+              Asignado el {new Date(delegado.fecha_asignacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </p>
+            <button className="btn btn-danger" onClick={handleRemoverDelegado} style={{ marginTop: '10px' }}>
+              🗑️ Remover delegado
+            </button>
+          </div>
+        ) : (
+          <div style={{ background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+            <h3 style={{ color: '#92400e', marginBottom: '5px' }}>⚠️ Sin delegado asignado</h3>
+            <p style={{ color: '#6b7280' }}>No hay ningún delegado. Selecciona un usuario abajo para asignarlo.</p>
+          </div>
+        )}
+
+        <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px' }}>
+          <h3 style={{ marginBottom: '15px' }}>Asignar nuevo delegado</h3>
+          <p style={{ color: '#6b7280', marginBottom: '15px', fontSize: '0.9rem' }}>
+            El usuario seleccionado tendrá los mismos permisos que un Super Admin dentro del panel.<br />
+            <strong>Nota:</strong> Si ya hay un delegado, será reemplazado automáticamente.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <h4 style={{ margin: 0 }}>Directivos</h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {directivos.filter(d => !delegado || d.id !== delegado.usuario_id || delegado.usuario_tipo !== 'directivo').map(d => (
+                <button
+                  key={`dir-${d.id}`}
+                  className="btn btn-outline"
+                  onClick={() => handleAsignarDelegado(d.id, 'directivo')}
+                  disabled={asignandoDelegado}
+                  style={{ fontSize: '0.85rem', padding: '6px 14px' }}
+                >
+                  {d.nombre_completo} - {d.cargo}
+                </button>
+              ))}
+              {directivos.filter(d => !delegado || d.id !== delegado.usuario_id || delegado.usuario_tipo !== 'directivo').length === 0 && (
+                <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>No hay directivos disponibles</p>
+              )}
+            </div>
+
+            <h4 style={{ margin: '15px 0 0' }}>Personal</h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {personal.filter(p => !delegado || p.id !== delegado.usuario_id || delegado.usuario_tipo !== 'personal').map(p => (
+                <button
+                  key={`per-${p.id}`}
+                  className="btn btn-outline"
+                  onClick={() => handleAsignarDelegado(p.id, 'personal')}
+                  disabled={asignandoDelegado}
+                  style={{ fontSize: '0.85rem', padding: '6px 14px' }}
+                >
+                  {p.nombre_completo} - {p.puesto}
+                </button>
+              ))}
+              {personal.filter(p => !delegado || p.id !== delegado.usuario_id || delegado.usuario_tipo !== 'personal').length === 0 && (
+                <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>No hay personal disponible</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderDashboard = () => (
     <div className="dashboard-content">
       <div className="welcome-section">
         <h2>Panel de Super Administración</h2>
         <p>Bienvenido, <strong>{admin?.username || 'Administrador'}</strong>. Gestiona todo el sistema universitario.</p>
+        {delegado && !admin?.isDelegado && (
+          <div style={{ marginTop: '10px', padding: '8px 15px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <span>✅</span>
+            <span>Delegado activo: <strong>{delegado.nombre}</strong></span>
+            <button className="btn btn-small btn-outline" onClick={() => setActiveTab('delegado')} style={{ marginLeft: '10px', padding: '2px 10px', fontSize: '0.8rem' }}>Gestionar</button>
+          </div>
+        )}
       </div>
       <div className="stats-grid">
         <div className="stat-card" onClick={() => setActiveTab('usuarios')}>
@@ -557,6 +681,7 @@ const SuperAdminDashboard = ({ admin }) => {
   useSocketEvent('tarea:deleted', () => refreshRef.current());
   useSocketEvent('tarea:completada', () => refreshRef.current());
   useSocketEvent('logo:updated', () => refreshRef.current());
+  useSocketEvent('superadmin:delegado-changed', () => refreshRef.current());
 
   return (
     <div className="superadmin-dashboard">
@@ -581,6 +706,9 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'smoa' ? 'active' : ''}`} onClick={() => setActiveTab('smoa')}>📈 SMOA</button>
         <button className={`tab-btn ${activeTab === 'seplade' ? 'active' : ''}`} onClick={() => setActiveTab('seplade')}>📋 SEPLADE</button>
         <button className={`tab-btn ${activeTab === 'poa' ? 'active' : ''}`} onClick={() => setActiveTab('poa')}>📋 POA</button>
+        {!admin?.isDelegado && (
+          <button className={`tab-btn ${activeTab === 'delegado' ? 'active' : ''}`} onClick={() => setActiveTab('delegado')}>👤 Delegado</button>
+        )}
       </div>
       <div className="dashboard-tabs-row">
         <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-genero')}>📊 Estadísticos por Género</button>
@@ -598,6 +726,7 @@ const SuperAdminDashboard = ({ admin }) => {
         {activeTab === 'smoa' && <SuperAdminSMOA onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'seplade' && <SuperAdminSeplade onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'poa' && <SuperAdminPOA onClose={() => setActiveTab('dashboard')} />}
+        {activeTab === 'delegado' && renderDelegado()}
         {activeTab === 'estadisticos-genero' && <SuperAdminEstadisticosGenero onClose={() => setActiveTab('dashboard')} />}
         {activeTab === 'estadisticos-docentes' && <SuperAdminEstadisticosDocentes onClose={() => setActiveTab('dashboard')} />}
       </div>

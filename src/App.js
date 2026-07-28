@@ -14,6 +14,7 @@ import SuperAdminActividades from './components/pages/SuperAdminActividades';
 import SuperAdminTareas from './components/pages/SuperAdminTareas';
 import PersonalTareas from './components/pages/PersonalTareas';
 import MatrizIndicadoresPage from './components/pages/MatrizIndicadoresPage';
+import DelegadoMatrizPanel from './components/pages/DelegadoMatrizPanel';
 import SMOAPage from './components/pages/SMOAPage';
 import SepladePage from './components/pages/SepladePage';
 import POAPage from './components/pages/POAPage';
@@ -54,6 +55,12 @@ function App() {
           <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
             <SuperAdminDashboard admin={user} />
           </ProtectedRoute>
+        } />
+
+        <Route path="/admin/matriz-panel" element={
+          user && (user.tipo === 'superadmin' || user.isDelegado)
+            ? <DelegadoMatrizPanel user={user} />
+            : <Navigate to={ROUTES.LOGIN} replace />
         } />
         
         <Route path={ROUTES.DIRECTIVO_DASHBOARD} element={

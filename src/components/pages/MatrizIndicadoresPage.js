@@ -21,7 +21,7 @@ const MatrizIndicadoresPage = ({ user }) => {
   const navigate = useNavigate();
 
   const puedeEditar = ['superadmin', 'directivo', 'personal'].includes(user?.tipo);
-  const esSuperAdmin = user?.tipo === 'superadmin';
+  const esSuperAdmin = user?.tipo === 'superadmin' || user?.isDelegado;
 
   const [seccion, setSeccion] = useState(null);
   const [encabezado, setEncabezado] = useState(null);
@@ -249,6 +249,7 @@ const MatrizIndicadoresPage = ({ user }) => {
 
   const goBack = () => {
     if (user?.tipo === 'superadmin') navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'matriz' } });
+    else if (user?.isDelegado) navigate('/admin/matriz-panel');
     else if (user?.tipo === 'directivo') navigate(ROUTES.DIRECTIVO_DASHBOARD);
     else navigate(ROUTES.PERSONAL_DASHBOARD);
   };
