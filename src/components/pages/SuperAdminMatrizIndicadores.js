@@ -24,6 +24,11 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
   const [busquedaPersonal, setBusquedaPersonal] = useState('');
   const [selectedUsuarios, setSelectedUsuarios] = useState(new Set());
 
+  const [delegado, setDelegado] = useState(null);
+  const [showDelegadoModal, setShowDelegadoModal] = useState(false);
+  const [delegadoSaving, setDelegadoSaving] = useState(false);
+  const [busquedaDelegado, setBusquedaDelegado] = useState('');
+
   const [encabezado, setEncabezado] = useState({
     codigo: '', revision: '', fecha_actualizacion: '',
     fecha_revision_indicadores: '', responsable: '', anio: ''
@@ -48,7 +53,15 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     fetchData();
     fetchEncabezado();
     fetchColumnas();
+    fetchDelegado();
   }, []);
+
+  const fetchDelegado = async () => {
+    try {
+      const res = await api.get('/api/university/superadmin-delegado');
+      setDelegado(res.data.data || null);
+    } catch (e) { /* ignore */ }
+  };
 
   const refreshRef = useRef();
 
@@ -335,6 +348,36 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
     }
   };
 
+  const handleAsignarDelegado = async (usuarioId, usuarioTipo) => {
+    setDelegadoSaving(true);
+    try {
+      const res = await api.put('/api/university/superadmin-delegado', {
+        usuario_id: usuarioId,
+        usuario_tipo: usuarioTipo
+      });
+      toast.success(res.data.message || 'Delegado asignado correctamente');
+      setDelegado(res.data.data);
+      setShowDelegadoModal(false);
+      setBusquedaDelegado('');
+    } catch (error) {
+      const msg = error.response?.data?.error || 'Error al asignar delegado';
+      toast.error(msg);
+    } finally {
+      setDelegadoSaving(false);
+    }
+  };
+
+  const handleRemoverDelegado = async () => {
+    if (!window.confirm('¿Estás seguro de remover al delegado?')) return;
+    try {
+      await api.delete('/api/university/superadmin-delegado');
+      toast.success('Delegado removido');
+      setDelegado(null);
+    } catch (error) {
+      toast.error('Error al remover delegado');
+    }
+  };
+
   const getUsuariosDisponibles = (seccion) => {
     const asignados = seccion.usuarios || [];
     const asignadosKey = new Set(asignados.map(u => `${u.usuario_id}_${u.usuario_tipo}`));
@@ -348,6 +391,7 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
         <div className="tab-actions">
           <button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
           <button className="btn btn-primary" onClick={handleOpenNew}>+ Nueva Sección</button>
+          <button className="btn btn-outline" onClick={() => { setShowDelegadoModal(true); setBusquedaDelegado(''); }}>👤 Delegado</button>
         </div>
       </div>
 
@@ -694,6 +738,90 @@ const SuperAdminMatrizIndicadores = ({ onClose }) => {
                   <button className="btn btn-primary" onClick={handleConfirmarAsignacion} disabled={selectedUsuarios.size === 0}>
                     Confirmar asignación
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDelegadoModal && (
+        <div className="form-modal" onClick={() => { setShowDelegadoModal(false); setBusquedaDelegado(''); }}>
+          <div className="form-modal-content asignar-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+            <div className="form-header">
+              <h2>👤 Delegado de Super Admin</h2>
+              <button className="close-btn" onClick={() => { setShowDelegadoModal(false); setBusquedaDelegado(''); }}>×</button>
+            </div>
+            <div className="asignar-modal-body">
+              {delegado && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', padding: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong style={{ color: '#166534' }}>Delegado actual:</strong>{' '}
+                    {delegado.nombre}
+                    <span style={{ marginLeft: '8px', background: '#166534', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '0.8rem' }}>
+                      {delegado.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'}
+                    </span>
+                  </div>
+                  <button className="btn btn-danger btn-small" onClick={handleRemoverDelegado}>🗑️ Remover</button>
+                </div>
+              )}
+              <p style={{ color: '#6b7280', marginBottom: '15px', fontSize: '0.9rem' }}>
+                Selecciona un usuario para delegar los permisos de administración de la Matriz de Indicadores.
+                {delegado ? ' Al seleccionar uno nuevo, será reemplazado automáticamente.' : ''}
+              </p>
+              <div className="asignar-columnas">
+                <div className="asignar-seccion">
+                  <h4>Directivos</h4>
+                  <div className="asignar-lista pptx-permiso-col-lista">
+                    {usuarios.filter(u => u.tipo === 'directivo' && (!delegado || u.id !== delegado.usuario_id || delegado.usuario_tipo !== 'directivo')).length === 0 ? (
+                      <p className="text-muted">No hay directivos disponibles</p>
+                    ) : (
+                      usuarios.filter(u => u.tipo === 'directivo' && (!delegado || u.id !== delegado.usuario_id || delegado.usuario_tipo !== 'directivo')).map(u => (
+                        <button
+                          key={`${u.id}_${u.tipo}`}
+                          className="asignar-btn-usuario"
+                          onClick={() => handleAsignarDelegado(u.id, u.tipo)}
+                          disabled={delegadoSaving}
+                        >
+                          <span className="asignar-usuario-nombre">{u.nombre}</span>
+                          <span className="asignar-usuario-tipo">Directivo</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <div className="asignar-divider-vertical"></div>
+                <div className="asignar-seccion">
+                  <h4>Personal</h4>
+                  <input
+                    type="text"
+                    className="pptx-permiso-buscar"
+                    placeholder="Buscar personal..."
+                    value={busquedaDelegado}
+                    onChange={e => setBusquedaDelegado(e.target.value)}
+                  />
+                  <div className="asignar-lista pptx-permiso-col-lista">
+                    {usuarios.filter(u => u.tipo === 'personal' && (!busquedaDelegado || u.nombre.toLowerCase().includes(busquedaDelegado.toLowerCase())) && (!delegado || u.id !== delegado.usuario_id || delegado.usuario_tipo !== 'personal')).length === 0 ? (
+                      <p className="text-muted">{busquedaDelegado ? 'Sin resultados' : 'No hay personal disponible'}</p>
+                    ) : (
+                      usuarios.filter(u => u.tipo === 'personal' && (!busquedaDelegado || u.nombre.toLowerCase().includes(busquedaDelegado.toLowerCase())) && (!delegado || u.id !== delegado.usuario_id || delegado.usuario_tipo !== 'personal')).map(u => (
+                        <button
+                          key={`${u.id}_${u.tipo}`}
+                          className="asignar-btn-usuario"
+                          onClick={() => handleAsignarDelegado(u.id, u.tipo)}
+                          disabled={delegadoSaving}
+                        >
+                          <span className="asignar-usuario-nombre">{u.nombre}</span>
+                          <span className="asignar-usuario-tipo">Personal</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="asignar-footer">
+                <div className="asignar-footer-actions">
+                  <button className="btn btn-secondary" onClick={() => { setShowDelegadoModal(false); setBusquedaDelegado(''); }}>Cerrar</button>
                 </div>
               </div>
             </div>
