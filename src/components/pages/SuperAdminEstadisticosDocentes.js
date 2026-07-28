@@ -8,11 +8,14 @@ import useSocketEvent from '../../hooks/useSocketEvent';
 
 const TIPOS_SECCION = [
   { value: 'ultimo_grado', label: 'Último grado de estudios', color: 'green' },
-  { value: 'solo_utma', label: 'Sólo en la UTMA', color: 'blue' },
-  { value: 'laboral', label: 'Laboral en general', color: 'blue' },
+  { value: 'solo_utma', label: 'EXPERIENCIA DOCENTE Y LABORAL (SOLO EN LA UTMA)', color: 'blue' },
+  { value: 'laboral', label: 'EXPERIENCIA DOCENTE Y LABORAL EN GENERAL (INCLUYENDO LA UTMA)', color: 'blue' },
   { value: 'edad', label: 'Edad', color: 'red' },
   { value: 'investigadores', label: 'Investigadores', color: 'orange' }
 ];
+
+const isTotalKey = (key) => key === 'total_h' || key === 'total_m';
+const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
 const COLUMNAS_POR_TIPO = {
   ultimo_grado: [
@@ -146,7 +149,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
       const r = await api.get(`/api/university/estadisticos-docentes-carreras?hoja_id=${hojaId}`);
       const carreras = r.data.data || [];
       const TIPOS = ['ultimo_grado', 'solo_utma', 'laboral', 'edad', 'investigadores'];
-      const NFS = ['Total Acumulado', 'PTC', 'Asignatura'];
+      const NFS = ['PTC', 'Asignatura'];
       const resultado = {};
 
       for (const tipo of TIPOS) {
@@ -216,7 +219,20 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
       const fm = {};
       for (const sec of secs) {
         const fr = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
-        fm[sec.id] = fr.data.data || [];
+        fm[sec.id] = (fr.data.data || []).map(f => {
+          if (f.nombre_fila === 'Total Acumulado') return f;
+          const cols = COLUMNAS_POR_TIPO[sec.tipo] || [];
+          const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
+          let sumH = 0, sumM = 0;
+          for (const c of cols) {
+            if (isTotalKey(c.keys[0])) continue;
+            sumH += parseNum(vals[c.keys[0]]);
+            sumM += parseNum(vals[c.keys[1]]);
+          }
+          vals.total_h = String(sumH);
+          vals.total_m = String(sumM);
+          return { ...f, valores: vals };
+        });
       }
       setFilasPorSeccion(fm);
     } catch (e) { handleApiError(e, 'Error'); } finally { setSeccionesLoading(false); }
@@ -230,9 +246,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const getUsuariosDisponibles = () => { const a = new Set(usuariosAsignados.map(u => `${u.usuario_id}_${u.usuario_tipo}`)); return usuariosDisponibles.filter(u => !a.has(`${u.id}_${u.tipo}`)); };
 
   const getValor = (fila, key) => { try { const v = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {}); return v[key] ?? ''; } catch { return ''; } };
-  const startEditCelda = (fila, key, val) => { if (fila.nombre_fila === 'Total Acumulado') return; setEditingCelda({ filaId: fila.id, key }); setEditValue(val); setTimeout(() => inputRef.current?.focus(), 0); };
-
-  const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+  const startEditCelda = (fila, key, val) => { if (isTotalKey(key) || fila.nombre_fila === 'Total Acumulado') return; setEditingCelda({ filaId: fila.id, key }); setEditValue(val); setTimeout(() => inputRef.current?.focus(), 0); };
 
   const saveCelda = useCallback(async () => {
     if (!editingCelda) return;
@@ -242,34 +256,54 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
       setFilasPorSeccion(prev => {
         const next = { ...prev };
         for (const sid of Object.keys(next)) {
+          const secMeta = secciones.find(s => s.id === parseInt(sid));
+          const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
           next[sid] = next[sid].map(f => {
-            if (f.id !== filaId) return f;
+            if (f.nombre_fila === 'Total Acumulado' || f.id !== filaId) return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            vals[key] = editValue; return { ...f, valores: vals };
+            vals[key] = editValue;
+            return { ...f, valores: vals };
+          });
+          next[sid] = next[sid].map(f => {
+            if (f.nombre_fila === 'Total Acumulado') return f;
+            const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
+            let sumH = 0, sumM = 0;
+            for (const c of cols) {
+              if (isTotalKey(c.keys[0])) continue;
+              sumH += parseNum(vals[c.keys[0]]);
+              sumM += parseNum(vals[c.keys[1]]);
+            }
+            vals.total_h = String(sumH);
+            vals.total_m = String(sumM);
+            return { ...f, valores: vals };
+          });
+          next[sid] = next[sid].map(f => {
+            if (f.nombre_fila === 'Total Acumulado') return f;
+            const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => {});
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => {});
+            return f;
           });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
           const asig = next[sid].find(f => f.nombre_fila === 'Asignatura');
-          const total = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
-          if (ptc && asig && total) {
+          if (ptc && asig) {
             const pv = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
             const av = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
-            const tv = {}; const ks = [...new Set([...Object.keys(pv), ...Object.keys(av)])];
-            for (const k of ks) tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
-            next[sid] = next[sid].map(f => {
-              if (f.nombre_fila !== 'Total Acumulado') return f;
-              const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-              for (const [k, v] of Object.entries(tv)) vals[k] = v;
-              return { ...f, valores: vals };
-            });
-            const tf = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
-            if (tf) for (const [k, v] of Object.entries(tv)) api.patch(`/api/university/estadisticos-docentes-filas/${tf.id}/celda`, { key: k, value: v }).catch(() => {});
+            const totalRow = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
+            if (totalRow) {
+              const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
+              for (const k of Object.keys(pv)) {
+                tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
+                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: tv[k] }).catch(() => {});
+              }
+            }
           }
         }
         return next;
       });
     } catch (e) { handleApiError(e, 'Error al guardar'); }
     setEditingCelda(null); setEditValue('');
-  }, [editingCelda, editValue]);
+  }, [editingCelda, editValue, secciones]);
 
   const handleCeldaKeyDown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveCelda(); } if (e.key === 'Escape') { setEditingCelda(null); setEditValue(''); } if (e.key === 'Tab') { e.preventDefault(); saveCelda(); } };
 
@@ -288,9 +322,17 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
             const info = getInfoTipo(sec.tipo);
             const cols = COLUMNAS_POR_TIPO[sec.tipo] || [];
             const filas = filasPorSeccion[sec.id] || [];
-            const total = filas.find(f => f.nombre_fila === 'Total Acumulado');
             const ptc = filas.find(f => f.nombre_fila === 'PTC');
             const asig = filas.find(f => f.nombre_fila === 'Asignatura');
+            const filasVisibles = [ptc, asig].filter(Boolean);
+            const colsNormales = cols.filter(c => !isTotalKey(c.keys[0]));
+            const colTotal = cols.find(c => isTotalKey(c.keys[0]));
+            const totalRow = {};
+            if (ptc && asig) {
+              const pv = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
+              const av = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
+              for (const k of Object.keys(pv)) totalRow[k] = String(parseNum(pv[k]) + parseNum(av[k]));
+            }
             return (
               <div key={sec.id} className={`ed-panel ed-panel-${info.color}`}>
                 <h2>{sec.nombre}</h2>
@@ -300,24 +342,34 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
                     <tr><th></th>{cols.map(c => <React.Fragment key={c.keys[0]}><th>H</th><th>M</th></React.Fragment>)}</tr>
                   </thead>
                   <tbody>
-                    {[total, ptc, asig].filter(Boolean).map(fila => {
-                      const esTotal = fila.nombre_fila === 'Total Acumulado';
-                      return (
-                        <tr key={fila.id} className={esTotal ? 'ed-total-row' : ''}>
-                          <td className="ed-rowlabel">{fila.nombre_fila}</td>
-                          {cols.map(c => c.keys.map(key => {
-                            const ck = `${fila.id}_${key}`;
-                            const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
-                            const val = getValor(fila, key);
-                            if (esTotal) return <td key={ck} className="ed-celda-readonly">{val || ''}</td>;
-                            return <td key={ck} className="ed-celda-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
-                              {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="ed-input" />
-                                : <span>{val || ''}</span>}
-                            </td>;
-                          }))}
-                        </tr>
-                      );
-                    })}
+                    {filasVisibles.map(fila => (
+                      <tr key={fila.id}>
+                        <td className="ed-rowlabel">{fila.nombre_fila}</td>
+                        {colsNormales.map(c => c.keys.map(key => {
+                          const ck = `${fila.id}_${key}`;
+                          const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
+                          const val = getValor(fila, key);
+                          return <td key={ck} className="ed-celda-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
+                            {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="ed-input" />
+                              : <span>{val || ''}</span>}
+                          </td>;
+                        }))}
+                        {colTotal && colTotal.keys.map(key => (
+                          <td key={`${fila.id}_${key}`} className="ed-celda-readonly">{getValor(fila, key) || ''}</td>
+                        ))}
+                      </tr>
+                    ))}
+                    {Object.keys(totalRow).length > 0 && (
+                      <tr className="ed-total-row">
+                        <td className="ed-rowlabel">Total</td>
+                        {colsNormales.map(c => c.keys.map(key => (
+                          <td key={`total_${key}`} className="ed-celda-readonly">{totalRow[key] || ''}</td>
+                        )))}
+                        {colTotal && colTotal.keys.map(key => (
+                          <td key={`total_${key}`} className="ed-celda-readonly">{totalRow[key] || ''}</td>
+                        ))}
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -440,8 +492,14 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
         </div>
         <div className="ed-secciones-wrap">{TIPOS_SECCION.map(({ value: tipo, label, color }) => {
           const cols = COLUMNAS_POR_TIPO[tipo] || [];
+          const colsNormales = cols.filter(c => !isTotalKey(c.keys[0]));
+          const colTotal = cols.find(c => isTotalKey(c.keys[0]));
           const data = concentradoData[tipo];
           if (!data) return null;
+          const ptcVals = data['PTC'] || {};
+          const asigVals = data['Asignatura'] || {};
+          const totalCalc = {};
+          for (const k of Object.keys(ptcVals)) totalCalc[k] = String(parseNum(ptcVals[k]) + parseNum(asigVals[k]));
           return (
             <div key={tipo} className={`ed-panel ed-panel-${color}`}>
               <h2>{label}</h2>
@@ -451,15 +509,23 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
                   <tr><th></th>{cols.map(c => <React.Fragment key={c.keys[0]}><th>H</th><th>M</th></React.Fragment>)}</tr>
                 </thead>
                 <tbody>
-                  {['Total Acumulado', 'PTC', 'Asignatura'].map(nf => {
+                  {['PTC', 'Asignatura'].map(nf => {
                     const vals = data[nf] || {};
                     return (
-                      <tr key={nf} className={nf === 'Total Acumulado' ? 'ed-total-row' : ''}>
+                      <tr key={nf}>
                         <td className="ed-rowlabel">{nf}</td>
-                        {cols.map(c => c.keys.map(key => <td key={key} className={nf === 'Total Acumulado' ? 'ed-celda-readonly' : ''}>{vals[key] || ''}</td>))}
+                        {colsNormales.map(c => c.keys.map(key => <td key={key} className="">{vals[key] || ''}</td>))}
+                        {colTotal && colTotal.keys.map(key => <td key={key} className="">{vals[key] || ''}</td>)}
                       </tr>
                     );
                   })}
+                  {Object.keys(totalCalc).length > 0 && (
+                    <tr className="ed-total-row">
+                      <td className="ed-rowlabel">Total</td>
+                      {colsNormales.map(c => c.keys.map(key => <td key={`tot_${key}`} className="ed-celda-readonly">{totalCalc[key] || ''}</td>))}
+                      {colTotal && colTotal.keys.map(key => <td key={`tot_${key}`} className="ed-celda-readonly">{totalCalc[key] || ''}</td>)}
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
