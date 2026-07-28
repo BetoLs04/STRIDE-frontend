@@ -335,7 +335,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
             }
             return (
               <div key={sec.id} className={`ed-panel ed-panel-${info.color}`}>
-                <h2>{sec.nombre}</h2>
+                <h2>{getInfoTipo(sec.tipo).label}</h2>
                 <table className="ed-tabla">
                   <thead>
                     <tr><th></th>{cols.map(c => <th key={c.keys[0]} colSpan={2}>{c.label}</th>)}</tr>

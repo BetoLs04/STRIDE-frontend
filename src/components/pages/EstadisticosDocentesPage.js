@@ -221,7 +221,7 @@ const EstadisticosDocentesPage = ({ user }) => {
             }
             return (
               <div key={sec.id} className={`edp-panel edp-panel-${info.color}`}>
-                <h2>{sec.nombre}</h2>
+                <h2>{getInfoTipo(sec.tipo).label}</h2>
                 <table className="edp-tabla">
                   <thead>
                     <tr><th></th>{cols.map(c => <th key={c.keys[0]} colSpan={2}>{c.label}</th>)}</tr>
