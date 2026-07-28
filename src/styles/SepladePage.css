@@ -387,3 +387,18 @@
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
 }
+
+/* === Nivel = Componente row color === */
+.seplade-table .row-prog.row-componente td {
+  background: #F9CB9C !important;
+}
+
+/* Keep evidencia cells green */
+.seplade-table .row-prog.row-componente td.col-evidence-green {
+  background: #d5f5e3 !important;
+}
+
+/* Keep encargado with original background */
+.seplade-table .row-prog.row-componente td.col-encargado {
+  background: #eaf3fb;
+}

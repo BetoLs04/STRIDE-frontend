@@ -346,7 +346,7 @@ const SepladePage = ({ user }) => {
             ) : (
               indicadoresVisibles.map(ind => (
                 <React.Fragment key={ind.id}>
-                  <tr className="row-prog">
+                  <tr className={`row-prog${ind.nivel === 'Componente' ? ' row-componente' : ''}`}>
                     <td
                       className="col-indicador"
                       rowSpan="2"
@@ -383,6 +383,7 @@ const SepladePage = ({ user }) => {
                     })}
                     <td
                       rowSpan="2"
+                      className="col-encargado"
                       onClick={() => esSuperAdmin && openModal(ind.id, 'encargado', null, null, ind.encargado)}
                       style={{ cursor: esSuperAdmin ? 'pointer' : 'default', textAlign: 'left' }}
                     >
