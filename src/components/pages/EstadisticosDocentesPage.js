@@ -57,6 +57,8 @@ const getInfoTipo = (tipo) => TIPOS_SECCION.find(t => t.value === tipo) || { lab
 
 const parseNum = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
+const isTotalKey = (key) => key === 'total_h' || key === 'total_m';
+
 const EstadisticosDocentesPage = ({ user }) => {
   const [misHojas, setMisHojas] = useState([]);
   const [aniosDisponibles, setAniosDisponibles] = useState([]);
@@ -109,16 +111,16 @@ const EstadisticosDocentesPage = ({ user }) => {
       const secs = r.data.data || []; setSecciones(secs);
       const fm = {};
       for (const sec of secs) { const fr = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`); fm[sec.id] = fr.data.data || []; }
-      // Auto-calcular totales de cada fila al cargar
       for (const sid of Object.keys(fm)) {
         const secMeta = secs.find(s => s.id === parseInt(sid));
         const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
         fm[sid] = fm[sid].map(f => {
           if (f.nombre_fila === 'Total Acumulado') return f;
-          const ft = computeFilaTotals(f, cols);
           const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-          vals.total_h = ft.total_h;
-          vals.total_m = ft.total_m;
+          const sumH = cols.filter(c => !isTotalKey(c.keys[0])).reduce((acc, c) => acc + parseNum(vals[c.keys[0]]), 0);
+          const sumM = cols.filter(c => !isTotalKey(c.keys[0])).reduce((acc, c) => acc + parseNum(vals[c.keys[1]]), 0);
+          vals.total_h = String(sumH);
+          vals.total_m = String(sumM);
           return { ...f, valores: vals };
         });
       }
@@ -128,19 +130,20 @@ const EstadisticosDocentesPage = ({ user }) => {
 
   const getValor = (fila, key) => { try { const v = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {}); return v[key] ?? ''; } catch { return ''; } };
 
-  const getCategoryKeys = (cols) => cols.filter(c => c.keys[0] !== 'total_h' && c.keys[1] !== 'total_m').flatMap(c => c.keys);
+  const startEditCelda = (fila, key, val) => { if (isTotalKey(key)) return; setEditingCelda({ filaId: fila.id, key }); setEditValue(val); setTimeout(() => inputRef.current?.focus(), 0); };
 
-  const computeFilaTotals = (fila, cols) => {
-    const cKeys = getCategoryKeys(cols);
+  const actualizarTotalesFila = (fila, cols) => {
+    const vals = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
     let sumH = 0, sumM = 0;
-    for (let i = 0; i < cKeys.length; i += 2) {
-      sumH += parseNum(getValor(fila, cKeys[i]));
-      sumM += parseNum(getValor(fila, cKeys[i + 1]));
+    for (const c of cols) {
+      if (isTotalKey(c.keys[0])) continue;
+      sumH += parseNum(vals[c.keys[0]]);
+      sumM += parseNum(vals[c.keys[1]]);
     }
-    return { total_h: String(sumH), total_m: String(sumM) };
+    vals.total_h = String(sumH);
+    vals.total_m = String(sumM);
+    return { ...fila, valores: vals };
   };
-
-  const startEditCelda = (fila, key, val) => { setEditingCelda({ filaId: fila.id, key }); setEditValue(val); setTimeout(() => inputRef.current?.focus(), 0); };
 
   const saveCelda = useCallback(async () => {
     if (!editingCelda) return;
@@ -150,42 +153,38 @@ const EstadisticosDocentesPage = ({ user }) => {
       setFilasPorSeccion(prev => {
         const next = { ...prev };
         for (const sid of Object.keys(next)) {
+          const secMeta = secciones.find(s => s.id === parseInt(sid));
+          const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
           next[sid] = next[sid].map(f => {
-            if (f.id !== filaId) return f;
+            if (f.nombre_fila === 'Total Acumulado' || f.id !== filaId) return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
             vals[key] = editValue;
             return { ...f, valores: vals };
           });
-          const secMeta = secciones.find(s => s.id === parseInt(sid));
-          const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado') return f;
-            const ft = computeFilaTotals(f, cols);
+            return actualizarTotalesFila(f, cols);
+          });
+          next[sid] = next[sid].map(f => {
+            if (f.nombre_fila === 'Total Acumulado') return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            if (vals.total_h !== ft.total_h) { vals.total_h = ft.total_h; api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: ft.total_h }).catch(() => {}); }
-            if (vals.total_m !== ft.total_m) { vals.total_m = ft.total_m; api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: ft.total_m }).catch(() => {}); }
-            return { ...f, valores: vals };
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => {});
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => {});
+            return f;
           });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
           const asig = next[sid].find(f => f.nombre_fila === 'Asignatura');
           if (ptc && asig) {
             const pv = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
             const av = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
-            const allKeys = [...new Set([...Object.keys(pv), ...Object.keys(av)])];
-            const totalRow = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
-            if (totalRow) {
-              const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
-              for (const k of allKeys) {
-                const sum = String(parseNum(pv[k]) + parseNum(av[k]));
-                if (tv[k] !== sum) {
-                  tv[k] = sum;
-                  api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => {});
-                }
+            for (const k of Object.keys(pv)) {
+              const sum = String(parseNum(pv[k]) + parseNum(av[k]));
+              const totalRow = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
+              if (totalRow) {
+                const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
+                tv[k] = sum;
+                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => {});
               }
-              next[sid] = next[sid].map(f => {
-                if (f.nombre_fila !== 'Total Acumulado') return f;
-                return { ...f, valores: tv };
-              });
             }
           }
         }
@@ -236,8 +235,7 @@ const EstadisticosDocentesPage = ({ user }) => {
                           const ck = `${fila.id}_${key}`;
                           const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
                           const val = getValor(fila, key);
-                          const esTotal = c.keys[0] === 'total_h';
-                          if (esTotal) return <td key={ck} className="edp-readonly">{val || ''}</td>;
+                          if (isTotalKey(key)) return <td key={ck} className="edp-readonly">{val || ''}</td>;
                           return <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
                             {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
                               : <span>{val || ''}</span>}
