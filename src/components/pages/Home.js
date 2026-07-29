@@ -513,63 +513,74 @@ const Home = () => {
         </div>
       )}
 
-      {/* SECCIÓN 1: METAS Y OBJETIVOS MANUALES */}
-      <h2 style={{ textAlign: 'center', color: '#1e3c72', marginTop: '3rem', marginBottom: '1.5rem', fontSize: '1.6rem' }}>
-        METAS Y OBJETIVOS MANUALES
+      {/* SECCIÓN 1: METAS Y OBJETIVOS ANUALES */}
+      <div className="section-divider" />
+      <h2 style={{ textAlign: 'center', color: '#1e3c72', marginTop: '2rem', marginBottom: '1.5rem', fontSize: '1.6rem' }}>
+        METAS Y OBJETIVOS ANUALES
       </h2>
       <div className="features-grid" style={{ marginTop: '0.5rem' }}>
 
         <div
           className="feature-card"
-          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
           onClick={handleSepladeClick}
         >
-          <div className="feature-icon">{isLoggedIn ? '📑' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>SEPLADE</h3>
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📑' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>SEPLADE</h3>
         </div>
 
         <div
           className="feature-card"
-          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
           onClick={handleMatrizClick}
         >
-          <div className="feature-icon">{isLoggedIn ? '📋' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>MATRIZ DE INDICADORES</h3>
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📋' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>MATRIZ DE INDICADORES</h3>
         </div>
 
         <div
           className="feature-card"
-          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
           onClick={handleSOAClick}
         >
-          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>Seguimiento de Objetivos Anuales (SOA)</h3>
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>Seguimiento de Objetivos Anuales (SOA)</h3>
+        </div>
+
+        <div
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
+          onClick={handlePOAClick}
+        >
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📋' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>Programa Operativo Anual (POA)</h3>
         </div>
 
       </div>
 
       {/* SECCIÓN 2: Datos estadisticos */}
-      <h2 style={{ textAlign: 'center', color: '#1e3c72', marginTop: '3rem', marginBottom: '1.5rem', fontSize: '1.6rem' }}>
+      <div className="section-divider" />
+      <h2 style={{ textAlign: 'center', color: '#1e3c72', marginTop: '2rem', marginBottom: '1.5rem', fontSize: '1.6rem' }}>
         DATOS ESTADÍSTICOS
       </h2>
       <div className="features-grid" style={{ marginTop: '0.5rem' }}>
 
         <div
           className="feature-card"
-          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
           onClick={handleEstadisticosAprovechamientoClick}
         >
-          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>ESTADÍSTICOS DE APROVECHAMIENTO ACADÉMICO</h3>
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>Estadísticos de Aprovechamiento Académico</h3>
         </div>
 
         {/* Próximamente: Estadísticos Docentes
         <div
           className="feature-card"
-          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
         >
-          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>ESTADÍSTICOS DOCENTES</h3>
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>ESTADÍSTICOS DOCENTES</h3>
         </div>
         */}
 

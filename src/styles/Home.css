@@ -970,3 +970,12 @@
 .slick-dotted.slick-slider {
   margin-bottom: 0 !important;
 }
+
+/* ===== SECTION DIVIDERS ===== */
+.section-divider {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--turquesa));
+  border-radius: 2px;
+  margin: 2rem auto;
+}
