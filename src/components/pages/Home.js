@@ -85,7 +85,7 @@ const Home = () => {
     }
   };
 
-  const handleSMOAClick = async () => {
+  const handleSOAClick = async () => {
     if (!isLoggedIn) {
       toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
       return;
@@ -100,13 +100,13 @@ const Home = () => {
       const asignados = res.data.data || [];
       const tieneAcceso = asignados.some(u => u.usuario_id === userData.id && u.usuario_tipo === userData.tipo);
       if (!tieneAcceso) {
-        toast.error('🚫 Permiso denegado. No tienes acceso al SMOA.');
+        toast.error('🚫 Permiso denegado. No tienes acceso al SOA.');
         return;
       }
       const prefix = getRoutePrefix(userData.tipo);
       navigate(`${prefix}/smoa`);
     } catch (error) {
-      handleApiError(error, 'Error al cargar datos SMOA');
+      handleApiError(error, 'Error al cargar datos SOA');
     }
   };
 
@@ -134,7 +134,7 @@ const Home = () => {
     }
   };
 
-  const handleEstadisticosGeneroClick = async () => {
+  const handleEstadisticosAprovechamientoClick = async () => {
     if (!isLoggedIn) {
       toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
       return;
@@ -148,7 +148,7 @@ const Home = () => {
       const res = await api.get(`/api/university/estadisticos-genero-mis-hojas?usuario_id=${userData.id}&usuario_tipo=${userData.tipo}`);
       const hojas = res.data.data || [];
       if (hojas.length === 0) {
-        toast.error('🚫 Permiso denegado. No tienes acceso a Estadísticos por Género.');
+        toast.error('🚫 Permiso denegado. No tienes acceso a Estadísticos de Aprovechamiento Académico.');
         return;
       }
       const prefix = getRoutePrefix(userData.tipo);
@@ -513,16 +513,11 @@ const Home = () => {
         </div>
       )}
 
-      {/* Enlaces y Recursos */}
-      <div className="features-grid" style={{ marginTop: '3rem' }}>
-        <div
-          className="feature-card"
-          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
-          onClick={handlePOAClick}
-        >
-          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>POA</h3>
-        </div>
+      {/* SECCIÓN 1: METAS Y OBJETIVOS MANUALES */}
+      <h2 style={{ textAlign: 'center', color: '#1e3c72', marginTop: '3rem', marginBottom: '1.5rem', fontSize: '1.6rem' }}>
+        METAS Y OBJETIVOS MANUALES
+      </h2>
+      <div className="features-grid" style={{ marginTop: '0.5rem' }}>
 
         <div
           className="feature-card"
@@ -545,20 +540,39 @@ const Home = () => {
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
-          onClick={handleSMOAClick}
+          onClick={handleSOAClick}
         >
           <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>SMOA</h3>
+          <h3 style={{ marginBottom: 0 }}>Seguimiento de Objetivos Anuales (SOA)</h3>
         </div>
+
+      </div>
+
+      {/* SECCIÓN 2: Datos estadisticos */}
+      <h2 style={{ textAlign: 'center', color: '#1e3c72', marginTop: '3rem', marginBottom: '1.5rem', fontSize: '1.6rem' }}>
+        DATOS ESTADÍSTICOS
+      </h2>
+      <div className="features-grid" style={{ marginTop: '0.5rem' }}>
 
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
-          onClick={handleEstadisticosGeneroClick}
+          onClick={handleEstadisticosAprovechamientoClick}
         >
           <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0 }}>ESTADÍSTICOS POR GÉNERO</h3>
+          <h3 style={{ marginBottom: 0 }}>ESTADÍSTICOS DE APROVECHAMIENTO ACADÉMICO</h3>
         </div>
+
+        {/* Próximamente: Estadísticos Docentes
+        <div
+          className="feature-card"
+          style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '150px' }}
+        >
+          <div className="feature-icon">{isLoggedIn ? '📊' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0 }}>ESTADÍSTICOS DOCENTES</h3>
+        </div>
+        */}
+
       </div>
     </div>
   );
