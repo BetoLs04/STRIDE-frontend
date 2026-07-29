@@ -242,7 +242,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         imagen_alineacion: encabezado.imagen_alineacion || 'center'
       });
       setEncabezado(prev => ({ ...prev, contenido }));
-      toast.success('Encabezado SMOA guardado correctamente');
+      toast.success('Encabezado SOA guardado correctamente');
       setEditingEncabezado(false);
     } catch (error) {
       handleApiError(error, 'Error al guardar encabezado');
@@ -342,7 +342,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         tipo_dato: nuevaColumnaTipo,
         permiso_subida: nuevaColumnaPermiso
       });
-      toast.success('Columna SMOA creada');
+      toast.success('Columna SOA creada');
       setNuevaColumna('');
       setNuevaColumnaTipo('texto');
       setNuevaColumnaPermiso('todos');
@@ -373,7 +373,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         tipo_dato: editColumnaTipo,
         permiso_subida: editColumnaPermiso
       });
-      toast.success('Columna SMOA actualizada');
+      toast.success('Columna SOA actualizada');
       setEditColumnaId(null);
       setEditColumnaNombre('');
       fetchColumnas();
@@ -395,7 +395,7 @@ const SuperAdminSMOA = ({ onClose }) => {
     if (!window.confirm(`¿Eliminar la columna "${columna.nombre}"?`)) return;
     try {
       await api.delete(`/api/university/smoa-columnas/${columna.id}`);
-      toast.success('Columna SMOA eliminada');
+      toast.success('Columna SOA eliminada');
       fetchColumnas();
     } catch (error) {
       handleApiError(error, 'Error al eliminar columna');
@@ -445,7 +445,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         );
       }
       await Promise.all(promises);
-      toast.success(`${selectedUsuarios.size} usuario(s) asignado(s) a SMOA`);
+      toast.success(`${selectedUsuarios.size} usuario(s) asignado(s) al SOA`);
       setShowAsignar(false);
       setSelectedUsuarios(new Set());
       fetchUsuarios();
@@ -455,10 +455,10 @@ const SuperAdminSMOA = ({ onClose }) => {
   };
 
   const handleQuitarUsuario = async (asignacion) => {
-    if (!window.confirm(`¿Quitar a "${asignacion.nombre}" del SMOA?`)) return;
+    if (!window.confirm(`¿Quitar a "${asignacion.nombre}" del SOA?`)) return;
     try {
       await api.delete(`/api/university/smoa-usuarios/${asignacion.asignacion_id}`);
-      toast.success('Usuario quitado de SMOA');
+      toast.success('Usuario quitado del SOA');
       fetchUsuarios();
     } catch (error) {
       handleApiError(error, 'Error al quitar usuario');
@@ -473,10 +473,10 @@ const SuperAdminSMOA = ({ onClose }) => {
   return (
     <div className="tab-content smo-indicadores">
       <div className="tab-header">
-        <h2>SMOA - Seguimiento Mensual de Objetivos Anuales</h2>
+        <h2>SOA - Seguimiento de Objetivos Anuales</h2>
         <div className="tab-actions">
           <button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
-          <button style={{ marginLeft: '2rem' }} className="btn btn-primary" onClick={() => navigate(ROUTES.ADMIN_SMOA)}>Ver hoja SMOA</button>
+          <button style={{ marginLeft: '2rem' }} className="btn btn-primary" onClick={() => navigate(ROUTES.ADMIN_SMOA)}>Ver hoja SOA</button>
         </div>
       </div>
 
@@ -672,7 +672,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         <div className="smoa-right">
           <div className="smoa-panel">
             <div className="smoa-panel-header">
-              <h3>Encabezado SMOA</h3>
+              <h3>Encabezado SOA</h3>
               {!encabezadoLoading && (
                 <button className="smoa-edit-toggle" onClick={() => setEditingEncabezado(!editingEncabezado)} title={editingEncabezado ? 'Cancelar edición' : 'Editar'}>
                   {editingEncabezado ? 'Cancelar' : 'Editar'}
@@ -687,7 +687,7 @@ const SuperAdminSMOA = ({ onClose }) => {
                   ref={quillRef}
                   value={encabezado.contenido || ''}
                   onChange={valor => setEncabezado(prev => ({ ...prev, contenido: valor }))}
-                  placeholder="Escribe el contenido del encabezado SMOA..."
+                  placeholder="Escribe el contenido del encabezado SOA..."
                   theme="snow"
                   modules={{
                     toolbar: {
@@ -768,7 +768,7 @@ const SuperAdminSMOA = ({ onClose }) => {
                 )}
                 {encabezadoImageUrl && (
                   <div className="smoa-encabezado-imagen-view">
-                    <img src={encabezadoImageUrl} alt="Encabezado SMOA" />
+                    <img src={encabezadoImageUrl} alt="Encabezado SOA" />
                   </div>
                 )}
               </div>
@@ -781,7 +781,7 @@ const SuperAdminSMOA = ({ onClose }) => {
         <div className="form-modal" onClick={() => setShowAsignar(false)}>
           <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
             <div className="form-header">
-              <h2>Asignar usuarios a SMOA</h2>
+              <h2>Asignar usuarios al SOA</h2>
               <button className="close-btn" onClick={() => setShowAsignar(false)}>×</button>
             </div>
             <div className="asignar-modal-body">

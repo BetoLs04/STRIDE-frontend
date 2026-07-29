@@ -160,7 +160,7 @@ const SMOAPage = ({ user }) => {
         setPermisosPptx(permisosRes.data.data);
       }
     } catch (error) {
-      handleApiError(error, 'Error al cargar datos SMOA');
+      handleApiError(error, 'Error al cargar datos SOA');
     } finally {
       setLoading(false);
     }
@@ -411,7 +411,7 @@ const SMOAPage = ({ user }) => {
   if (loading) {
     return (
       <div className="smoa-page-container">
-        <div className="loading">Cargando SMOA...</div>
+        <div className="loading">Cargando SOA...</div>
       </div>
     );
   }
@@ -422,7 +422,7 @@ const SMOAPage = ({ user }) => {
         <div className="no-data" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⛔</div>
           <h2>Permiso denegado</h2>
-          <p style={{ marginBottom: '2rem', color: '#6b7280' }}>No tienes acceso al SMOA.</p>
+          <p style={{ marginBottom: '2rem', color: '#6b7280' }}>No tienes acceso al SOA.</p>
           <button className="btn btn-secondary" onClick={goBack}>← Volver</button>
         </div>
       </div>
@@ -441,7 +441,7 @@ const SMOAPage = ({ user }) => {
       </div>
 
       <div className="smoa-page-title">
-        <h1>Seguimiento Mensual de Objetivos Anuales</h1>
+        <h1>Seguimiento de Objetivos Anuales (SOA)</h1>
       </div>
 
       {encabezado?.contenido && (
@@ -451,7 +451,7 @@ const SMOAPage = ({ user }) => {
         <div className={`smoa-encabezado-imagen-view smoa-align-${encabezado.imagen_alineacion || 'center'}`}>
           <img
             src={`${API_URL}/api/university/smoa-editor-images/${encabezado.imagen}`}
-            alt="Encabezado SMOA"
+            alt="Encabezado SOA"
             style={encabezado.imagen_ancho ? { width: encabezado.imagen_ancho + 'px' } : {}}
           />
         </div>

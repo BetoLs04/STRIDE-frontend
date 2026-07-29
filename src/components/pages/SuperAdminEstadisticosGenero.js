@@ -472,7 +472,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   return (
     <div className="tab-content estadisticos-genero">
       <div className="tab-header">
-        <h2>📊 Estadísticos por Género</h2>
+        <h2>📊 Estadísticos de Aprovechamiento Académico</h2>
         <div className="tab-actions">
           <button className="btn btn-secondary" onClick={onClose}>← Volver al Dashboard</button>
           <button className="btn btn-primary" onClick={handleOpenNewHoja}>+ Nueva Hoja</button>

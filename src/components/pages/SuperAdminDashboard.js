@@ -578,12 +578,12 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => setActiveTab('personal')}>👤 Personal</button>
         <button className={`tab-btn ${activeTab === 'comunicados' ? 'active' : ''}`} onClick={() => setActiveTab('comunicados')}>📢 Comunicados</button>
         <button className={`tab-btn ${activeTab === 'matriz' ? 'active' : ''}`} onClick={() => setActiveTab('matriz')}>📊 Matriz de Indicadores</button>
-        <button className={`tab-btn ${activeTab === 'smoa' ? 'active' : ''}`} onClick={() => setActiveTab('smoa')}>📈 SMOA</button>
+        <button className={`tab-btn ${activeTab === 'smoa' ? 'active' : ''}`} onClick={() => setActiveTab('smoa')}>📈 SOA</button>
         <button className={`tab-btn ${activeTab === 'seplade' ? 'active' : ''}`} onClick={() => setActiveTab('seplade')}>📋 SEPLADE</button>
         <button className={`tab-btn ${activeTab === 'poa' ? 'active' : ''}`} onClick={() => setActiveTab('poa')}>📋 POA</button>
       </div>
       <div className="dashboard-tabs-row">
-        <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-genero')}>📊 Estadísticos por Género</button>
+        <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-genero')}>📊 Estadísticos de Aprovechamiento Académico</button>
         <button className={`tab-btn ${activeTab === 'estadisticos-docentes' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-docentes')}>📊 Datos Estadísticos - Docentes</button>
       </div>
 
