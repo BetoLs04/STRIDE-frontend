@@ -535,7 +535,7 @@ const Home = () => {
           onClick={handleMatrizClick}
         >
           <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📋' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>MATRIZ DE INDICADORES</h3>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>Matriz de Indicadores</h3>
         </div>
 
         <div
