@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { API_URL } from '../api';
-import { IMAGES } from '../constants/index';
 
 const useUserPhoto = () => {
   const [userPhoto, setUserPhoto] = useState(null);
@@ -12,9 +11,8 @@ const useUserPhoto = () => {
     }
 
     const urlsToTry = [
-      `${API_URL}/api/university/personal/foto/${fotoPerfil}`,
       `${API_URL}/uploads/personal/${fotoPerfil}`,
-      `${API_URL}${IMAGES.DEFAULT_AVATAR}`,
+      `${API_URL}/api/university/personal/foto/${fotoPerfil}`,
     ];
 
     const tryLoad = (index) => {

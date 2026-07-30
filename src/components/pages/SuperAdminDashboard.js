@@ -440,19 +440,31 @@ const SuperAdminDashboard = ({ admin }) => {
               </thead>
               <tbody>
                 {personal.map(pers => {
-                  const fotoUrl = pers.foto_perfil
-                    ? `${API_URL}/api/university/personal/foto/${pers.foto_perfil}`
-                    : `${API_URL}${IMAGES.DEFAULT_AVATAR}`;
+                  const hasFoto = pers.foto_perfil;
+                  const fotoStaticUrl = hasFoto ? `${API_URL}/uploads/personal/${pers.foto_perfil}` : null;
+                  const fotoApiUrl = hasFoto ? `${API_URL}/api/university/personal/foto/${pers.foto_perfil}` : null;
                   return (
                     <tr key={pers.id}>
                       <td>
                         <div className="personal-foto-cell">
-                          <img
-                            src={fotoUrl}
-                            alt={pers.nombre_completo}
-                            className="personal-foto"
-                            onError={(e) => { e.target.src = `${API_URL}${IMAGES.DEFAULT_AVATAR}`; }}
-                          />
+                          {hasFoto ? (
+                            <img
+                              src={fotoStaticUrl}
+                              alt={pers.nombre_completo}
+                              className="personal-foto"
+                              onError={(e) => {
+                                if (e.target.src !== fotoApiUrl) {
+                                  e.target.src = fotoApiUrl;
+                                }
+                              }}
+                            />
+                          ) : (
+                            <svg width="40" height="40" viewBox="0 0 100 100" className="personal-foto">
+                              <circle cx="50" cy="50" r="50" fill="#e0e0e0"/>
+                              <circle cx="50" cy="38" r="18" fill="#b0b0b0"/>
+                              <path d="M22 82c0-15.5 12.5-28 28-28s28 12.5 28 28" fill="#b0b0b0"/>
+                            </svg>
+                          )}
                         </div>
                       </td>
                       <td><strong>{pers.nombre_completo}</strong></td>
@@ -511,7 +523,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
   const renderModalEditPersonal = () => {
     if (!showEditPersonal || !editingPersonal) return null;
-    const fotoActual = editingPersonal.foto_perfil && !editPersonalRemoveFoto ? `${API_URL}/api/university/personal/foto/${editingPersonal.foto_perfil}` : null;
+    const fotoActual = editingPersonal.foto_perfil && !editPersonalRemoveFoto ? `${API_URL}/uploads/personal/${editingPersonal.foto_perfil}` : null;
     return (
       <div className="form-modal">
         <div className="form-modal-content" style={{ maxWidth: '550px' }}>
