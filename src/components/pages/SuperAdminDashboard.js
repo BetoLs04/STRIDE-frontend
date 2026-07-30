@@ -529,7 +529,7 @@ const SuperAdminDashboard = ({ admin }) => {
             </FormSelect>
             <FormInput label="Email *" name="edit-personal-email" type="email" value={editFormPersonal.email} onChange={e => setEditFormPersonal({ ...editFormPersonal, email: e.target.value })} required />
             <FormInput label="Nueva Contraseña" name="edit-personal-password" type="password" value={editFormPersonal.password} onChange={e => setEditFormPersonal({ ...editFormPersonal, password: e.target.value })} placeholder="Nueva contraseña (opcional)" hint="(dejar vacío para no cambiar)" />
-            <FormFileUpload label="Foto de Perfil" accept="image/*" onChange={handleEditPersonalFoto} preview={editPersonalFotoPreview || fotoActual} noFileLabel="📷 Subir foto" previewLabel="📷 Cambiar foto" hint="Máximo 2MB • JPG, PNG, GIF" />
+            <FormFileUpload label="Foto de Perfil" accept="image/*" onChange={handleEditPersonalFoto} preview={editPersonalFotoPreview || fotoActual} onPreviewRemove={handleRemoveEditPersonalFoto} noFileLabel="📷 Subir foto" previewLabel="📷 Cambiar foto" hint="Máximo 2MB • JPG, PNG, GIF" />
             <div className="form-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setShowEditPersonal(false)}>Cancelar</button>
               <button type="submit" className="btn btn-primary" disabled={savingEdit}>{savingEdit ? 'Guardando...' : '💾 Guardar Cambios'}</button>
