@@ -38,6 +38,7 @@ const SuperAdminDashboard = ({ admin }) => {
   const [editFormPersonal, setEditFormPersonal] = useState({ nombre_completo: '', puesto: '', direccion_id: '', email: '', password: '' });
   const [editPersonalFoto, setEditPersonalFoto] = useState(null);
   const [editPersonalFotoPreview, setEditPersonalFotoPreview] = useState(null);
+  const [editPersonalRemoveFoto, setEditPersonalRemoveFoto] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
 
   const [usuarios, setUsuarios] = useState([]);
@@ -168,6 +169,7 @@ const SuperAdminDashboard = ({ admin }) => {
     });
     setEditPersonalFoto(null);
     setEditPersonalFotoPreview(null);
+    setEditPersonalRemoveFoto(false);
     setShowEditPersonal(true);
   };
 
@@ -177,12 +179,14 @@ const SuperAdminDashboard = ({ admin }) => {
     if (file.size > LIMITS.FILE_SIZE.PHOTO) { toast.error('La foto no puede exceder 2MB'); return; }
     setEditPersonalFoto(file);
     setEditPersonalFotoPreview(URL.createObjectURL(file));
+    setEditPersonalRemoveFoto(false);
   };
 
   const handleRemoveEditPersonalFoto = () => {
     if (editPersonalFotoPreview) URL.revokeObjectURL(editPersonalFotoPreview);
     setEditPersonalFoto(null);
     setEditPersonalFotoPreview(null);
+    setEditPersonalRemoveFoto(true);
   };
 
   const handleSaveEditPersonal = async (e) => {
@@ -195,6 +199,7 @@ const SuperAdminDashboard = ({ admin }) => {
       formData.append('direccion_id', editFormPersonal.direccion_id);
       formData.append('email', editFormPersonal.email);
       if (editFormPersonal.password) formData.append('password', editFormPersonal.password);
+      if (editPersonalRemoveFoto) formData.append('removeFoto', 'true');
       if (editPersonalFoto) formData.append('foto', editPersonalFoto);
       await api.put(`/api/university/personal/${editingPersonal.id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -506,7 +511,7 @@ const SuperAdminDashboard = ({ admin }) => {
 
   const renderModalEditPersonal = () => {
     if (!showEditPersonal || !editingPersonal) return null;
-    const fotoActual = editingPersonal.foto_perfil ? `${API_URL}/api/university/personal/foto/${editingPersonal.foto_perfil}` : null;
+    const fotoActual = editingPersonal.foto_perfil && !editPersonalRemoveFoto ? `${API_URL}/api/university/personal/foto/${editingPersonal.foto_perfil}` : null;
     return (
       <div className="form-modal">
         <div className="form-modal-content" style={{ maxWidth: '550px' }}>
