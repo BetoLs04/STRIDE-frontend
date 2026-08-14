@@ -278,24 +278,18 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     if (!editingCelda) return;
     const { filaId, key } = editingCelda;
     try {
-      const updated = {};
-      const filaActual = filas.find(f => f.id === filaId);
-      const valsActual = filaActual ? (typeof filaActual.valores === 'string' ? JSON.parse(filaActual.valores) : (filaActual.valores || {})) : {};
       const valorFinal = CAMPOS_DECIMALES.has(key) ? round2(editValue) : editValue;
-      updated[key] = valorFinal;
-      const conTotales = computeTotals({ ...valsActual, [key]: valorFinal });
-      for (const k of ['cant_total', 'aprov_total']) {
-        if (conTotales[k] !== (valsActual[k] ?? '')) {
-          updated[k] = conTotales[k];
-        }
-      }
-      for (const [k, v] of Object.entries(updated)) {
-        await api.patch(`/api/university/estadisticos-genero-filas/${filaId}/celda`, { key: k, value: v });
-      }
+      await api.patch(`/api/university/estadisticos-genero-filas/${filaId}/celda`, { key, value: valorFinal });
       setFilas(prev => prev.map(f => {
         if (f.id !== filaId) return f;
         const valores = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-        for (const [k, v] of Object.entries(updated)) valores[k] = v;
+        valores[key] = valorFinal;
+        const h = parseFloat(valores.cant_hombres) || 0;
+        const m = parseFloat(valores.cant_mujeres) || 0;
+        valores.cant_total = String(h + m);
+        const ah = parseFloat(valores.aprov_hombres) || 0;
+        const am = parseFloat(valores.aprov_mujeres) || 0;
+        valores.aprov_total = (ah + am) > 0 ? ((ah + am) / 2).toFixed(2) : '';
         return { ...f, valores };
       }));
     } catch (error) {
