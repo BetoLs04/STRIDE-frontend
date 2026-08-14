@@ -158,6 +158,30 @@ const Home = () => {
     }
   };
 
+  const handleEstadisticosDocentesClick = async () => {
+    if (!isLoggedIn) {
+      toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
+      return;
+    }
+    const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
+    if (userData?.tipo === USER_TYPES.SUPERADMIN) {
+      navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'estadisticos-docentes' } });
+      return;
+    }
+    try {
+      const res = await api.get(`/api/university/estadisticos-docentes-mis-hojas?usuario_id=${userData.id}&usuario_tipo=${userData.tipo}`);
+      const hojas = res.data.data || [];
+      if (hojas.length === 0) {
+        toast.error('🚫 Permiso denegado. No tienes acceso a Datos Estadísticos - Docentes.');
+        return;
+      }
+      const prefix = getRoutePrefix(userData.tipo);
+      navigate(`${prefix}/estadisticos-docentes`);
+    } catch (error) {
+      handleApiError(error, 'Error al cargar datos');
+    }
+  };
+
   const handlePOAClick = async () => {
     if (!isLoggedIn) {
       toast.warning('🔒 Por favor inicie sesión para acceder a este enlace.');
@@ -574,15 +598,14 @@ const Home = () => {
           <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>Estadísticos de Aprovechamiento Académico</h3>
         </div>
 
-        {/* Próximamente: Estadísticos Docentes
         <div
           className="feature-card"
           style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
+          onClick={handleEstadisticosDocentesClick}
         >
-          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '📊' : '🔒'}</div>
-          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>ESTADÍSTICOS DOCENTES</h3>
+          <div className="feature-icon" style={{ marginBottom: 0, fontSize: '1.5rem', flexShrink: 0 }}>{isLoggedIn ? '👨‍🏫' : '🔒'}</div>
+          <h3 style={{ marginBottom: 0, fontSize: '1rem' }}>Datos Estadísticos - Docentes</h3>
         </div>
-        */}
 
       </div>
     </div>
