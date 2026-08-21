@@ -414,7 +414,7 @@ const PersonalDashboard = ({ user }) => {
         fetchActividades();
       }
     } catch (error) {
-      handleApiError(error, 'Error al eliminar actividad');
+      handleApiError(error, 'Error al editar actividad');
     } finally {
       setGuardandoEdicion(false);
     }
