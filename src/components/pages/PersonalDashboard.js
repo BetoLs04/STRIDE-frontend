@@ -414,6 +414,7 @@ const PersonalDashboard = ({ user }) => {
         fetchActividades();
       }
     } catch (error) {
+      console.error('❌ Error completo:', error.response?.status, error.response?.data);
       handleApiError(error, 'Error al editar actividad');
     } finally {
       setGuardandoEdicion(false);
