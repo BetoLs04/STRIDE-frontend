@@ -179,6 +179,11 @@ const PersonalDashboard = ({ user }) => {
     return { anio: anioActual.toString(), periodo: periodoActual };
   };
 
+  const esPeriodoActual = (actividad) => {
+    const periodo = obtenerPeriodoActual();
+    return String(actividad.periodo_anio) === periodo.anio && actividad.periodo_nombre === periodo.periodo;
+  };
+
   const toggleAnioExpandido = (anio) => {
     setExpansiones(prev => ({ ...prev, años: { ...prev.años, [anio]: !prev.años[anio] } }));
   };
@@ -527,7 +532,7 @@ const PersonalDashboard = ({ user }) => {
             <button className="btn btn-primary btn-small" onClick={() => abrirModalActividad(actividad)}>
               Ver detalles
             </button>
-            {actividad.creado_por_id === user.id && (
+            {actividad.creado_por_id === user.id && esPeriodoActual(actividad) && (
               <button className="btn btn-danger btn-small" onClick={() => eliminarActividad(actividad.id, actividad.titulo)} title="Eliminar esta actividad" style={{ marginLeft: '10px' }}>
                 🗑️
               </button>
@@ -752,8 +757,8 @@ const PersonalDashboard = ({ user }) => {
                 </div>
               </div>
 
-              {/* Cambiar estado - solo si es el creador */}
-              {actividadSeleccionada.creado_por_id === user.id && (
+              {/* Cambiar estado - solo si es el creador y periodo actual */}
+              {actividadSeleccionada.creado_por_id === user.id && esPeriodoActual(actividadSeleccionada) && (
                 <div className="modal-actions">
                   <h4>⚙️ Cambiar Estado:</h4>
                   <div className="estado-selector-modal">
@@ -783,7 +788,7 @@ const PersonalDashboard = ({ user }) => {
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={cerrarModal}>Cerrar</button>
-              {actividadSeleccionada.creado_por_id === user.id && (
+              {actividadSeleccionada.creado_por_id === user.id && esPeriodoActual(actividadSeleccionada) && (
                 <button
                   className="btn btn-primary"
                   onClick={() => {
@@ -794,7 +799,7 @@ const PersonalDashboard = ({ user }) => {
                   ✏️ Editar Actividad
                 </button>
               )}
-              {actividadSeleccionada.creado_por_id === user.id && (
+              {actividadSeleccionada.creado_por_id === user.id && esPeriodoActual(actividadSeleccionada) && (
                 <button className="btn btn-danger" onClick={() => { eliminarActividad(actividadSeleccionada.id, actividadSeleccionada.titulo); cerrarModal(); }}>
                   🗑️ Eliminar Actividad
                 </button>
