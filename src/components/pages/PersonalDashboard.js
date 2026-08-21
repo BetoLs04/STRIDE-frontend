@@ -170,13 +170,15 @@ const PersonalDashboard = ({ user }) => {
 
   const obtenerPeriodoActual = () => {
     const hoy = new Date();
-    const anioActual = hoy.getFullYear();
-    const mesActual = hoy.getMonth() + 1;
+    const anio = hoy.getFullYear();
+    const mes = hoy.getMonth() + 1;
+    const dia = hoy.getDate();
     let periodoActual;
-    if (mesActual >= 2 && mesActual <= 5) periodoActual = 'enero-abril';
-    else if (mesActual >= 6 && mesActual <= 9) periodoActual = 'mayo-agosto';
+    if ((mes === 1 && dia >= 11) || (mes >= 2 && mes <= 4) || (mes === 5 && dia <= 10)) periodoActual = 'enero-abril';
+    else if ((mes === 5 && dia >= 11) || (mes >= 6 && mes <= 8) || (mes === 9 && dia <= 10)) periodoActual = 'mayo-agosto';
     else periodoActual = 'septiembre-diciembre';
-    return { anio: anioActual.toString(), periodo: periodoActual };
+    const anioPeriodo = (mes === 1 && dia < 11) ? anio - 1 : anio;
+    return { anio: anioPeriodo.toString(), periodo: periodoActual };
   };
 
   const esPeriodoActual = (actividad) => {
@@ -184,11 +186,13 @@ const PersonalDashboard = ({ user }) => {
     if (!actividad.fecha_inicio) return true;
     const fecha = new Date(actividad.fecha_inicio.split(' ')[0].split('T')[0] + 'T12:00:00');
     const mes = fecha.getMonth() + 1;
+    const dia = fecha.getDate();
     let periodoActividad;
-    if (mes >= 2 && mes <= 5) periodoActividad = 'enero-abril';
-    else if (mes >= 6 && mes <= 9) periodoActividad = 'mayo-agosto';
+    if ((mes === 1 && dia >= 11) || (mes >= 2 && mes <= 4) || (mes === 5 && dia <= 10)) periodoActividad = 'enero-abril';
+    else if ((mes === 5 && dia >= 11) || (mes >= 6 && mes <= 8) || (mes === 9 && dia <= 10)) periodoActividad = 'mayo-agosto';
     else periodoActividad = 'septiembre-diciembre';
-    return String(fecha.getFullYear()) === periodo.anio && periodoActividad === periodo.periodo;
+    const anioActividad = (mes === 1 && dia < 11) ? fecha.getFullYear() - 1 : fecha.getFullYear();
+    return String(anioActividad) === periodo.anio && periodoActividad === periodo.periodo;
   };
 
   const toggleAnioExpandido = (anio) => {

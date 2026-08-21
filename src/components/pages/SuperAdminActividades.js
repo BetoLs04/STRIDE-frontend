@@ -328,15 +328,15 @@ const SuperAdminActividades = ({ admin }) => {
 
   const obtenerPeriodoActual = () => {
     const hoy = new Date();
-    const anioActual = hoy.getFullYear();
-    const mesActual = hoy.getMonth() + 1;
-    
+    const anio = hoy.getFullYear();
+    const mes = hoy.getMonth() + 1;
+    const dia = hoy.getDate();
     let periodoActual;
-    if (mesActual >= 2 && mesActual <= 5) periodoActual = 'enero-abril';
-    else if (mesActual >= 6 && mesActual <= 9) periodoActual = 'mayo-agosto';
+    if ((mes === 1 && dia >= 11) || (mes >= 2 && mes <= 4) || (mes === 5 && dia <= 10)) periodoActual = 'enero-abril';
+    else if ((mes === 5 && dia >= 11) || (mes >= 6 && mes <= 8) || (mes === 9 && dia <= 10)) periodoActual = 'mayo-agosto';
     else periodoActual = 'septiembre-diciembre';
-    
-    return { anio: anioActual.toString(), periodo: periodoActual };
+    const anioPeriodo = (mes === 1 && dia < 11) ? anio - 1 : anio;
+    return { anio: anioPeriodo.toString(), periodo: periodoActual };
   };
 
   const toggleAnioExpandido = (anio) => {
