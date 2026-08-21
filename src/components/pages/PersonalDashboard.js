@@ -415,8 +415,9 @@ const PersonalDashboard = ({ user }) => {
       }
     } catch (error) {
       const serverMsg = error.response?.data?.error || error.response?.data?.message || 'Sin mensaje del servidor';
-      console.error('❌ Error 403:', serverMsg, '| full data:', JSON.stringify(error.response?.data));
-      toast.error(serverMsg);
+      const debugInfo = error.response?.data?.debug ? ` | Debug: ${JSON.stringify(error.response.data.debug)}` : '';
+      console.error('❌ Error 403:', serverMsg, debugInfo);
+      toast.error(serverMsg + debugInfo);
     } finally {
       setGuardandoEdicion(false);
     }
