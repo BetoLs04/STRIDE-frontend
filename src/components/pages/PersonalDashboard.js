@@ -181,8 +181,14 @@ const PersonalDashboard = ({ user }) => {
 
   const esPeriodoActual = (actividad) => {
     const periodo = obtenerPeriodoActual();
-    if (!actividad.periodo_nombre || !actividad.periodo_anio) return true;
-    return String(actividad.periodo_anio) === periodo.anio && actividad.periodo_nombre === periodo.periodo;
+    if (!actividad.fecha_inicio) return true;
+    const fecha = new Date(actividad.fecha_inicio.split(' ')[0].split('T')[0] + 'T12:00:00');
+    const mes = fecha.getMonth() + 1;
+    let periodoActividad;
+    if (mes >= 2 && mes <= 5) periodoActividad = 'enero-abril';
+    else if (mes >= 6 && mes <= 9) periodoActividad = 'mayo-agosto';
+    else periodoActividad = 'septiembre-diciembre';
+    return String(fecha.getFullYear()) === periodo.anio && periodoActividad === periodo.periodo;
   };
 
   const toggleAnioExpandido = (anio) => {
