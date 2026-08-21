@@ -181,6 +181,7 @@ const PersonalDashboard = ({ user }) => {
 
   const esPeriodoActual = (actividad) => {
     const periodo = obtenerPeriodoActual();
+    if (!actividad.periodo_nombre || !actividad.periodo_anio) return true;
     return String(actividad.periodo_anio) === periodo.anio && actividad.periodo_nombre === periodo.periodo;
   };
 
