@@ -414,10 +414,7 @@ const PersonalDashboard = ({ user }) => {
         fetchActividades();
       }
     } catch (error) {
-      const serverMsg = error.response?.data?.error || error.response?.data?.message || 'Sin mensaje del servidor';
-      const debugInfo = error.response?.data?.debug ? ` | Debug: ${JSON.stringify(error.response.data.debug)}` : '';
-      console.error('❌ Error 403:', serverMsg, debugInfo);
-      toast.error(serverMsg + debugInfo);
+      handleApiError(error, 'Error al editar actividad');
     } finally {
       setGuardandoEdicion(false);
     }
