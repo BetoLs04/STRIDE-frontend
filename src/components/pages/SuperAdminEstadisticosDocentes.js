@@ -280,8 +280,8 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado') return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => {});
-            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => {});
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => { });
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => { });
             return f;
           });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
@@ -294,7 +294,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
               const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
               for (const k of Object.keys(pv)) {
                 tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
-                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: tv[k] }).catch(() => {});
+                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: tv[k] }).catch(() => { });
               }
             }
           }
@@ -319,7 +319,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
         </div>
 
         <div className="ed-cols-desc">
-          <h4 className="ed-cols-desc-title">Descripción de Columnas</h4>
+          <h4 className="ed-cols-desc-title">Notas Importantes</h4>
           <p className="ed-cols-desc-row">No es necesario llenar los espacios vacíos con “0”, pero puede hacerlo si así gusta.</p>
           <p className="ed-cols-desc-note">Los Totales se calculan automáticamente. No hay botón para guardar, los datos se guardan automáticamente al ingresarlos.</p>
         </div>
@@ -404,22 +404,26 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
                 <div className="asignar-columnas">
                   <div className="asignar-seccion"><h4>Directivos</h4><div className="asignar-lista">
                     {getUsuariosDisponibles().filter(u => u.tipo === 'directivo').length === 0 ? <p className="text-muted">No hay</p>
-                      : getUsuariosDisponibles().filter(u => u.tipo === 'directivo').map(u => { const k = `${u.id}_${u.tipo}`; return (
-                        <button key={k} className={`asignar-btn-usuario${selectedAsignar.has(k) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
-                          <span className="asignar-check">{selectedAsignar.has(k) ? '✓' : ''}</span>
-                          <span className="asignar-usuario-nombre">{u.nombre}</span>
-                          <span className="asignar-usuario-tipo">Directivo</span>
-                        </button>); })}
+                      : getUsuariosDisponibles().filter(u => u.tipo === 'directivo').map(u => {
+                        const k = `${u.id}_${u.tipo}`; return (
+                          <button key={k} className={`asignar-btn-usuario${selectedAsignar.has(k) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedAsignar.has(k) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Directivo</span>
+                          </button>);
+                      })}
                   </div></div>
                   <div className="asignar-divider-vertical"></div>
                   <div className="asignar-seccion"><h4>Personal</h4><div className="asignar-lista">
                     {getUsuariosDisponibles().filter(u => u.tipo === 'personal').length === 0 ? <p className="text-muted">No hay</p>
-                      : getUsuariosDisponibles().filter(u => u.tipo === 'personal').map(u => { const k = `${u.id}_${u.tipo}`; return (
-                        <button key={k} className={`asignar-btn-usuario${selectedAsignar.has(k) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
-                          <span className="asignar-check">{selectedAsignar.has(k) ? '✓' : ''}</span>
-                          <span className="asignar-usuario-nombre">{u.nombre}</span>
-                          <span className="asignar-usuario-tipo">Personal</span>
-                        </button>); })}
+                      : getUsuariosDisponibles().filter(u => u.tipo === 'personal').map(u => {
+                        const k = `${u.id}_${u.tipo}`; return (
+                          <button key={k} className={`asignar-btn-usuario${selectedAsignar.has(k) ? ' selected' : ''}`} onClick={() => toggleAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedAsignar.has(k) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Personal</span>
+                          </button>);
+                      })}
                   </div></div>
                 </div>
                 <div className="asignar-footer">

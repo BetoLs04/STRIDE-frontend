@@ -123,7 +123,7 @@ const EstadisticosDocentesPage = ({ user }) => {
   const handleSelectHoja = async (hoja) => {
     setSelectedHoja(hoja); setSelectedCarrera(null); setEditingCelda(null);
     fetchCarreras(hoja.id);
-    api.get('/api/university/estadisticos-docentes-notas').then(r => setGlobalNotas(r.data.data?.contenido || '')).catch(() => {});
+    api.get('/api/university/estadisticos-docentes-notas').then(r => setGlobalNotas(r.data.data?.contenido || '')).catch(() => { });
   };
 
   const fetchCarreras = async (hojaId) => {
@@ -201,8 +201,8 @@ const EstadisticosDocentesPage = ({ user }) => {
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado') return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => {});
-            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => {});
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => { });
+            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => { });
             return f;
           });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
@@ -216,7 +216,7 @@ const EstadisticosDocentesPage = ({ user }) => {
               if (totalRow) {
                 const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
                 tv[k] = sum;
-                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => {});
+                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => { });
               }
             }
           }
@@ -240,7 +240,7 @@ const EstadisticosDocentesPage = ({ user }) => {
         </div>
 
         <div className="edp-cols-desc">
-          <h4 className="edp-cols-desc-title">Descripción de Columnas</h4>
+          <h4 className="edp-cols-desc-title">Notas Importantes</h4>
           <p className="edp-cols-desc-row">No es necesario llenar los espacios vacíos con “0”, pero puede hacerlo si así gusta.</p>
           <p className="edp-cols-desc-note">Los Totales se calculan automáticamente. No hay botón para guardar, los datos se guardan automáticamente al ingresarlos.</p>
         </div>
@@ -272,22 +272,23 @@ const EstadisticosDocentesPage = ({ user }) => {
                       const colsNormales = cols.filter(c => !isTotalKey(c.keys[0]));
                       const colTotal = cols.find(c => isTotalKey(c.keys[0]));
                       return (
-                      <tr key={fila.id}>
-                        <td className="edp-rowlabel">{fila.nombre_fila}</td>
-                        {colsNormales.map(c => c.keys.map(key => {
-                          const ck = `${fila.id}_${key}`;
-                          const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
-                          const val = getValor(fila, key);
-                          return <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
-                            {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
-                              : <span>{val || ''}</span>}
-                          </td>;
-                        }))}
-                        {colTotal && colTotal.keys.map(key => (
-                          <td key={`${fila.id}_${key}`} className="edp-readonly">{getValor(fila, key) || ''}</td>
-                        ))}
-                      </tr>
-                    );})}
+                        <tr key={fila.id}>
+                          <td className="edp-rowlabel">{fila.nombre_fila}</td>
+                          {colsNormales.map(c => c.keys.map(key => {
+                            const ck = `${fila.id}_${key}`;
+                            const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
+                            const val = getValor(fila, key);
+                            return <td key={ck} className="edp-edit" onClick={() => !isEditing && startEditCelda(fila, key, val)}>
+                              {isEditing ? <input ref={inputRef} type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveCelda} onKeyDown={handleCeldaKeyDown} className="edp-input" />
+                                : <span>{val || ''}</span>}
+                            </td>;
+                          }))}
+                          {colTotal && colTotal.keys.map(key => (
+                            <td key={`${fila.id}_${key}`} className="edp-readonly">{getValor(fila, key) || ''}</td>
+                          ))}
+                        </tr>
+                      );
+                    })}
                     {Object.keys(totalRow).length > 0 && (
                       <tr className="edp-total-row">
                         <td className="edp-rowlabel">Total</td>
@@ -394,11 +395,11 @@ const EstadisticosDocentesPage = ({ user }) => {
           : <><div className="edp-anios">{aniosDisponibles.map(anio => (
             <button key={anio} className={`edp-anio-btn ${selectedAnio === anio ? 'active' : ''}`} onClick={() => setSelectedAnio(anio)}>{anio}</button>
           ))}</div>
-          <div className="edp-hojas">{hojasFiltradas.map(hoja => (
-            <div key={hoja.id} className="edp-hoja-card" onClick={() => handleSelectHoja(hoja)}>
-              <h3>{hoja.cuatrimestre || 'Sin nombre'}</h3><p>{hoja.anio}</p>
-            </div>
-          ))}</div></>}
+            <div className="edp-hojas">{hojasFiltradas.map(hoja => (
+              <div key={hoja.id} className="edp-hoja-card" onClick={() => handleSelectHoja(hoja)}>
+                <h3>{hoja.cuatrimestre || 'Sin nombre'}</h3><p>{hoja.anio}</p>
+              </div>
+            ))}</div></>}
     </div>
   );
 };
