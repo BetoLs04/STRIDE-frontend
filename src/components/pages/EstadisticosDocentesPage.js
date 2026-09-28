@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../../api';
+import { toast } from 'react-toastify';
 import '../../styles/EstadisticosDocentesPage.css';
 import { handleApiError } from '../../utils/errorHandler';
+import useSocketEvent from '../../hooks/useSocketEvent';
 
 const TIPOS_SECCION = [
   { value: 'ultimo_grado', label: 'Último grado de estudios', color: 'green' },
@@ -79,7 +81,38 @@ const EstadisticosDocentesPage = ({ user }) => {
   const [editValue, setEditValue] = useState('');
   const inputRef = useRef(null);
 
+  const refreshRef = useRef();
+  useEffect(() => {
+    refreshRef.current = () => {
+      fetchMisHojas();
+      if (selectedHoja) {
+        fetchCarreras(selectedHoja.id);
+        if (selectedCarrera) {
+          cargarSecciones(selectedCarrera.id);
+        }
+      }
+    };
+  });
+  useSocketEvent('estadisticos-docentes:updated', () => refreshRef.current?.());
+
   useEffect(() => { fetchMisHojas(); }, []);
+
+  const isCarreraAsignada = (carrera) => {
+    if (!user) return false;
+    if (user.tipo === 'superadmin' || user.isDelegado) return true;
+    return Boolean(
+      carrera.usuarios &&
+      carrera.usuarios.some(u => u.usuario_id === user.id && u.usuario_tipo === user.tipo)
+    );
+  };
+
+  const handleCarreraCardClick = (carrera) => {
+    if (!isCarreraAsignada(carrera)) {
+      toast.warning('🔒 Acceso restringido. Solo el maestro asignado puede ingresar a esta carrera.');
+      return;
+    }
+    handleSelectCarrera(carrera);
+  };
 
   const fetchMisHojas = async () => {
     setLoading(true);
@@ -274,15 +307,73 @@ const EstadisticosDocentesPage = ({ user }) => {
       <div className="edp-container">
         <div className="edp-header">
           <button className="btn btn-secondary" onClick={() => { setSelectedHoja(null); setCarreras([]); }}>← Volver</button>
-          <div><h2>{selectedHoja.cuatrimestre} - {selectedHoja.anio}</h2><p className="text-muted">Carreras</p></div>
+          <div>
+            <h2>{selectedHoja.cuatrimestre} - {selectedHoja.anio}</h2>
+            <p className="text-muted">Selecciona tu carrera para acceder a la captura y consulta estadística.</p>
+          </div>
         </div>
-        {carrerasLoading ? <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>
-          : carreras.length === 0 ? <p className="text-muted" style={{ padding: '3rem', textAlign: 'center' }}>Sin carreras disponibles.</p>
-            : <div className="edp-hojas">{carreras.map(c => (
-              <div key={c.id} className="edp-hoja-card" onClick={() => handleSelectCarrera(c)}>
-                <h3>{c.nombre || 'Sin nombre'}</h3>
-              </div>
-            ))}</div>}
+
+        <div className="edp-info-bar">
+          <div>
+            <p><strong>Control de acceso docente:</strong> Solo puedes ingresar y capturar datos en la carrera asignada a tu cuenta.</p>
+            <div className="edp-legend">
+              <span className="edp-legend-item">
+                <span className="edp-legend-dot allowed"></span> Tu carrera asignada (Habilitada)
+              </span>
+              <span className="edp-legend-item">
+                <span className="edp-legend-dot restricted"></span> Carreras de otros docentes (Restringidas)
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {carrerasLoading ? (
+          <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Cargando carreras...</div>
+        ) : carreras.length === 0 ? (
+          <p className="text-muted" style={{ padding: '3rem', textAlign: 'center' }}>Sin carreras disponibles.</p>
+        ) : (
+          <div className="edp-carreras-grid">
+            {carreras.map(c => {
+              const permitida = isCarreraAsignada(c);
+
+              return (
+                <div
+                  key={c.id}
+                  className={`edp-carrera-card ${permitida ? 'edp-carrera-permitida' : 'edp-carrera-restringida'}`}
+                  onClick={() => handleCarreraCardClick(c)}
+                  title={permitida ? 'Hacer clic para ingresar' : 'Acceso restringido: no estás asignado a esta carrera'}
+                >
+                  <div>
+                    <div className="edp-carrera-badge-row">
+                      <span className={`edp-carrera-badge ${permitida ? 'edp-badge-permitido' : 'edp-badge-restringido'}`}>
+                        {permitida ? '✓ Acceso Permitido' : '🔒 Restringida'}
+                      </span>
+                    </div>
+
+                    <h3>{c.nombre || 'Sin nombre'}</h3>
+
+                    <p className={`edp-carrera-status ${permitida ? 'edp-status-allowed' : 'edp-status-restricted'}`}>
+                      {permitida ? (
+                        <span>🎓 Carrera asignada a tu usuario</span>
+                      ) : (
+                        <span>🚫 Solo el docente asignado puede entrar</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="edp-carrera-footer">
+                    {permitida ? (
+                      <span className="edp-btn-entrar">Ingresar a carrera →</span>
+                    ) : (
+                      <span className="edp-btn-bloqueado">🔒 Bloqueado</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {globalNotas && <div className="edp-notas" style={{ marginTop: '1.5rem' }}><p>{globalNotas}</p></div>}
       </div>
     );

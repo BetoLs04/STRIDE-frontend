@@ -5,6 +5,7 @@ import '../../styles/SuperAdminEstadisticosGenero.css';
 import FormInput from '../shared/FormInput';
 import { handleApiError } from '../../utils/errorHandler';
 import useSocketEvent from '../../hooks/useSocketEvent';
+import { getUserColor } from '../../utils/userColors';
 
 const COLUMNAS_FIJAS = [
   { key: 'programa', label: 'Programa', tipo: 'texto' },
@@ -80,6 +81,14 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   const [showAsignarUsuarios, setShowAsignarUsuarios] = useState(false);
   const [selectedAsignar, setSelectedAsignar] = useState(new Set());
   const [usuariosLoading, setUsuariosLoading] = useState(false);
+
+  // Asignación por fila
+  const [showModalFilaUsuarios, setShowModalFilaUsuarios] = useState(false);
+  const [selectedFilaForUsuarios, setSelectedFilaForUsuarios] = useState(null);
+  const [filaUsuarios, setFilaUsuarios] = useState([]);
+  const [selectedFilaAsignar, setSelectedFilaAsignar] = useState(new Set());
+  const [savingFilaUsuarios, setSavingFilaUsuarios] = useState(false);
+
   const [editingCelda, setEditingCelda] = useState(null);
   const [editValue, setEditValue] = useState('');
 
@@ -257,6 +266,63 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     return usuariosDisponibles.filter(u => !asignadosKey.has(`${u.id}_${u.tipo}`));
   };
 
+  // --- Handlers de asignación por fila ---
+  const handleOpenAsignarFila = (fila) => {
+    setSelectedFilaForUsuarios(fila);
+    setFilaUsuarios(fila.usuarios || []);
+    setSelectedFilaAsignar(new Set());
+    setShowModalFilaUsuarios(true);
+  };
+
+  const toggleFilaAsignarUsuario = (usuario) => {
+    const key = `${usuario.id}_${usuario.tipo}`;
+    setSelectedFilaAsignar(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  const handleConfirmarFilaAsignacion = async () => {
+    if (selectedFilaAsignar.size === 0) { toast.error('Selecciona al menos un usuario'); return; }
+    setSavingFilaUsuarios(true);
+    try {
+      for (const key of selectedFilaAsignar) {
+        const [id, tipo] = key.split('_');
+        await api.post('/api/university/estadisticos-genero-fila-usuarios', {
+          fila_id: selectedFilaForUsuarios.id,
+          usuario_id: parseInt(id),
+          usuario_tipo: tipo
+        });
+      }
+      toast.success(`${selectedFilaAsignar.size} usuario(s) asignado(s) a la fila`);
+      setShowModalFilaUsuarios(false);
+      setSelectedFilaAsignar(new Set());
+      if (selectedHoja) fetchFilas(selectedHoja.id);
+    } catch (error) {
+      handleApiError(error, 'Error al asignar usuario a la fila');
+    } finally {
+      setSavingFilaUsuarios(false);
+    }
+  };
+
+  const handleQuitarUsuarioFila = async (asignacion) => {
+    if (!window.confirm(`¿Quitar a "${asignacion.nombre}" de esta fila?`)) return;
+    try {
+      await api.delete(`/api/university/estadisticos-genero-fila-usuarios/${asignacion.asignacion_id}`);
+      toast.success('Usuario quitado de la fila');
+      setFilaUsuarios(prev => prev.filter(u => u.asignacion_id !== asignacion.asignacion_id));
+      if (selectedHoja) fetchFilas(selectedHoja.id);
+    } catch (error) {
+      handleApiError(error, 'Error al quitar usuario de la fila');
+    }
+  };
+
+  const getUsuariosDisponiblesFila = () => {
+    const asignadosKey = new Set((filaUsuarios || []).map(u => `${u.usuario_id}_${u.usuario_tipo}`));
+    return usuariosDisponibles.filter(u => !asignadosKey.has(`${u.id}_${u.tipo}`));
+  };
+
   const getValor = (fila, key) => {
     try {
       const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
@@ -361,6 +427,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                     <tr>
                       <th className="th-accion" rowSpan="2"></th>
                       <th className="th-blue" rowSpan="2">Programa</th>
+                      <th className="th-blue" rowSpan="2" style={{ minWidth: '170px' }}>Responsable(s) de Fila</th>
                       <th className="th-blue" rowSpan="2">Grupos</th>
                       <th className="th-orange" colSpan="3">Cantidad</th>
                       <th className="th-green" colSpan="3">Aprovechamiento</th>
@@ -377,16 +444,73 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                   <tbody>
                     {filas.length === 0 ? (
                       <tr>
-                        <td colSpan={COLUMNAS_FIJAS.length + 1} style={{ textAlign: 'center', color: '#9ca3af', padding: '2rem' }}>
+                        <td colSpan={COLUMNAS_FIJAS.length + 2} style={{ textAlign: 'center', color: '#9ca3af', padding: '2rem' }}>
                           Sin filas aún
                         </td>
                       </tr>
                     ) : filas.map((fila, index) => (
                       <tr key={fila.id}>
                         <td className="td-accion">
-                          <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)} title="Eliminar">×</button>
+                          <button className="btn btn-danger btn-small" onClick={() => handleDeleteFila(fila)} title="Eliminar fila">×</button>
                         </td>
-                        {COLUMNAS_FIJAS.map(col => {
+                        {/* Programa */}
+                        <td
+                          className="editable-cell"
+                          onClick={() => !editingCelda && startEditCelda(fila, 'programa', getValor(fila, 'programa'))}
+                        >
+                          {editingCelda?.filaId === fila.id && editingCelda?.key === 'programa' ? (
+                            <input
+                              ref={inputRef}
+                              type="text"
+                              value={editValue}
+                              onChange={e => setEditValue(e.target.value)}
+                              onBlur={saveCelda}
+                              onKeyDown={handleCeldaKeyDown}
+                              className="celda-input"
+                            />
+                          ) : (
+                            <span className="celda-valor" style={{ fontWeight: 600 }}>{getValor(fila, 'programa')}</span>
+                          )}
+                        </td>
+                        {/* Responsable(s) asignados */}
+                        <td className="td-responsable" style={{ padding: '0.4rem 0.6rem', textAlign: 'left' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', alignItems: 'center' }}>
+                              {fila.usuarios && fila.usuarios.length > 0 ? (
+                                fila.usuarios.map(u => {
+                                  const cStyle = getUserColor(u.nombre || u.usuario_id);
+                                  return (
+                                    <span
+                                      key={u.asignacion_id}
+                                      className="eg-user-badge"
+                                      style={{
+                                        backgroundColor: cStyle.bg,
+                                        color: cStyle.text,
+                                        borderColor: cStyle.border
+                                      }}
+                                      title={`${u.nombre} (${u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})`}
+                                    >
+                                      <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
+                                      <span className="eg-user-name">{u.nombre}</span>
+                                    </span>
+                                  );
+                                })
+                              ) : (
+                                <span className="eg-user-badge eg-badge-unassigned">⚠️ Sin asignar</span>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              className="btn-asignar-fila"
+                              onClick={() => handleOpenAsignarFila(fila)}
+                              title="Asignar o cambiar personal que puede llenar esta fila"
+                            >
+                              👥 Asignar personal
+                            </button>
+                          </div>
+                        </td>
+                        {/* Demás columnas */}
+                        {COLUMNAS_FIJAS.filter(col => col.key !== 'programa').map(col => {
                           const cellKey = `${fila.id}_${col.key}`;
                           const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === col.key;
                           const val = getValor(fila, col.key);
@@ -427,9 +551,11 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                     <tfoot>
                       <tr className="tr-total">
                         <td className="td-accion"></td>
+                        <td className="celda-total" style={{ fontWeight: 700 }}>Total</td>
+                        <td className="celda-total"></td>
                         {(() => {
                           const tg = computeTotalesGenerales(filas, getValor);
-                          return COLUMNAS_FIJAS.map(col => (
+                          return COLUMNAS_FIJAS.filter(col => col.key !== 'programa').map(col => (
                             <td key={col.key} className="celda-total">{tg[col.key] ?? ''}</td>
                           ));
                         })()}
@@ -540,21 +666,34 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
           <p className="text-muted" style={{ padding: '0.5rem 1rem', margin: 0 }}>Sin usuarios asignados</p>
         ) : (
           <div className="eg-usuarios-tags">
-            {usuariosAsignados.map(u => (
-              <span key={u.asignacion_id} className="eg-usuario-tag">
-                {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
-                <button className="tag-remove" onClick={() => handleQuitarUsuario(u)}>×</button>
-              </span>
-            ))}
+            {usuariosAsignados.map(u => {
+              const cStyle = getUserColor(u.nombre || u.usuario_id);
+              return (
+                <span
+                  key={u.asignacion_id}
+                  className="eg-usuario-tag"
+                  style={{
+                    backgroundColor: cStyle.bg,
+                    color: cStyle.text,
+                    border: `1px solid ${cStyle.border}`
+                  }}
+                >
+                  <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
+                  {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
+                  <button className="tag-remove" style={{ color: cStyle.text }} onClick={() => handleQuitarUsuario(u)}>×</button>
+                </span>
+              );
+            })}
           </div>
         )}
       </div>
 
+      {/* Modal para asignación global */}
       {showAsignarUsuarios && (
         <div className="form-modal" onClick={() => setShowAsignarUsuarios(false)}>
           <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
             <div className="form-header">
-              <h2>Asignar usuarios</h2>
+              <h2>Asignar usuarios con acceso general</h2>
               <button className="close-btn" onClick={() => setShowAsignarUsuarios(false)}>×</button>
             </div>
             <div className="asignar-modal-body">
@@ -605,6 +744,118 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                   <button className="btn btn-secondary" onClick={() => setShowAsignarUsuarios(false)}>Cancelar</button>
                   <button className="btn btn-primary" onClick={handleConfirmarAsignacion} disabled={selectedAsignar.size === 0}>
                     Confirmar asignación
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para asignación de usuarios por FILA */}
+      {showModalFilaUsuarios && selectedFilaForUsuarios && (
+        <div className="form-modal" onClick={() => setShowModalFilaUsuarios(false)}>
+          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '650px' }}>
+            <div className="form-header">
+              <div>
+                <h2>Asignar personal a fila</h2>
+                <p className="text-muted" style={{ margin: '0.2rem 0 0', fontSize: '0.9rem' }}>
+                  Programa: <strong>{getValor(selectedFilaForUsuarios, 'programa') || `Fila #${selectedFilaForUsuarios.id}`}</strong>
+                </p>
+              </div>
+              <button className="close-btn" onClick={() => setShowModalFilaUsuarios(false)}>×</button>
+            </div>
+
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e5e7eb', background: '#f8fafc' }}>
+              <strong style={{ display: 'block', marginBottom: '0.5rem', color: '#1e293b', fontSize: '0.9rem' }}>
+                Personal asignado actualmente a esta fila:
+              </strong>
+              {filaUsuarios.length === 0 ? (
+                <span className="text-muted" style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>
+                  No hay personal asignado a esta fila todavía.
+                </span>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {filaUsuarios.map(u => {
+                    const cStyle = getUserColor(u.nombre || u.usuario_id);
+                    return (
+                      <span
+                        key={u.asignacion_id}
+                        className="eg-usuario-tag"
+                        style={{
+                          backgroundColor: cStyle.bg,
+                          color: cStyle.text,
+                          border: `1px solid ${cStyle.border}`
+                        }}
+                      >
+                        <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
+                        {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
+                        <button
+                          className="tag-remove"
+                          style={{ color: cStyle.text }}
+                          onClick={() => handleQuitarUsuarioFila(u)}
+                          title="Quitar de esta fila"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="asignar-modal-body">
+              <strong style={{ display: 'block', padding: '0 1.5rem 0.5rem', color: '#475569', fontSize: '0.85rem' }}>
+                Selecciona personal disponible para agregar:
+              </strong>
+              <div className="asignar-columnas">
+                <div className="asignar-seccion">
+                  <h4>Directivos</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponiblesFila().filter(u => u.tipo === 'directivo').length === 0 ? (
+                      <p className="text-muted">No hay directivos disponibles</p>
+                    ) : (
+                      getUsuariosDisponiblesFila().filter(u => u.tipo === 'directivo').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedFilaAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleFilaAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedFilaAsignar.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Directivo</span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+                <div className="asignar-divider-vertical"></div>
+                <div className="asignar-seccion">
+                  <h4>Personal</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponiblesFila().filter(u => u.tipo === 'personal').length === 0 ? (
+                      <p className="text-muted">No hay personal disponible</p>
+                    ) : (
+                      getUsuariosDisponiblesFila().filter(u => u.tipo === 'personal').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedFilaAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleFilaAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedFilaAsignar.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Personal</span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="asignar-footer">
+                <span className="asignar-seleccionados">{selectedFilaAsignar.size} seleccionado(s)</span>
+                <div className="asignar-footer-actions">
+                  <button className="btn btn-secondary" onClick={() => setShowModalFilaUsuarios(false)}>Cerrar</button>
+                  <button className="btn btn-primary" onClick={handleConfirmarFilaAsignacion} disabled={selectedFilaAsignar.size === 0 || savingFilaUsuarios}>
+                    {savingFilaUsuarios ? 'Guardando...' : 'Asignar a fila'}
                   </button>
                 </div>
               </div>

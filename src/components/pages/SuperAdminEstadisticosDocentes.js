@@ -443,7 +443,22 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           : carreras.length === 0 ? <div className="ed-empty"><p>No hay carreras. Crea la primera.</p><button className="btn btn-primary" onClick={handleOpenNewCarrera}>+ Nueva Carrera</button></div>
             : <div className="ed-hojas-list">{carreras.map(c => (
               <div key={c.id} className="ed-hoja-card">
-                <div className="ed-hoja-info"><h3>{c.nombre || 'Sin nombre'}</h3></div>
+                <div className="ed-hoja-info">
+                  <h3>{c.nombre || 'Sin nombre'}</h3>
+                  {c.usuarios && c.usuarios.length > 0 ? (
+                    <div style={{ marginTop: '0.35rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#0369a1', background: '#e0f2fe', padding: '0.15rem 0.55rem', borderRadius: '12px', fontWeight: '500' }}>
+                        👤 {c.usuarios.map(u => u.nombre).join(', ')}
+                      </span>
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: '0.35rem' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontStyle: 'italic' }}>
+                        Sin docente asignado
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <div className="ed-hoja-actions">
                   <button className="btn btn-success" onClick={() => handleSelectCarrera(c)}>Entrar</button>
                   <button className="btn btn-secondary btn-small" onClick={() => handleOpenEditCarrera(c)}>✏️</button>

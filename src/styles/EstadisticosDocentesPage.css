@@ -7,10 +7,199 @@
 .edp-anio-btn:hover { background: #e5e7eb; }
 .edp-anio-btn.active { background: var(--primary-blue); color: #fff; border-color: var(--primary-blue); }
 .edp-hojas { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
-.edp-hoja-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; cursor: pointer; }
-.edp-hoja-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+.edp-hoja-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: all 0.2s ease; }
+.edp-hoja-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); transform: translateY(-2px); border-color: var(--primary-blue); }
 .edp-hoja-card h3 { margin: 0 0 0.25rem; color: #1f2937; }
 .edp-hoja-card p { margin: 0; color: #6b7280; font-size: 0.9rem; }
+
+/* Grid de Carreras */
+.edp-carreras-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.edp-carrera-card {
+  position: relative;
+  border-radius: 12px;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 150px;
+  transition: all 0.25s ease-in-out;
+}
+
+/* Carrera Permitida (Docente Asignado) */
+.edp-carrera-card.edp-carrera-permitida {
+  background: #ffffff;
+  border: 1.5px solid #a7f3d0;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
+  cursor: pointer;
+}
+
+.edp-carrera-card.edp-carrera-permitida:hover {
+  transform: translateY(-3px);
+  border-color: #10b981;
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.18);
+}
+
+.edp-carrera-card.edp-carrera-permitida h3 {
+  margin: 0 0 0.4rem;
+  color: #065f46;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* Carrera Restringida (Rojo desvanecido) */
+.edp-carrera-card.edp-carrera-restringida {
+  background: linear-gradient(135deg, #fff5f5 0%, #fee2e2 100%);
+  border: 1.5px dashed #fca5a5;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.05);
+  cursor: not-allowed;
+  opacity: 0.75;
+  transition: all 0.2s ease;
+}
+
+.edp-carrera-card.edp-carrera-restringida:hover {
+  opacity: 0.9;
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
+}
+
+.edp-carrera-card.edp-carrera-restringida h3 {
+  margin: 0 0 0.4rem;
+  color: #991b1b;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Badges */
+.edp-carrera-badge-row {
+  margin-bottom: 0.75rem;
+}
+
+.edp-carrera-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.edp-badge-permitido {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.edp-badge-restringido {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Info de estado */
+.edp-carrera-status {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.edp-status-allowed {
+  color: #059669;
+  font-weight: 500;
+}
+
+.edp-status-restricted {
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+.edp-carrera-footer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.edp-btn-entrar {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #059669;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.edp-btn-bloqueado {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #dc2626;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Barra informativa & Leyenda */
+.edp-info-bar {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.edp-info-bar p {
+  margin: 0;
+  color: #374151;
+  font-size: 0.92rem;
+}
+
+.edp-legend {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.edp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.83rem;
+  color: #4b5563;
+}
+
+.edp-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.edp-legend-dot.allowed {
+  background: #10b981;
+  box-shadow: 0 0 0 2px #d1fae5;
+}
+
+.edp-legend-dot.restricted {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px #fee2e2;
+}
 
 .edp-secciones { display: flex; flex-direction: column; gap: 20px; }
 .edp-panel { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }

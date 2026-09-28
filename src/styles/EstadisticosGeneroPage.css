@@ -1,5 +1,5 @@
 .eg-page-container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .eg-page-header h2 {
@@ -21,8 +21,110 @@
   color: #6b7280;
 }
 
+/* Banner de leyenda de personal y colores */
+.eg-info-legend-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.eg-legend-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.eg-legend-content {
+  font-size: 0.9rem;
+  color: #166534;
+  line-height: 1.5;
+}
+
+.eg-user-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.eg-legend-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: #15803d;
+}
+
+/* Badges de usuario por color */
+.eg-user-badges-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.eg-user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.eg-user-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.eg-user-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eg-you-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.eg-badge-is-you {
+  box-shadow: 0 0 0 1.5px #10b981;
+  font-weight: 600;
+}
+
+.eg-badge-unassigned {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+  font-style: italic;
+}
+
+.eg-badge-mine {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  padding: 0.15rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Selector de años */
 .eg-page-anios {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   padding: 0.75rem 1rem;
@@ -39,6 +141,7 @@
   cursor: pointer;
   font-size: 0.9rem;
   color: #374151;
+  transition: all 0.15s;
 }
 
 .eg-page-anio-btn:hover {
@@ -46,14 +149,15 @@
 }
 
 .eg-page-anio-btn.active {
-  background: var(--primary-blue);
+  background: var(--primary-blue, #2563eb);
   color: #fff;
-  border-color: var(--primary-blue);
+  border-color: var(--primary-blue, #2563eb);
 }
 
+/* Tarjetas de hojas */
 .eg-page-hojas {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
 }
 
@@ -63,11 +167,13 @@
   border-radius: 8px;
   padding: 1.5rem;
   cursor: pointer;
-  transition: box-shadow 0.2s;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .eg-page-hoja-card:hover {
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: #3b82f6;
 }
 
 .eg-page-hoja-card h3 {
@@ -75,17 +181,12 @@
   color: #1f2937;
 }
 
-.eg-page-hoja-card p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
+/* Tabla */
 .eg-page-table-wrap {
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   overflow-x: auto;
 }
 
@@ -97,7 +198,7 @@
 .eg-page-table th,
 .eg-page-table td {
   border: 2px solid #fff;
-  padding: 0.6rem 0.75rem;
+  padding: 0.55rem 0.7rem;
   text-align: center;
 }
 
@@ -121,45 +222,29 @@
 
 .eg-page-table thead tr:last-child th {
   font-weight: normal;
+  padding: 0.45rem 0.6rem;
 }
 
 .eg-page-table td {
   border: 1px solid #d1d5db;
 }
 
-.eg-page-table tbody tr:nth-child(even) {
-  background: #f9fafb;
+/* Filas asignadas vs no asignadas */
+.eg-fila-mine {
+  background: #f0fdf4 !important;
+  border-left: 4px solid #16a34a !important;
 }
 
-.eg-page-nav {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  padding: 0.75rem 1rem;
+.eg-fila-mine:hover {
+  background: #dcfce7 !important;
+}
+
+.eg-fila-other {
   background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  flex-wrap: wrap;
 }
 
-.eg-page-nav-btn {
-  padding: 0.4rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+.eg-fila-other:nth-child(even) {
   background: #f9fafb;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #374151;
-}
-
-.eg-page-nav-btn:hover {
-  background: #e5e7eb;
-}
-
-.eg-page-nav-btn.active {
-  background: var(--primary-blue);
-  color: #fff;
-  border-color: var(--primary-blue);
 }
 
 .eg-page-table .celda-readonly {
@@ -181,13 +266,22 @@
   color: #1f2937;
 }
 
-.eg-page-table .editable-cell {
+.eg-page-table .editable-cell.cell-allowed {
   cursor: pointer;
   transition: background 0.12s;
 }
 
-.eg-page-table .editable-cell:hover {
-  background: #eef2ff;
+.eg-page-table .editable-cell.cell-allowed:hover {
+  background: #dbeafe;
+}
+
+.eg-page-table .editable-cell.cell-locked {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.eg-page-table .editable-cell.cell-locked:hover {
+  background: #fee2e2;
 }
 
 .eg-page-table .celda-valor {
@@ -204,4 +298,37 @@
   outline: none;
   box-sizing: border-box;
   background: #fff;
+}
+
+/* Navegador inferior */
+.eg-page-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.eg-page-nav-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #374151;
+  transition: all 0.15s;
+}
+
+.eg-page-nav-btn:hover {
+  background: #e5e7eb;
+}
+
+.eg-page-nav-btn.active {
+  background: var(--primary-blue, #2563eb);
+  color: #fff;
+  border-color: var(--primary-blue, #2563eb);
 }

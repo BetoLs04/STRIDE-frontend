@@ -1,38 +1,27 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
-import { ROUTES } from '../../constants/routes';
 import '../../styles/EstadisticosGeneroPage.css';
 import { handleApiError } from '../../utils/errorHandler';
 import { toast } from 'react-toastify';
+import useSocketEvent from '../../hooks/useSocketEvent';
+import { getUserColor } from '../../utils/userColors';
 
 const EDITABLES = new Set(['grupos', 'cant_hombres', 'cant_mujeres', 'aprov_hombres', 'aprov_mujeres']);
 
-const COLUMNAS = [
-  { key: 'programa', label: 'Programa' },
-  { key: 'grupos', label: 'Grupos' },
-  { key: 'cant_total', label: 'Cantidad Total' },
-  { key: 'cant_hombres', label: 'Cantidad Hombres' },
-  { key: 'cant_mujeres', label: 'Cantidad Mujeres' },
-  { key: 'aprov_hombres', label: 'Aprovechamiento Hombres' },
-  { key: 'aprov_mujeres', label: 'Aprovechamiento Mujeres' },
-  { key: 'aprov_total', label: 'Aprovechamiento Total' }
+const COLUMNAS_FIJAS = [
+  { key: 'grupos', label: 'Grupos', tipo: 'numero' },
+  { key: 'cant_total', label: 'Cantidad Total', tipo: 'numero', readOnly: true },
+  { key: 'cant_hombres', label: 'Cantidad Hombres', tipo: 'numero' },
+  { key: 'cant_mujeres', label: 'Cantidad Mujeres', tipo: 'numero' },
+  { key: 'aprov_hombres', label: 'Aprovechamiento Hombres', tipo: 'decimal' },
+  { key: 'aprov_mujeres', label: 'Aprovechamiento Mujeres', tipo: 'decimal' },
+  { key: 'aprov_total', label: 'Aprovechamiento Total', tipo: 'decimal', readOnly: true }
 ];
 
 const parseNum = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
 const round2 = (v) => { const n = parseFloat(v); return isNaN(n) ? v : n.toFixed(2); };
-
-const computeTotals = (valores) => {
-  const next = { ...valores };
-  const h = parseNum(next.cant_hombres);
-  const m = parseNum(next.cant_mujeres);
-  next.cant_total = String(h + m);
-  const ah = parseNum(next.aprov_hombres);
-  const am = parseNum(next.aprov_mujeres);
-  next.aprov_total = (ah + am) > 0 ? ((ah + am) / 2).toFixed(2) : '';
-  return next;
-};
 
 const computeTotalesGenerales = (filas, getValorFn) => {
   const total = { grupos: 0, cant_total: 0, cant_hombres: 0, cant_mujeres: 0, aprov_hombres: [], aprov_mujeres: [], aprov_total: [] };
@@ -75,6 +64,17 @@ const EstadisticosGeneroPage = ({ user }) => {
   const [editValue, setEditValue] = useState('');
   const inputRef = useRef(null);
 
+  const refreshRef = useRef();
+  useEffect(() => {
+    refreshRef.current = () => {
+      fetchMisHojas();
+      if (selectedHoja) {
+        fetchFilas(selectedHoja.id);
+      }
+    };
+  });
+  useSocketEvent('estadisticos-genero:updated', () => refreshRef.current && refreshRef.current());
+
   useEffect(() => {
     fetchMisHojas();
   }, []);
@@ -87,7 +87,7 @@ const EstadisticosGeneroPage = ({ user }) => {
       setMisHojas(hojas);
       const anios = [...new Set(hojas.map(h => h.anio).filter(Boolean))].sort((a, b) => b - a);
       setAniosDisponibles(anios);
-      if (anios.length > 0) setSelectedAnio(anios[0]);
+      if (anios.length > 0 && !selectedAnio) setSelectedAnio(anios[0]);
     } catch (error) {
       handleApiError(error, 'Error al cargar tus hojas');
     } finally {
@@ -113,6 +113,15 @@ const EstadisticosGeneroPage = ({ user }) => {
     fetchFilas(hoja.id);
   };
 
+  const isFilaAsignada = (fila) => {
+    if (!user) return false;
+    if (user.tipo === 'superadmin' || user.isDelegado) return true;
+    return Boolean(
+      fila.usuarios &&
+      fila.usuarios.some(u => u.usuario_id === user.id && u.usuario_tipo === user.tipo)
+    );
+  };
+
   const getValor = (fila, key) => {
     try {
       const valores = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
@@ -121,6 +130,10 @@ const EstadisticosGeneroPage = ({ user }) => {
   };
 
   const startEditCelda = (fila, key, currentValue) => {
+    if (!isFilaAsignada(fila)) {
+      toast.warning('🔒 Acceso restringido. Solo el personal asignado a esta fila puede modificarla.');
+      return;
+    }
     setEditingCelda({ filaId: fila.id, key });
     setEditValue(currentValue);
     setTimeout(() => inputRef.current?.focus(), 0);
@@ -151,7 +164,7 @@ const EstadisticosGeneroPage = ({ user }) => {
     }
     setEditingCelda(null);
     setEditValue('');
-  }, [editingCelda, editValue, filas]);
+  }, [editingCelda, editValue]);
 
   const handleCeldaKeyDown = (e) => {
     if (e.key === 'Enter') { e.preventDefault(); saveCelda(); }
@@ -166,15 +179,47 @@ const EstadisticosGeneroPage = ({ user }) => {
   };
 
   const hojasFiltradas = misHojas.filter(h => !selectedAnio || h.anio === selectedAnio);
+  const myColor = user ? getUserColor(user.nombre || user.id) : null;
 
   if (selectedHoja) {
     return (
       <div className="eg-page-container">
         <div className="eg-page-header">
-          <button className="btn btn-secondary" onClick={() => { setSelectedHoja(null); setFilas([]); setEditingCelda(null); }}>← Volver</button>
+          <button className="btn btn-secondary" onClick={() => { setSelectedHoja(null); setFilas([]); setEditingCelda(null); }}>← Volver a Hojas</button>
           <div>
             <h2>Información Estadística por Género</h2>
             <p className="text-muted">{selectedHoja.cuatrimestre} - {selectedHoja.anio}</p>
+          </div>
+        </div>
+
+        {/* Banner de información de asignación y leyenda de colores */}
+        <div className="eg-info-legend-banner">
+          <div className="eg-legend-icon">👥</div>
+          <div className="eg-legend-content">
+            <div>
+              <strong>Asignación por fila:</strong> Cada fila tiene personal asignado con un color único.
+              {myColor && user?.nombre && (
+                <span className="eg-user-legend-pill">
+                  Tu etiqueta de llenado:
+                  <span
+                    className="eg-user-badge eg-badge-is-you"
+                    style={{
+                      backgroundColor: myColor.bg,
+                      color: myColor.text,
+                      borderColor: myColor.border,
+                      marginLeft: '0.4rem',
+                      display: 'inline-flex'
+                    }}
+                  >
+                    <span className="eg-user-dot" style={{ backgroundColor: myColor.dot }}></span>
+                    <strong>{user.nombre}</strong>
+                  </span>
+                </span>
+              )}
+            </div>
+            <p className="eg-legend-hint">
+              Solo puedes editar las filas identificadas como <strong style={{ color: '#15803d' }}>⭐ Tu fila</strong>. Las demás filas son de solo lectura para tu usuario.
+            </p>
           </div>
         </div>
 
@@ -188,6 +233,7 @@ const EstadisticosGeneroPage = ({ user }) => {
               <thead>
                 <tr>
                   <th className="th-blue" rowSpan="2">Programa</th>
+                  <th className="th-blue" rowSpan="2" style={{ minWidth: '180px' }}>Responsable(s) de Llenado</th>
                   <th className="th-blue" rowSpan="2">Grupos</th>
                   <th className="th-orange" colSpan="3">Cantidad</th>
                   <th className="th-green" colSpan="3">Aprovechamiento</th>
@@ -202,51 +248,114 @@ const EstadisticosGeneroPage = ({ user }) => {
                 </tr>
               </thead>
               <tbody>
-                {filas.map((fila, index) => (
-                  <tr key={fila.id}>
-                    {['programa', 'grupos', 'cant_total', 'cant_hombres', 'cant_mujeres', 'aprov_hombres', 'aprov_mujeres', 'aprov_total'].map(key => {
-                      const cellKey = `${fila.id}_${key}`;
-                      const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === key;
-                      const val = getValor(fila, key);
-                      const editable = EDITABLES.has(key);
-                      const readonly = !editable;
-
-                      if (readonly) {
-                        return <td key={cellKey} className="celda-readonly"><span>{val}</span></td>;
-                      }
-
-                      return (
-                        <td
-                          key={cellKey}
-                          className="editable-cell"
-                          onClick={() => !isEditing && startEditCelda(fila, key, val)}
-                        >
-                          {isEditing ? (
-                            <input
-                              ref={inputRef}
-                              type={getTipo(key) === 'decimal' ? 'number' : getTipo(key) === 'numero' ? 'number' : 'text'}
-                              step={getTipo(key) === 'decimal' ? '0.01' : undefined}
-                              value={editValue}
-                              onChange={e => setEditValue(e.target.value)}
-                              onBlur={saveCelda}
-                              onKeyDown={handleCeldaKeyDown}
-                              className="celda-input"
-                            />
-                          ) : (
-                            <span className="celda-valor">{val}</span>
+                {filas.map((fila) => {
+                  const isMine = isFilaAsignada(fila);
+                  return (
+                    <tr key={fila.id} className={isMine ? 'eg-fila-mine' : 'eg-fila-other'}>
+                      {/* Programa */}
+                      <td className="celda-programa">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}>
+                          <span style={{ fontWeight: 600 }}>{getValor(fila, 'programa') || `Fila #${fila.id}`}</span>
+                          {isMine && user?.tipo !== 'superadmin' && (
+                            <span className="eg-badge-mine" title="Eres responsable de llenar esta fila">⭐ Tu fila</span>
                           )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                        </div>
+                      </td>
+
+                      {/* Responsables de Llenado con colores únicos */}
+                      <td className="td-responsables" style={{ textAlign: 'left', padding: '0.4rem 0.6rem' }}>
+                        <div className="eg-user-badges-wrap">
+                          {fila.usuarios && fila.usuarios.length > 0 ? (
+                            fila.usuarios.map(u => {
+                              const cStyle = getUserColor(u.nombre || u.usuario_id);
+                              const isCurrentLoggedInUser = u.usuario_id === user?.id && u.usuario_tipo === user?.tipo;
+                              return (
+                                <span
+                                  key={u.asignacion_id}
+                                  className={`eg-user-badge ${isCurrentLoggedInUser ? 'eg-badge-is-you' : ''}`}
+                                  style={{
+                                    backgroundColor: cStyle.bg,
+                                    color: cStyle.text,
+                                    borderColor: cStyle.border
+                                  }}
+                                  title={`${u.nombre} (${u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})${isCurrentLoggedInUser ? ' - ¡Eres tú!' : ''}`}
+                                >
+                                  <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
+                                  <span className="eg-user-name">{u.nombre}</span>
+                                  {isCurrentLoggedInUser && <span className="eg-you-tag">(Tú)</span>}
+                                </span>
+                              );
+                            })
+                          ) : (
+                            <span className="eg-user-badge eg-badge-unassigned">⚠️ Sin asignar</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Columnas de datos */}
+                      {COLUMNAS_FIJAS.map(col => {
+                        const cellKey = `${fila.id}_${col.key}`;
+                        const isEditing = editingCelda?.filaId === fila.id && editingCelda?.key === col.key;
+                        const val = getValor(fila, col.key);
+                        const isEditableField = EDITABLES.has(col.key) && !col.readOnly;
+
+                        if (!isEditableField) {
+                          return (
+                            <td key={cellKey} className="celda-readonly">
+                              <span className="celda-valor">{val}</span>
+                            </td>
+                          );
+                        }
+
+                        if (!isMine) {
+                          return (
+                            <td
+                              key={cellKey}
+                              className="editable-cell cell-locked"
+                              onClick={() => startEditCelda(fila, col.key, val)}
+                              title="🔒 Solo el personal asignado a esta fila puede editarla"
+                            >
+                              <span className="celda-valor">{val}</span>
+                            </td>
+                          );
+                        }
+
+                        return (
+                          <td
+                            key={cellKey}
+                            className="editable-cell cell-allowed"
+                            onClick={() => !isEditing && startEditCelda(fila, col.key, val)}
+                            title="Haz clic para editar este valor"
+                          >
+                            {isEditing ? (
+                              <input
+                                ref={inputRef}
+                                type={col.tipo === 'decimal' ? 'number' : col.tipo === 'numero' ? 'number' : 'text'}
+                                step={col.tipo === 'decimal' ? '0.01' : undefined}
+                                value={editValue}
+                                onChange={e => setEditValue(e.target.value)}
+                                onBlur={saveCelda}
+                                onKeyDown={handleCeldaKeyDown}
+                                className="celda-input"
+                              />
+                            ) : (
+                              <span className="celda-valor">{val}</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
               </tbody>
               {filas.length > 0 && (
                 <tfoot>
                   <tr className="tr-total">
-                    {['programa', 'grupos', 'cant_total', 'cant_hombres', 'cant_mujeres', 'aprov_hombres', 'aprov_mujeres', 'aprov_total'].map(key => {
+                    <td className="celda-total" style={{ fontWeight: 700 }}>Total</td>
+                    <td className="celda-total"></td>
+                    {COLUMNAS_FIJAS.map(col => {
                       const tg = computeTotalesGenerales(filas, getValor);
-                      return <td key={key} className="celda-total">{tg[key] ?? ''}</td>;
+                      return <td key={col.key} className="celda-total">{tg[col.key] ?? ''}</td>;
                     })}
                   </tr>
                 </tfoot>
@@ -256,6 +365,9 @@ const EstadisticosGeneroPage = ({ user }) => {
         </div>
 
         <div className="eg-page-nav">
+          <span style={{ fontWeight: 600, color: '#4b5563', alignSelf: 'center', marginRight: '0.5rem', fontSize: '0.85rem' }}>
+            Otras Hojas:
+          </span>
           {hojasFiltradas.map(hoja => (
             <button
               key={hoja.id}
@@ -273,17 +385,28 @@ const EstadisticosGeneroPage = ({ user }) => {
   return (
     <div className="eg-page-container">
       <div className="eg-page-header">
-        <h2>Información Estadística por Género</h2>
-        <p className="text-muted">Selecciona un año y una hoja para ver la información.</p>
+        <div>
+          <h2>📊 Información Estadística por Género</h2>
+          <p className="text-muted">Selecciona un año y una hoja cuatrimestral para ver y llenar tus estadísticas asignadas.</p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>
+        <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando tus hojas...</div>
       ) : misHojas.length === 0 ? (
-        <p className="text-muted" style={{ padding: '3rem', textAlign: 'center' }}>No tienes hojas asignadas.</p>
+        <div style={{ textAlign: 'center', padding: '3rem', background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+          <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '0.5rem' }}>📋</span>
+          <h3 style={{ margin: '0 0 0.5rem', color: '#1f2937' }}>No tienes hojas asignadas</h3>
+          <p className="text-muted" style={{ margin: 0 }}>
+            El administrador del sistema te asignará a las filas correspondientes para que puedas registrar la información.
+          </p>
+        </div>
       ) : (
         <>
           <div className="eg-page-anios">
+            <span style={{ fontWeight: 600, color: '#4b5563', alignSelf: 'center', marginRight: '0.5rem', fontSize: '0.9rem' }}>
+              Año:
+            </span>
             {aniosDisponibles.map(anio => (
               <button
                 key={anio}
@@ -298,8 +421,15 @@ const EstadisticosGeneroPage = ({ user }) => {
           <div className="eg-page-hojas">
             {hojasFiltradas.map(hoja => (
               <div key={hoja.id} className="eg-page-hoja-card" onClick={() => handleSelectHoja(hoja)}>
-                <h3>{hoja.cuatrimestre || 'Sin nombre'}</h3>
-                <p>{hoja.anio}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0 }}>{hoja.cuatrimestre || 'Sin nombre'}</h3>
+                  <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '0.75rem', fontWeight: 600, padding: '0.2rem 0.6rem', borderRadius: '12px' }}>
+                    {hoja.anio}
+                  </span>
+                </div>
+                <p style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#6b7280' }}>
+                  Haz clic para ver y llenar datos
+                </p>
               </div>
             ))}
           </div>
