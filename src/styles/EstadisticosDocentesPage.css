@@ -2,6 +2,12 @@
 .edp-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
 .edp-header h2 { margin: 0; color: #1f2937; }
 .edp-header p { margin: 0.25rem 0 0; color: #6b7280; }
+
+/* Descripción de columnas */
+.edp-cols-desc { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.5rem; }
+.edp-cols-desc-title { margin: 0 0 0.6rem; font-size: 0.95rem; font-weight: 700; color: #1f2937; }
+.edp-cols-desc-row { margin: 0 0 0.6rem; font-size: 0.85rem; line-height: 1.5; color: #4b5563; }
+.edp-cols-desc-note { margin: 0; font-size: 0.85rem; line-height: 1.5; color: #1e40af; background: #eff6ff; border: 1px solid #dbeafe; border-radius: 6px; padding: 0.55rem 0.75rem; }
 .edp-anios { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; }
 .edp-anio-btn { padding: 0.4rem 1.2rem; border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb; cursor: pointer; font-size: 0.9rem; color: #374151; }
 .edp-anio-btn:hover { background: #e5e7eb; }

@@ -1,6 +1,12 @@
 .estadisticos-docentes .ed-info-bar { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
 .estadisticos-docentes .ed-info-bar h3 { margin: 0 0 0.25rem; color: #1f2937; }
 .estadisticos-docentes .ed-info-bar p { margin: 0; color: #6b7280; font-size: 0.9rem; }
+
+/* Descripción de columnas */
+.estadisticos-docentes .ed-cols-desc { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.5rem; }
+.estadisticos-docentes .ed-cols-desc-title { margin: 0 0 0.6rem; font-size: 0.95rem; font-weight: 700; color: #1f2937; }
+.estadisticos-docentes .ed-cols-desc-row { margin: 0 0 0.6rem; font-size: 0.85rem; line-height: 1.5; color: #4b5563; }
+.estadisticos-docentes .ed-cols-desc-note { margin: 0; font-size: 0.85rem; line-height: 1.5; color: #1e40af; background: #eff6ff; border: 1px solid #dbeafe; border-radius: 6px; padding: 0.55rem 0.75rem; }
 .estadisticos-docentes .ed-anios-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.75rem 1.25rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; }
 .estadisticos-docentes .ed-anios-label { font-size: 0.85rem; font-weight: 600; color: #6b7280; white-space: nowrap; }
 .estadisticos-docentes .ed-anios-lista { display: flex; gap: 0.5rem; flex-wrap: wrap; }

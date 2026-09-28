@@ -317,6 +317,13 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           <div><h2>Datos Estadísticos - Docentes</h2><p className="text-muted" style={{ margin: 0 }}>{selectedCarrera.nombre} — {nombreHoja(selectedHoja)}</p></div>
           <div className="tab-actions"><button className="btn btn-secondary" onClick={() => setSelectedCarrera(null)}>← Volver a carreras</button></div>
         </div>
+
+        <div className="ed-cols-desc">
+          <h4 className="ed-cols-desc-title">Descripción de Columnas</h4>
+          <p className="ed-cols-desc-row">No es necesario llenar los espacios vacíos con “0”, pero puede hacerlo si así gusta.</p>
+          <p className="ed-cols-desc-note">Los Totales se calculan automáticamente. No hay botón para guardar, los datos se guardan automáticamente al ingresarlos.</p>
+        </div>
+
         {seccionesLoading ? <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>
           : <div className="ed-secciones-wrap">{secciones.map(sec => {
             const info = getInfoTipo(sec.tipo);

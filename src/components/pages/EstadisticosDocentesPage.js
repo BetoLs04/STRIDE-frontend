@@ -238,6 +238,13 @@ const EstadisticosDocentesPage = ({ user }) => {
           <button className="btn btn-secondary" onClick={() => { setSelectedCarrera(null); setSecciones([]); setEditingCelda(null); }}>← Volver</button>
           <div><h2>{selectedCarrera.nombre}</h2><p className="text-muted">{selectedHoja.cuatrimestre} - {selectedHoja.anio}</p></div>
         </div>
+
+        <div className="edp-cols-desc">
+          <h4 className="edp-cols-desc-title">Descripción de Columnas</h4>
+          <p className="edp-cols-desc-row">No es necesario llenar los espacios vacíos con “0”, pero puede hacerlo si así gusta.</p>
+          <p className="edp-cols-desc-note">Los Totales se calculan automáticamente. No hay botón para guardar, los datos se guardan automáticamente al ingresarlos.</p>
+        </div>
+
         {seccionesLoading ? <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>
           : <div className="edp-secciones">{secciones.map(sec => {
             const info = getInfoTipo(sec.tipo); const cols = COLUMNAS_POR_TIPO[sec.tipo] || [];
