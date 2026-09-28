@@ -384,3 +384,122 @@
   color: #1e293b;
 }
 
+/* Modal de Asignación */
+.asignar-modal-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.asignar-columnas {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.asignar-seccion {
+  flex: 1;
+  min-width: 0;
+}
+
+.asignar-seccion h4 {
+  margin: 0 0 0.6rem 0;
+  color: var(--primary-blue, #2563eb);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.asignar-divider-vertical {
+  width: 1px;
+  background: #e5e7eb;
+  align-self: stretch;
+}
+
+.asignar-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.asignar-btn-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.asignar-btn-usuario:hover {
+  background: #eff6ff;
+  border-color: var(--primary-blue, #2563eb);
+}
+
+.asignar-btn-usuario.selected {
+  background: #eff6ff;
+  border-color: var(--primary-blue, #2563eb);
+  box-shadow: 0 0 0 1px var(--primary-blue, #2563eb);
+}
+
+.asignar-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid #d1d5db;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.asignar-btn-usuario.selected .asignar-check {
+  background: var(--primary-blue, #2563eb);
+  border-color: var(--primary-blue, #2563eb);
+}
+
+.asignar-usuario-nombre {
+  flex: 1;
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 0.88rem;
+}
+
+.asignar-usuario-tipo {
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.asignar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.asignar-seleccionados {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.asignar-footer-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+

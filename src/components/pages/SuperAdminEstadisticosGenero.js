@@ -271,6 +271,9 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
     setSelectedFilaForUsuarios(fila);
     setFilaUsuarios(fila.usuarios || []);
     setSelectedFilaAsignar(new Set());
+    if (!usuariosDisponibles || usuariosDisponibles.length === 0) {
+      fetchUsuariosGlobal();
+    }
     setShowModalFilaUsuarios(true);
   };
 
@@ -406,7 +409,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
       <><div className="tab-content estadisticos-genero">
         <div className="tab-header">
           <div>
-            <h2>Información Estadística por Género</h2>
+            <h2>Información Estadística de Aprovechamiento Académico</h2>
             <p className="text-muted" style={{ margin: 0 }}>{nombreHoja(selectedHoja)}</p>
           </div>
           <div className="tab-actions">
@@ -416,7 +419,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
 
         <div className="eg-hoja-view">
           <div className="eg-vista-previa">
-            <h3 style={{ textAlign: 'center', margin: 0 }}>Información Estadística por Género</h3>
+            <h3 style={{ textAlign: 'center', margin: 0 }}>Información Estadística de Aprovechamiento Académico</h3>
             <p style={{ textAlign: 'center', color: '#6b7280', margin: '0.25rem 0 1rem' }}>{nombreHoja(selectedHoja)}</p>
             {filasLoading ? (
               <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>
@@ -585,9 +588,122 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
             ))}
           </div>
         </div>
-      </div></>
-    );
-  }
+      </div>
+
+      {/* Modal para asignación de usuarios por FILA */}
+      {showModalFilaUsuarios && selectedFilaForUsuarios && (
+        <div className="form-modal" onClick={() => setShowModalFilaUsuarios(false)}>
+          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '650px' }}>
+            <div className="form-header">
+              <div>
+                <h2>Asignar personal a fila</h2>
+                <p className="text-muted" style={{ margin: '0.2rem 0 0', fontSize: '0.9rem' }}>
+                  Programa: <strong>{getValor(selectedFilaForUsuarios, 'programa') || `Fila #${selectedFilaForUsuarios.id}`}</strong>
+                </p>
+              </div>
+              <button className="close-btn" onClick={() => setShowModalFilaUsuarios(false)}>×</button>
+            </div>
+
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e5e7eb', background: '#f8fafc' }}>
+              <strong style={{ display: 'block', marginBottom: '0.5rem', color: '#1e293b', fontSize: '0.9rem' }}>
+                Personal asignado actualmente a esta fila:
+              </strong>
+              {filaUsuarios.length === 0 ? (
+                <span className="text-muted" style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>
+                  No hay personal asignado a esta fila todavía.
+                </span>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {filaUsuarios.map(u => {
+                    const cStyle = getUserColor(u.nombre || u.usuario_id);
+                    return (
+                      <span
+                        key={u.asignacion_id}
+                        className="eg-usuario-tag"
+                        style={{
+                          backgroundColor: cStyle.bg,
+                          color: cStyle.text,
+                          border: `1px solid ${cStyle.border}`
+                        }}
+                      >
+                        <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
+                        {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
+                        <button
+                          className="tag-remove"
+                          style={{ color: cStyle.text }}
+                          onClick={() => handleQuitarUsuarioFila(u)}
+                          title="Quitar de esta fila"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="asignar-modal-body">
+              <strong style={{ display: 'block', padding: '0 1.5rem 0.5rem', color: '#475569', fontSize: '0.85rem' }}>
+                Selecciona personal disponible para agregar:
+              </strong>
+              <div className="asignar-columnas">
+                <div className="asignar-seccion">
+                  <h4>Directivos</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponiblesFila().filter(u => u.tipo === 'directivo').length === 0 ? (
+                      <p className="text-muted">No hay directivos disponibles</p>
+                    ) : (
+                      getUsuariosDisponiblesFila().filter(u => u.tipo === 'directivo').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedFilaAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleFilaAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedFilaAsignar.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Directivo</span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+                <div className="asignar-divider-vertical"></div>
+                <div className="asignar-seccion">
+                  <h4>Personal</h4>
+                  <div className="asignar-lista">
+                    {getUsuariosDisponiblesFila().filter(u => u.tipo === 'personal').length === 0 ? (
+                      <p className="text-muted">No hay personal disponible</p>
+                    ) : (
+                      getUsuariosDisponiblesFila().filter(u => u.tipo === 'personal').map(u => {
+                        const key = `${u.id}_${u.tipo}`;
+                        return (
+                          <button key={key} className={`asignar-btn-usuario${selectedFilaAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleFilaAsignarUsuario(u)}>
+                            <span className="asignar-check">{selectedFilaAsignar.has(key) ? '✓' : ''}</span>
+                            <span className="asignar-usuario-nombre">{u.nombre}</span>
+                            <span className="asignar-usuario-tipo">Personal</span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="asignar-footer">
+                <span className="asignar-seleccionados">{selectedFilaAsignar.size} seleccionado(s)</span>
+                <div className="asignar-footer-actions">
+                  <button className="btn btn-secondary" onClick={() => setShowModalFilaUsuarios(false)}>Cerrar</button>
+                  <button className="btn btn-primary" onClick={handleConfirmarFilaAsignacion} disabled={selectedFilaAsignar.size === 0 || savingFilaUsuarios}>
+                    {savingFilaUsuarios ? 'Guardando...' : 'Asignar a fila'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
   return (
     <div className="tab-content estadisticos-genero">
@@ -600,7 +716,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
       </div>
 
       <div className="eg-info-bar">
-        <h3>Información Estadística por Género</h3>
+        <h3>Información Estadística de Aprovechamiento Académico</h3>
         <p>Selecciona un año y luego una hoja para ver y editar sus datos.</p>
       </div>
 
@@ -752,117 +868,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
         </div>
       )}
 
-      {/* Modal para asignación de usuarios por FILA */}
-      {showModalFilaUsuarios && selectedFilaForUsuarios && (
-        <div className="form-modal" onClick={() => setShowModalFilaUsuarios(false)}>
-          <div className="form-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '650px' }}>
-            <div className="form-header">
-              <div>
-                <h2>Asignar personal a fila</h2>
-                <p className="text-muted" style={{ margin: '0.2rem 0 0', fontSize: '0.9rem' }}>
-                  Programa: <strong>{getValor(selectedFilaForUsuarios, 'programa') || `Fila #${selectedFilaForUsuarios.id}`}</strong>
-                </p>
-              </div>
-              <button className="close-btn" onClick={() => setShowModalFilaUsuarios(false)}>×</button>
-            </div>
 
-            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e5e7eb', background: '#f8fafc' }}>
-              <strong style={{ display: 'block', marginBottom: '0.5rem', color: '#1e293b', fontSize: '0.9rem' }}>
-                Personal asignado actualmente a esta fila:
-              </strong>
-              {filaUsuarios.length === 0 ? (
-                <span className="text-muted" style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>
-                  No hay personal asignado a esta fila todavía.
-                </span>
-              ) : (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                  {filaUsuarios.map(u => {
-                    const cStyle = getUserColor(u.nombre || u.usuario_id);
-                    return (
-                      <span
-                        key={u.asignacion_id}
-                        className="eg-usuario-tag"
-                        style={{
-                          backgroundColor: cStyle.bg,
-                          color: cStyle.text,
-                          border: `1px solid ${cStyle.border}`
-                        }}
-                      >
-                        <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
-                        {u.nombre} <small>({u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})</small>
-                        <button
-                          className="tag-remove"
-                          style={{ color: cStyle.text }}
-                          onClick={() => handleQuitarUsuarioFila(u)}
-                          title="Quitar de esta fila"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <div className="asignar-modal-body">
-              <strong style={{ display: 'block', padding: '0 1.5rem 0.5rem', color: '#475569', fontSize: '0.85rem' }}>
-                Selecciona personal disponible para agregar:
-              </strong>
-              <div className="asignar-columnas">
-                <div className="asignar-seccion">
-                  <h4>Directivos</h4>
-                  <div className="asignar-lista">
-                    {getUsuariosDisponiblesFila().filter(u => u.tipo === 'directivo').length === 0 ? (
-                      <p className="text-muted">No hay directivos disponibles</p>
-                    ) : (
-                      getUsuariosDisponiblesFila().filter(u => u.tipo === 'directivo').map(u => {
-                        const key = `${u.id}_${u.tipo}`;
-                        return (
-                          <button key={key} className={`asignar-btn-usuario${selectedFilaAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleFilaAsignarUsuario(u)}>
-                            <span className="asignar-check">{selectedFilaAsignar.has(key) ? '✓' : ''}</span>
-                            <span className="asignar-usuario-nombre">{u.nombre}</span>
-                            <span className="asignar-usuario-tipo">Directivo</span>
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-                <div className="asignar-divider-vertical"></div>
-                <div className="asignar-seccion">
-                  <h4>Personal</h4>
-                  <div className="asignar-lista">
-                    {getUsuariosDisponiblesFila().filter(u => u.tipo === 'personal').length === 0 ? (
-                      <p className="text-muted">No hay personal disponible</p>
-                    ) : (
-                      getUsuariosDisponiblesFila().filter(u => u.tipo === 'personal').map(u => {
-                        const key = `${u.id}_${u.tipo}`;
-                        return (
-                          <button key={key} className={`asignar-btn-usuario${selectedFilaAsignar.has(key) ? ' selected' : ''}`} onClick={() => toggleFilaAsignarUsuario(u)}>
-                            <span className="asignar-check">{selectedFilaAsignar.has(key) ? '✓' : ''}</span>
-                            <span className="asignar-usuario-nombre">{u.nombre}</span>
-                            <span className="asignar-usuario-tipo">Personal</span>
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="asignar-footer">
-                <span className="asignar-seleccionados">{selectedFilaAsignar.size} seleccionado(s)</span>
-                <div className="asignar-footer-actions">
-                  <button className="btn btn-secondary" onClick={() => setShowModalFilaUsuarios(false)}>Cerrar</button>
-                  <button className="btn btn-primary" onClick={handleConfirmarFilaAsignacion} disabled={selectedFilaAsignar.size === 0 || savingFilaUsuarios}>
-                    {savingFilaUsuarios ? 'Guardando...' : 'Asignar a fila'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {showFormHoja && (
         <div className="form-modal" onClick={() => setShowFormHoja(false)}>

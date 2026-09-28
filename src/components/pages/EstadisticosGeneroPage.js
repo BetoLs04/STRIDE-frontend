@@ -187,7 +187,7 @@ const EstadisticosGeneroPage = ({ user }) => {
         <div className="eg-page-header">
           <button className="btn btn-secondary" onClick={() => { setSelectedHoja(null); setFilas([]); setEditingCelda(null); }}>← Volver a Hojas</button>
           <div>
-            <h2>Información Estadística por Género</h2>
+            <h2>Información Estadística de Aprovechamiento Académico</h2>
             <p className="text-muted">{selectedHoja.cuatrimestre} - {selectedHoja.anio}</p>
           </div>
         </div>
@@ -386,7 +386,7 @@ const EstadisticosGeneroPage = ({ user }) => {
     <div className="eg-page-container">
       <div className="eg-page-header">
         <div>
-          <h2>📊 Información Estadística por Género</h2>
+          <h2>📊 Información Estadística de Aprovechamiento Académico</h2>
           <p className="text-muted">Selecciona un año y una hoja cuatrimestral para ver y llenar tus estadísticas asignadas.</p>
         </div>
       </div>
