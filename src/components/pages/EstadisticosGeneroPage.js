@@ -223,6 +223,32 @@ const EstadisticosGeneroPage = ({ user }) => {
           </div>
         </div>
 
+        {/* Descripción de columnas */}
+        <div className="eg-cols-desc">
+          <h4 className="eg-cols-desc-title">Descripción de Columnas</h4>
+          <div className="eg-cols-desc-grid">
+            <div className="eg-cols-desc-block">
+              <span className="eg-cols-desc-block-title" style={{ color: '#3b82f6', borderLeftColor: '#3b82f6' }}>Grupos</span>
+              <p className="eg-cols-desc-row">Cantidad total de grupos en dicho PE.</p>
+            </div>
+
+            <div className="eg-cols-desc-block">
+              <span className="eg-cols-desc-block-title" style={{ color: '#f59e0b', borderLeftColor: '#f59e0b' }}>Cantidad</span>
+              <p className="eg-cols-desc-row"><b>Hombres:</b> Cantidad total de hombres en el PE (ej. 54).</p>
+              <p className="eg-cols-desc-row"><b>Mujeres:</b> Cantidad total de mujeres en el PE (ej. 67).</p>
+            </div>
+
+            <div className="eg-cols-desc-block">
+              <span className="eg-cols-desc-block-title" style={{ color: '#10b981', borderLeftColor: '#10b981' }}>Aprovechamiento</span>
+              <p className="eg-cols-desc-row"><b>Hombres:</b> Promedio final de hombres al final del PE (ej. 9.54).</p>
+              <p className="eg-cols-desc-row"><b>Mujeres:</b> Promedio final de mujeres al final del PE (ej. 9.54).</p>
+            </div>
+          </div>
+          <p className="eg-cols-desc-note">
+            Los Totales se calculan automáticamente. No hay botón para guardar, los datos se guardan automáticamente al ingresarlos.
+          </p>
+        </div>
+
         <div className="eg-page-table-wrap">
           {filasLoading ? (
             <div className="loading" style={{ padding: '3rem', textAlign: 'center' }}>Cargando...</div>

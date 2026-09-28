@@ -57,6 +57,62 @@
   color: #15803d;
 }
 
+/* Descripción de columnas */
+.eg-cols-desc {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem 1.25rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.eg-cols-desc-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.eg-cols-desc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.5rem 1.5rem;
+}
+
+.eg-cols-desc-block {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 0.75rem;
+}
+
+.eg-cols-desc-block-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.eg-cols-desc-row {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.eg-cols-desc-row b {
+  color: #1f2937;
+}
+
+.eg-cols-desc-note {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+}
+
 /* Badges de usuario por color */
 .eg-user-badges-wrap {
   display: flex;
