@@ -430,7 +430,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                     <tr>
                       <th className="th-accion" rowSpan="2"></th>
                       <th className="th-blue" rowSpan="2">Programa</th>
-                      <th className="th-blue" rowSpan="2" style={{ width: '90px', minWidth: '85px', maxWidth: '95px' }}>Responsables</th>
+                      <th className="th-blue" rowSpan="2" style={{ width: '175px', minWidth: '150px', maxWidth: '195px' }}>Responsables</th>
                       <th className="th-blue" rowSpan="2">Grupos</th>
                       <th className="th-orange" colSpan="3">Cantidad</th>
                       <th className="th-green" colSpan="3">Aprovechamiento</th>
@@ -476,7 +476,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                           )}
                         </td>
                         {/* Responsable(s) asignados */}
-                        <td className="td-responsable" style={{ padding: '0.35rem 0.4rem', textAlign: 'center', width: '90px', maxWidth: '95px' }}>
+                        <td className="td-responsable" style={{ padding: '0.35rem 0.4rem', textAlign: 'center', width: '175px', maxWidth: '195px' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center' }}>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', justifyContent: 'center' }}>
                               {fila.usuarios && fila.usuarios.length > 0 ? (

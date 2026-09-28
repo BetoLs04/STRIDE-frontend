@@ -233,7 +233,7 @@ const EstadisticosGeneroPage = ({ user }) => {
               <thead>
                 <tr>
                   <th className="th-blue" rowSpan="2">Programa</th>
-                  <th className="th-blue" rowSpan="2" style={{ width: '130px', minWidth: '110px', maxWidth: '150px' }}>Responsable(s) de Llenado</th>
+                  <th className="th-blue" rowSpan="2" style={{ width: '175px', minWidth: '150px', maxWidth: '195px' }}>Responsable(s) de Llenado</th>
                   <th className="th-blue" rowSpan="2">Grupos</th>
                   <th className="th-orange" colSpan="3">Cantidad</th>
                   <th className="th-green" colSpan="3">Aprovechamiento</th>
