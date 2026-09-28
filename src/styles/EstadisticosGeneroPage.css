@@ -86,7 +86,7 @@
 }
 
 .eg-user-name {
-  max-width: 140px;
+  max-width: 105px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

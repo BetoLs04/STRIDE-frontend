@@ -430,7 +430,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                     <tr>
                       <th className="th-accion" rowSpan="2"></th>
                       <th className="th-blue" rowSpan="2">Programa</th>
-                      <th className="th-blue" rowSpan="2" style={{ minWidth: '170px' }}>Responsable(s) de Fila</th>
+                      <th className="th-blue" rowSpan="2" style={{ width: '90px', minWidth: '85px', maxWidth: '95px' }}>Responsables</th>
                       <th className="th-blue" rowSpan="2">Grupos</th>
                       <th className="th-orange" colSpan="3">Cantidad</th>
                       <th className="th-green" colSpan="3">Aprovechamiento</th>
@@ -476,9 +476,9 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                           )}
                         </td>
                         {/* Responsable(s) asignados */}
-                        <td className="td-responsable" style={{ padding: '0.4rem 0.6rem', textAlign: 'left' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', alignItems: 'center' }}>
+                        <td className="td-responsable" style={{ padding: '0.35rem 0.4rem', textAlign: 'center', width: '90px', maxWidth: '95px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', justifyContent: 'center' }}>
                               {fila.usuarios && fila.usuarios.length > 0 ? (
                                 fila.usuarios.map(u => {
                                   const cStyle = getUserColor(u.nombre || u.usuario_id);
@@ -508,7 +508,7 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
                               onClick={() => handleOpenAsignarFila(fila)}
                               title="Asignar o cambiar personal que puede llenar esta fila"
                             >
-                              👥 Asignar personal
+                              👥 Asignar
                             </button>
                           </div>
                         </td>

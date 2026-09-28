@@ -218,7 +218,7 @@ const EstadisticosGeneroPage = ({ user }) => {
               )}
             </div>
             <p className="eg-legend-hint">
-              Solo puedes editar las filas identificadas como <strong style={{ color: '#15803d' }}>⭐ Tu fila</strong>. Las demás filas son de solo lectura para tu usuario.
+              Solo puedes editar las filas <strong style={{ color: '#15803d' }}>resaltadas en verde</strong>. Las demás filas son de solo lectura para tu usuario.
             </p>
           </div>
         </div>
@@ -233,7 +233,7 @@ const EstadisticosGeneroPage = ({ user }) => {
               <thead>
                 <tr>
                   <th className="th-blue" rowSpan="2">Programa</th>
-                  <th className="th-blue" rowSpan="2" style={{ minWidth: '180px' }}>Responsable(s) de Llenado</th>
+                  <th className="th-blue" rowSpan="2" style={{ width: '130px', minWidth: '110px', maxWidth: '150px' }}>Responsable(s) de Llenado</th>
                   <th className="th-blue" rowSpan="2">Grupos</th>
                   <th className="th-orange" colSpan="3">Cantidad</th>
                   <th className="th-green" colSpan="3">Aprovechamiento</th>
@@ -254,17 +254,12 @@ const EstadisticosGeneroPage = ({ user }) => {
                     <tr key={fila.id} className={isMine ? 'eg-fila-mine' : 'eg-fila-other'}>
                       {/* Programa */}
                       <td className="celda-programa">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}>
-                          <span style={{ fontWeight: 600 }}>{getValor(fila, 'programa') || `Fila #${fila.id}`}</span>
-                          {isMine && user?.tipo !== 'superadmin' && (
-                            <span className="eg-badge-mine" title="Eres responsable de llenar esta fila">⭐ Tu fila</span>
-                          )}
-                        </div>
+                        <span style={{ fontWeight: 600 }}>{getValor(fila, 'programa') || `Fila #${fila.id}`}</span>
                       </td>
 
                       {/* Responsables de Llenado con colores únicos */}
-                      <td className="td-responsables" style={{ textAlign: 'left', padding: '0.4rem 0.6rem' }}>
-                        <div className="eg-user-badges-wrap">
+                      <td className="td-responsables" style={{ textAlign: 'center', padding: '0.4rem 0.35rem' }}>
+                        <div className="eg-user-badges-wrap" style={{ justifyContent: 'center' }}>
                           {fila.usuarios && fila.usuarios.length > 0 ? (
                             fila.usuarios.map(u => {
                               const cStyle = getUserColor(u.nombre || u.usuario_id);
@@ -280,9 +275,7 @@ const EstadisticosGeneroPage = ({ user }) => {
                                   }}
                                   title={`${u.nombre} (${u.usuario_tipo === 'directivo' ? 'Directivo' : 'Personal'})${isCurrentLoggedInUser ? ' - ¡Eres tú!' : ''}`}
                                 >
-                                  <span className="eg-user-dot" style={{ backgroundColor: cStyle.dot }}></span>
                                   <span className="eg-user-name">{u.nombre}</span>
-                                  {isCurrentLoggedInUser && <span className="eg-you-tag">(Tú)</span>}
                                 </span>
                               );
                             })
