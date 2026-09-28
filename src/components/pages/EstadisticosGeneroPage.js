@@ -240,8 +240,8 @@ const EstadisticosGeneroPage = ({ user }) => {
 
             <div className="eg-cols-desc-block">
               <span className="eg-cols-desc-block-title" style={{ color: '#10b981', borderLeftColor: '#10b981' }}>Aprovechamiento</span>
-              <p className="eg-cols-desc-row"><b>Hombres:</b> Promedio final de hombres al final del PE (ej. 9.54).</p>
-              <p className="eg-cols-desc-row"><b>Mujeres:</b> Promedio final de mujeres al final del PE (ej. 9.54).</p>
+              <p className="eg-cols-desc-row"><b>Hombres:</b> Promedio final de hombres al final del Cuatrimestre (ej. 9.54).</p>
+              <p className="eg-cols-desc-row"><b>Mujeres:</b> Promedio final de mujeres al final del Cuatrimestre (ej. 9.54).</p>
             </div>
           </div>
           <p className="eg-cols-desc-note">
