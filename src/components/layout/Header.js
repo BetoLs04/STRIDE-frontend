@@ -20,6 +20,7 @@ const Header = ({ user, onLogout }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [userFullData, setUserFullData] = useState(null);
   const [superAdminExists, setSuperAdminExists] = useState(false);
+  const [superAdminCheckOk, setSuperAdminCheckOk] = useState(false);
   const [checkingSuperAdmin, setCheckingSuperAdmin] = useState(true);
   const userMenuRef = useRef(null);
 
@@ -36,9 +37,11 @@ const Header = ({ user, onLogout }) => {
     try {
       const response = await api.get('/api/university/check-superadmin');
       setSuperAdminExists(response.data.exists);
+      setSuperAdminCheckOk(true);
     } catch (error) {
       handleApiError(error, 'Error al verificar superadministradores');
       setSuperAdminExists(false);
+      setSuperAdminCheckOk(false);
     } finally {
       setCheckingSuperAdmin(false);
     }
@@ -289,7 +292,7 @@ const Header = ({ user, onLogout }) => {
               <Link to={ROUTES.LOGIN} className="nav-link active">
                 Iniciar Sesión
               </Link>
-              {!checkingSuperAdmin && !superAdminExists && (
+              {!checkingSuperAdmin && superAdminCheckOk && !superAdminExists && (
                 <Link to={ROUTES.CREATE_SUPERADMIN} className="nav-link">
                   Crear Super Admin
                 </Link>

@@ -16,6 +16,7 @@ const LoginGeneral = ({ onLogin }) => {
   });
   const [loading, setLoading] = useState(false);
   const [superAdminExists, setSuperAdminExists] = useState(false);
+  const [superAdminCheckOk, setSuperAdminCheckOk] = useState(false);
   const [checkingSuperAdmin, setCheckingSuperAdmin] = useState(true);
 
   useEffect(() => {
@@ -27,10 +28,12 @@ const LoginGeneral = ({ onLogin }) => {
     try {
       const response = await api.get('/api/university/check-superadmin');
       setSuperAdminExists(response.data.exists);
+      setSuperAdminCheckOk(true);
       console.log('¿Super Admin existe?', response.data.exists);
     } catch (error) {
       handleApiError(error, 'Error al verificar superusuarios');
       setSuperAdminExists(false);
+      setSuperAdminCheckOk(false);
     } finally {
       setCheckingSuperAdmin(false);
     }
@@ -128,7 +131,7 @@ const LoginGeneral = ({ onLogin }) => {
             </button>
           </div>
 
-          {!superAdminExists && (
+          {superAdminCheckOk && !superAdminExists && (
             <div className="warning-note">
               <small>⚠️ No hay Super Admin configurado. Contacta al administrador del sistema.</small>
             </div>
@@ -137,7 +140,7 @@ const LoginGeneral = ({ onLogin }) => {
 
           <div className="auth-footer">
             {/* Solo mostrar enlace para crear super admin si NO existe ninguno */}
-            {!superAdminExists ? (
+            {!superAdminCheckOk ? null : !superAdminExists ? (
               <p>
                 ¿Eres el primer administrador?{' '}
                 <Link to={ROUTES.CREATE_SUPERADMIN} className="auth-link">
