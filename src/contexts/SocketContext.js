@@ -10,9 +10,13 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const s = io(API_URL, {
+      transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 30000,
+      randomizationFactor: 0.5,
+      timeout: 20000,
     });
 
     s.on('connect', () => {
