@@ -86,6 +86,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const [showConcentrado, setShowConcentrado] = useState(false);
   const [concentradoData, setConcentradoData] = useState(null);
   const [concentradoLoading, setConcentradoLoading] = useState(false);
+  const [concentradoHoja, setConcentradoHoja] = useState(null);
 
   const [secciones, setSecciones] = useState([]);
   const [filasPorSeccion, setFilasPorSeccion] = useState({});
@@ -143,7 +144,10 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
     catch (e) { handleApiError(e, 'Error'); } finally { setCarrerasLoading(false); }
   };
 
-  const cargarConcentrado = async (hojaId) => {
+  const cargarConcentrado = async (hoja) => {
+    const hojaId = hoja?.id;
+    if (!hojaId) return;
+    setConcentradoHoja(hoja);
     setConcentradoLoading(true);
     try {
       const r = await api.get(`/api/university/estadisticos-docentes-carreras?hoja_id=${hojaId}`);
@@ -307,7 +311,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
 
   const handleCeldaKeyDown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveCelda(); } if (e.key === 'Escape') { setEditingCelda(null); setEditValue(''); } if (e.key === 'Tab') { e.preventDefault(); saveCelda(); } };
 
-  const nombreHoja = (hoja) => [hoja.cuatrimestre, hoja.anio].filter(Boolean).join(' - ');
+  const nombreHoja = (hoja) => (hoja ? [hoja.cuatrimestre, hoja.anio].filter(Boolean).join(' - ') : '');
 
   // === CARRERA VIEW ===
   if (selectedCarrera) {
@@ -480,7 +484,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
 
         <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={handleOpenNewCarrera}>+ Nueva Carrera</button>
 
-        <button className="btn btn-outline" style={{ marginTop: '1rem', marginLeft: '0.5rem' }} onClick={() => cargarConcentrado(selectedHoja.id)} disabled={concentradoLoading}>
+        <button className="btn btn-outline" style={{ marginTop: '1rem', marginLeft: '0.5rem' }} onClick={() => cargarConcentrado(selectedHoja)} disabled={concentradoLoading}>
           {concentradoLoading ? 'Cargando...' : '📊 Ver concentrado'}
         </button>
 
@@ -513,8 +517,8 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
     return (
       <div className="tab-content estadisticos-docentes">
         <div className="tab-header">
-          <div><h2>Concentrado — {nombreHoja(selectedHoja)}</h2></div>
-          <div className="tab-actions"><button className="btn btn-secondary" onClick={() => setShowConcentrado(false)}>← Volver</button></div>
+          <div><h2>Concentrado — {nombreHoja(concentradoHoja || selectedHoja)}</h2></div>
+          <div className="tab-actions"><button className="btn btn-secondary" onClick={() => { setShowConcentrado(false); if (!selectedHoja && concentradoHoja) setSelectedHoja(concentradoHoja); }}>← Volver</button></div>
         </div>
         <div className="ed-secciones-wrap">{TIPOS_SECCION.map(({ value: tipo, label, color }) => {
           const cols = COLUMNAS_POR_TIPO[tipo] || [];
