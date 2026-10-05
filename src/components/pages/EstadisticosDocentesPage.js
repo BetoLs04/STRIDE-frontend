@@ -93,7 +93,18 @@ const EstadisticosDocentesPage = ({ user }) => {
       }
     };
   });
-  useSocketEvent('estadisticos-docentes:updated', () => refreshRef.current?.());
+  // Paso 3: los cambios de celda llegan con los datos → parche en memoria (sin refetch, sin "recargar" la tabla)
+  useSocketEvent('estadisticos-docentes:updated', (payload) => {
+    if (payload?.type !== 'fila:celda-updated' || !payload.fila) return;
+    // Paso 2: ignorar el eco de mi propia edición
+    if (payload.origin_user_id != null && user?.id != null && String(payload.origin_user_id) === String(user.id)) return;
+    aplicarFilaRemota(payload.fila);
+  }, { throttle: false });
+  // Resto de eventos (hojas, carreras, usuarios...): refresco colapsado con throttle
+  useSocketEvent('estadisticos-docentes:updated', (payload) => {
+    if (payload?.type === 'fila:celda-updated' && payload.fila) return;
+    refreshRef.current?.();
+  });
 
   useEffect(() => { fetchMisHojas(); }, []);
 
@@ -178,6 +189,33 @@ const EstadisticosDocentesPage = ({ user }) => {
     return { ...fila, valores: vals };
   };
 
+  const aplicarFilaRemota = (filaRemota) => {
+    setFilasPorSeccion(prev => {
+      const sid = String(filaRemota.seccion_id);
+      if (!prev[sid]) return prev;
+      const secMeta = secciones.find(s => s.id === parseInt(sid));
+      const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
+      const newValores = typeof filaRemota.valores === 'string' ? JSON.parse(filaRemota.valores) : (filaRemota.valores || {});
+      let filas = prev[sid].map(f => (f.id === filaRemota.id ? { ...f, valores: newValores } : f));
+      if (filaRemota.nombre_fila !== 'Total Acumulado') {
+        filas = filas.map(f => (f.id === filaRemota.id ? actualizarTotalesFila(f, cols) : f));
+        const ptc = filas.find(f => f.nombre_fila === 'PTC');
+        const asig = filas.find(f => f.nombre_fila === 'Asignatura');
+        if (ptc && asig) {
+          const pv = typeof ptc.valores === 'string' ? JSON.parse(ptc.valores) : (ptc.valores || {});
+          const av = typeof asig.valores === 'string' ? JSON.parse(asig.valores) : (asig.valores || {});
+          filas = filas.map(f => {
+            if (f.nombre_fila !== 'Total Acumulado') return f;
+            const tv = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
+            for (const k of Object.keys(pv)) tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
+            return { ...f, valores: tv };
+          });
+        }
+      }
+      return { ...prev, [sid]: filas };
+    });
+  };
+
   const saveCelda = useCallback(async () => {
     if (!editingCelda) return;
     const { filaId, key } = editingCelda;
@@ -188,6 +226,11 @@ const EstadisticosDocentesPage = ({ user }) => {
         for (const sid of Object.keys(next)) {
           const secMeta = secciones.find(s => s.id === parseInt(sid));
           const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
+          const prevTotales = {};
+          (prev[sid] || []).forEach(r => {
+            const pv = typeof r.valores === 'string' ? JSON.parse(r.valores) : (r.valores || {});
+            prevTotales[r.id] = { total_h: String(pv.total_h ?? ''), total_m: String(pv.total_m ?? '') };
+          });
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado' || f.id !== filaId) return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
@@ -201,8 +244,13 @@ const EstadisticosDocentesPage = ({ user }) => {
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado') return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => { });
-            api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => { });
+            const oldTot = prevTotales[f.id] || { total_h: '', total_m: '' };
+            if (String(vals.total_h ?? '') !== oldTot.total_h) {
+              api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => { });
+            }
+            if (String(vals.total_m ?? '') !== oldTot.total_m) {
+              api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => { });
+            }
             return f;
           });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
@@ -215,8 +263,11 @@ const EstadisticosDocentesPage = ({ user }) => {
               const totalRow = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
               if (totalRow) {
                 const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
+                const oldVal = String(tv[k] ?? '');
                 tv[k] = sum;
-                api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => { });
+                if (oldVal !== sum) {
+                  api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => { });
+                }
               }
             }
           }

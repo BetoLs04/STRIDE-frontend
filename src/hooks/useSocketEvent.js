@@ -33,7 +33,8 @@ const schedule = (thunk) => {
   }
 };
 
-const useSocketEvent = (event, callback) => {
+const useSocketEvent = (event, callback, options = {}) => {
+  const { throttle = true } = options;
   const { socket } = useSocket();
   const callbackRef = useRef(callback);
 
@@ -45,12 +46,28 @@ const useSocketEvent = (event, callback) => {
     if (!socket) return;
 
     const handler = (...args) => {
-      schedule(() => callbackRef.current(...args));
+      if (throttle) {
+        schedule(() => callbackRef.current(...args));
+      } else {
+        callbackRef.current(...args);
+      }
+    };
+
+    // Al reconectar se pudo perder eventos → refrescar para resincronizar.
+    // La primera conexión no refresca: la página ya cargó sus datos al montar.
+    let yaConectado = socket.connected;
+    const alReconectar = () => {
+      if (!yaConectado) { yaConectado = true; return; }
+      callbackRef.current();
     };
 
     socket.on(event, handler);
-    return () => { socket.off(event, handler); };
-  }, [socket, event]);
+    socket.on('connect', alReconectar);
+    return () => {
+      socket.off(event, handler);
+      socket.off('connect', alReconectar);
+    };
+  }, [socket, event, throttle]);
 };
 
 export default useSocketEvent;

@@ -73,7 +73,24 @@ const EstadisticosGeneroPage = ({ user }) => {
       }
     };
   });
-  useSocketEvent('estadisticos-genero:updated', () => refreshRef.current && refreshRef.current());
+  // Paso 3: los cambios de celda llegan con los datos → parche en memoria (sin refetch, sin "recargar" la tabla)
+  useSocketEvent('estadisticos-genero:updated', (payload) => {
+    if (payload?.type !== 'fila:celda-updated' || !payload.fila) return;
+    // Paso 2: ignorar el eco de mi propia edición
+    if (payload.origin_user_id != null && user?.id != null && String(payload.origin_user_id) === String(user.id)) return;
+    aplicarFilaRemota(payload.fila);
+  }, { throttle: false });
+  // Resto de eventos (hojas, filas, usuarios...): refresco colapsado con throttle
+  useSocketEvent('estadisticos-genero:updated', (payload) => {
+    if (payload?.type === 'fila:celda-updated' && payload.fila) return;
+    refreshRef.current && refreshRef.current();
+  });
+
+  const aplicarFilaRemota = (filaRemota) => {
+    setFilas(prev => prev.map(f => (String(f.id) === String(filaRemota.id)
+      ? { ...f, valores: typeof filaRemota.valores === 'string' ? JSON.parse(filaRemota.valores) : filaRemota.valores }
+      : f)));
+  };
 
   useEffect(() => {
     fetchMisHojas();

@@ -5,6 +5,7 @@ import '../../styles/SuperAdminEstadisticosGenero.css';
 import FormInput from '../shared/FormInput';
 import { handleApiError } from '../../utils/errorHandler';
 import useSocketEvent from '../../hooks/useSocketEvent';
+import useAuth from '../../hooks/useAuth';
 import { getUserColor } from '../../utils/userColors';
 
 const COLUMNAS_FIJAS = [
@@ -60,6 +61,7 @@ const computeTotalesGenerales = (filas, getValorFn) => {
 };
 
 const SuperAdminEstadisticosGenero = ({ onClose }) => {
+  const { user } = useAuth();
   const [hojas, setHojas] = useState([]);
   const [aniosDisponibles, setAniosDisponibles] = useState([]);
   const [selectedAnio, setSelectedAnio] = useState(null);
@@ -101,7 +103,24 @@ const SuperAdminEstadisticosGenero = ({ onClose }) => {
   }, []);
 
   const refreshRef = useRef();
-  useSocketEvent('estadisticos-genero:updated', () => refreshRef.current && refreshRef.current());
+  // Paso 3: los cambios de celda llegan con los datos → parche en memoria (sin refetch)
+  useSocketEvent('estadisticos-genero:updated', (payload) => {
+    if (payload?.type !== 'fila:celda-updated' || !payload.fila) return;
+    // Paso 2: ignorar el eco de mi propia edición
+    if (payload.origin_user_id != null && user?.id != null && String(payload.origin_user_id) === String(user.id)) return;
+    aplicarFilaRemota(payload.fila);
+  }, { throttle: false });
+  // Resto de eventos: refresco colapsado con throttle
+  useSocketEvent('estadisticos-genero:updated', (payload) => {
+    if (payload?.type === 'fila:celda-updated' && payload.fila) return;
+    refreshRef.current && refreshRef.current();
+  });
+
+  const aplicarFilaRemota = (filaRemota) => {
+    setFilas(prev => prev.map(f => (String(f.id) === String(filaRemota.id)
+      ? { ...f, valores: typeof filaRemota.valores === 'string' ? JSON.parse(filaRemota.valores) : filaRemota.valores }
+      : f)));
+  };
 
   const fetchAnios = async () => {
     try {
