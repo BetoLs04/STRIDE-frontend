@@ -176,6 +176,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
               allFilas[nf][key] += parseFloat(val) || 0;
             }
           }
+          await new Promise(res => setTimeout(res, 120));
         }
 
         resultado[tipo] = {};
