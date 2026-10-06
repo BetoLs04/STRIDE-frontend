@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import useAuth from './hooks/useAuth';
 import Layout from './components/layout/Layout';
 import { SocketProvider } from './contexts/SocketContext';
@@ -20,12 +20,15 @@ import SepladePage from './components/pages/SepladePage';
 import POAPage from './components/pages/POAPage';
 import EstadisticosGeneroPage from './components/pages/EstadisticosGeneroPage';
 import EstadisticosDocentesPage from './components/pages/EstadisticosDocentesPage';
+import SuperAdminEstadisticosGenero from './components/pages/SuperAdminEstadisticosGenero';
+import SuperAdminEstadisticosDocentes from './components/pages/SuperAdminEstadisticosDocentes';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import { ROUTES, getDashboardPath, matrizIndicadores, seplade } from './constants/routes';
 import { USER_TYPE_ARRAYS } from './constants/index';
 
 function App() {
   const { user, loading, login: handleLogin, logout: handleLogout } = useAuth();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -167,7 +170,7 @@ function App() {
 
         <Route path="/admin/estadisticos-genero" element={
           <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
-            <EstadisticosGeneroPage user={user} />
+            <SuperAdminEstadisticosGenero onClose={() => navigate(ROUTES.ADMIN_DASHBOARD)} />
           </ProtectedRoute>
         } />
 
@@ -185,7 +188,7 @@ function App() {
 
         <Route path="/admin/estadisticos-docentes" element={
           <ProtectedRoute user={user} allowedTypes={USER_TYPE_ARRAYS.SUPERADMIN}>
-            <EstadisticosDocentesPage user={user} />
+            <SuperAdminEstadisticosDocentes onClose={() => navigate(ROUTES.ADMIN_DASHBOARD)} />
           </ProtectedRoute>
         } />
 

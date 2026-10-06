@@ -141,7 +141,7 @@ const Home = () => {
     }
     const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
     if (userData?.tipo === USER_TYPES.SUPERADMIN) {
-      navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'estadisticos-genero' } });
+      navigate(`${getRoutePrefix(userData.tipo)}/estadisticos-genero`);
       return;
     }
     try {
@@ -165,7 +165,7 @@ const Home = () => {
     }
     const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
     if (userData?.tipo === USER_TYPES.SUPERADMIN) {
-      navigate(ROUTES.ADMIN_DASHBOARD, { state: { tab: 'estadisticos-docentes' } });
+      navigate(`${getRoutePrefix(userData.tipo)}/estadisticos-docentes`);
       return;
     }
     try {

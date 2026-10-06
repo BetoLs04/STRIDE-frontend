@@ -600,8 +600,8 @@ const SuperAdminDashboard = ({ admin }) => {
         <button className={`tab-btn ${activeTab === 'poa' ? 'active' : ''}`} onClick={() => setActiveTab('poa')}>📋 POA</button>
       </div>
       <div className="dashboard-tabs-row">
-        <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-genero')}>📊 Estadísticos de Aprovechamiento Académico</button>
-        <button className={`tab-btn ${activeTab === 'estadisticos-docentes' ? 'active' : ''}`} onClick={() => setActiveTab('estadisticos-docentes')}>📊 Datos Estadísticos - Docentes</button>
+        <button className={`tab-btn ${activeTab === 'estadisticos-genero' ? 'active' : ''}`} onClick={() => navigate('/admin/estadisticos-genero')}>📊 Estadísticos de Aprovechamiento Académico</button>
+        <button className={`tab-btn ${activeTab === 'estadisticos-docentes' ? 'active' : ''}`} onClick={() => navigate('/admin/estadisticos-docentes')}>📊 Datos Estadísticos - Docentes</button>
       </div>
 
       <div className="dashboard-main">
