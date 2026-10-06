@@ -89,6 +89,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
   const [concentradoData, setConcentradoData] = useState(null);
   const [concentradoLoading, setConcentradoLoading] = useState(false);
   const [concentradoHoja, setConcentradoHoja] = useState(null);
+  const [concentradoFaltantes, setConcentradoFaltantes] = useState([]);
 
   const [secciones, setSecciones] = useState([]);
   const [filasPorSeccion, setFilasPorSeccion] = useState({});
@@ -168,8 +169,10 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
       const TIPOS = ['ultimo_grado', 'solo_utma', 'laboral', 'edad', 'investigadores'];
       const NFS = ['PTC', 'Asignatura'];
       const resultado = {};
+      const faltantes = [];
 
       for (const tipo of TIPOS) {
+        const cols = COLUMNAS_POR_TIPO[tipo] || [];
         const allFilas = {};
         for (const nf of NFS) allFilas[nf] = {};
 
@@ -177,16 +180,24 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           const sR = await api.get(`/api/university/estadisticos-docentes-secciones?carrera_id=${c.id}`);
           const secciones = sR.data.data || [];
           const sec = secciones.find(s => s.tipo === tipo);
-          if (!sec) continue;
+          if (!sec) { faltantes.push(`${c.nombre || 'Carrera'} → ${tipo}`); continue; }
           const fR = await api.get(`/api/university/estadisticos-docentes-filas?seccion_id=${sec.id}`);
           const filas = fR.data.data || [];
           for (const nf of NFS) {
             const fila = filas.find(f => f.nombre_fila === nf);
-            if (!fila) continue;
+            if (!fila) { faltantes.push(`${c.nombre || 'Carrera'} → ${tipo} → fila ${nf}`); continue; }
             const vals = typeof fila.valores === 'string' ? JSON.parse(fila.valores) : (fila.valores || {});
+            // total_h/total_m en la BD pueden estar viejos o vacíos; recalcular igual que la vista de carrera
+            let sumH = 0, sumM = 0;
+            for (const col of cols) {
+              if (isTotalKey(col.keys[0])) continue;
+              sumH += parseNum(vals[col.keys[0]]);
+              sumM += parseNum(vals[col.keys[1]]);
+            }
+            vals.total_h = String(sumH);
+            vals.total_m = String(sumM);
             for (const [key, val] of Object.entries(vals)) {
-              if (!allFilas[nf][key]) allFilas[nf][key] = 0;
-              allFilas[nf][key] += parseFloat(val) || 0;
+              allFilas[nf][key] = (allFilas[nf][key] || 0) + parseNum(val);
             }
           }
           await new Promise(res => setTimeout(res, 120));
@@ -196,12 +207,13 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
         for (const nf of NFS) {
           const vals = {};
           for (const [key, sum] of Object.entries(allFilas[nf])) {
-            vals[key] = String(sum);
+            vals[key] = String(Math.round(sum * 100) / 100);
           }
           resultado[tipo][nf] = vals;
         }
       }
       setConcentradoData(resultado);
+      setConcentradoFaltantes([...new Set(faltantes)]);
       setShowConcentrado(true);
     } catch (e) { handleApiError(e, 'Error al cargar concentrado'); }
     finally { setConcentradoLoading(false); }
@@ -315,11 +327,6 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
         for (const sid of Object.keys(next)) {
           const secMeta = secciones.find(s => s.id === parseInt(sid));
           const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
-          const prevTotales = {};
-          (prev[sid] || []).forEach(r => {
-            const pv = typeof r.valores === 'string' ? JSON.parse(r.valores) : (r.valores || {});
-            prevTotales[r.id] = { total_h: String(pv.total_h ?? ''), total_m: String(pv.total_m ?? '') };
-          });
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado' || f.id !== filaId) return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
@@ -339,18 +346,6 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
             vals.total_m = String(sumM);
             return { ...f, valores: vals };
           });
-          next[sid] = next[sid].map(f => {
-            if (f.nombre_fila === 'Total Acumulado') return f;
-            const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            const oldTot = prevTotales[f.id] || { total_h: '', total_m: '' };
-            if (String(vals.total_h ?? '') !== oldTot.total_h) {
-              api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => { });
-            }
-            if (String(vals.total_m ?? '') !== oldTot.total_m) {
-              api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => { });
-            }
-            return f;
-          });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
           const asig = next[sid].find(f => f.nombre_fila === 'Asignatura');
           if (ptc && asig) {
@@ -360,12 +355,7 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
             if (totalRow) {
               const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
               for (const k of Object.keys(pv)) {
-                const sum = String(parseNum(pv[k]) + parseNum(av[k]));
-                const oldVal = String(tv[k] ?? '');
-                tv[k] = sum;
-                if (oldVal !== sum) {
-                  api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => { });
-                }
+                tv[k] = String(parseNum(pv[k]) + parseNum(av[k]));
               }
             }
           }
@@ -587,6 +577,15 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           <div><h2>Concentrado — {nombreHoja(concentradoHoja || selectedHoja)}</h2></div>
           <div className="tab-actions"><button className="btn btn-secondary" onClick={() => { setShowConcentrado(false); if (!selectedHoja && concentradoHoja) setSelectedHoja(concentradoHoja); }}>← Volver</button></div>
         </div>
+        {concentradoFaltantes.length > 0 && (
+          <div style={{ margin: '0 0 1rem', padding: '0.75rem 1rem', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 8, color: '#92400e' }}>
+            Datos incompletos: faltan {concentradoFaltantes.length} seccion(es) que NO están incluidas en la suma:
+            <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem' }}>
+              {concentradoFaltantes.slice(0, 8).map((f, i) => <li key={i}>{f}</li>)}
+              {concentradoFaltantes.length > 8 && <li>…y {concentradoFaltantes.length - 8} más</li>}
+            </ul>
+          </div>
+        )}
         <div className="ed-secciones-wrap">{TIPOS_SECCION.map(({ value: tipo, label, color }) => {
           const cols = COLUMNAS_POR_TIPO[tipo] || [];
           const colsNormales = cols.filter(c => !isTotalKey(c.keys[0]));
@@ -596,7 +595,8 @@ const SuperAdminEstadisticosDocentes = ({ onClose }) => {
           const ptcVals = data['PTC'] || {};
           const asigVals = data['Asignatura'] || {};
           const totalCalc = {};
-          for (const k of Object.keys(ptcVals)) totalCalc[k] = String(parseNum(ptcVals[k]) + parseNum(asigVals[k]));
+          const todasLasClaves = [...new Set([...Object.keys(ptcVals), ...Object.keys(asigVals)])];
+          for (const k of todasLasClaves) totalCalc[k] = String(parseNum(ptcVals[k]) + parseNum(asigVals[k]));
           return (
             <div key={tipo} className={`ed-panel ed-panel-${color}`}>
               <h2>{label}</h2>

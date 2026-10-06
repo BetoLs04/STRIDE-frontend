@@ -226,11 +226,6 @@ const EstadisticosDocentesPage = ({ user }) => {
         for (const sid of Object.keys(next)) {
           const secMeta = secciones.find(s => s.id === parseInt(sid));
           const cols = COLUMNAS_POR_TIPO[secMeta?.tipo] || [];
-          const prevTotales = {};
-          (prev[sid] || []).forEach(r => {
-            const pv = typeof r.valores === 'string' ? JSON.parse(r.valores) : (r.valores || {});
-            prevTotales[r.id] = { total_h: String(pv.total_h ?? ''), total_m: String(pv.total_m ?? '') };
-          });
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado' || f.id !== filaId) return f;
             const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
@@ -240,18 +235,6 @@ const EstadisticosDocentesPage = ({ user }) => {
           next[sid] = next[sid].map(f => {
             if (f.nombre_fila === 'Total Acumulado') return f;
             return actualizarTotalesFila(f, cols);
-          });
-          next[sid] = next[sid].map(f => {
-            if (f.nombre_fila === 'Total Acumulado') return f;
-            const vals = typeof f.valores === 'string' ? JSON.parse(f.valores) : (f.valores || {});
-            const oldTot = prevTotales[f.id] || { total_h: '', total_m: '' };
-            if (String(vals.total_h ?? '') !== oldTot.total_h) {
-              api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_h', value: vals.total_h }).catch(() => { });
-            }
-            if (String(vals.total_m ?? '') !== oldTot.total_m) {
-              api.patch(`/api/university/estadisticos-docentes-filas/${f.id}/celda`, { key: 'total_m', value: vals.total_m }).catch(() => { });
-            }
-            return f;
           });
           const ptc = next[sid].find(f => f.nombre_fila === 'PTC');
           const asig = next[sid].find(f => f.nombre_fila === 'Asignatura');
@@ -263,11 +246,7 @@ const EstadisticosDocentesPage = ({ user }) => {
               const totalRow = next[sid].find(f => f.nombre_fila === 'Total Acumulado');
               if (totalRow) {
                 const tv = typeof totalRow.valores === 'string' ? JSON.parse(totalRow.valores) : (totalRow.valores || {});
-                const oldVal = String(tv[k] ?? '');
                 tv[k] = sum;
-                if (oldVal !== sum) {
-                  api.patch(`/api/university/estadisticos-docentes-filas/${totalRow.id}/celda`, { key: k, value: sum }).catch(() => { });
-                }
               }
             }
           }
