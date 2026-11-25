@@ -32,6 +32,10 @@ const SuperAdminActividades = ({ admin }) => {
   const [periodos, setPeriodos] = useState([]);
   const [abriendoPeriodo, setAbriendoPeriodo] = useState(false);
 
+  // ✅ Selección de actividades para exportar ZIP (2 Word por actividad)
+  const [seleccion, setSeleccion] = useState({});
+  const [exportando, setExportando] = useState(false);
+
   // Estado para controlar expansión de años y períodos
   const [expansiones, setExpansiones] = useState({
     años: {},
@@ -406,6 +410,78 @@ const SuperAdminActividades = ({ admin }) => {
     }
   };
 
+  // ========== FUNCIONES PARA SELECCIONAR Y EXPORTAR ZIP ==========
+  const totalSeleccionadas = Object.keys(seleccion).length;
+
+  const toggleSeleccion = (actividadId) => {
+    setSeleccion(prev => {
+      const siguiente = { ...prev };
+      if (siguiente[actividadId]) delete siguiente[actividadId];
+      else siguiente[actividadId] = true;
+      return siguiente;
+    });
+  };
+
+  const togglePeriodoSeleccion = (actividadesPeriodo) => {
+    setSeleccion(prev => {
+      const siguiente = { ...prev };
+      const todasMarcadas = actividadesPeriodo.length > 0 && actividadesPeriodo.every(a => siguiente[a.id]);
+      actividadesPeriodo.forEach(a => {
+        if (todasMarcadas) delete siguiente[a.id];
+        else siguiente[a.id] = true;
+      });
+      return siguiente;
+    });
+  };
+
+  const exportarSeleccion = async () => {
+    const ids = Object.keys(seleccion).map(Number);
+    if (ids.length === 0) {
+      toast.info('Selecciona al menos una actividad para descargar');
+      return;
+    }
+    try {
+      setExportando(true);
+      const res = await api.get('/api/university/actividades/export-zip', {
+        params: { ids: ids.join(',') },
+        responseType: 'blob',
+        timeout: 180000
+      });
+
+      // Nombre del archivo desde el header (con respaldo si no llega)
+      const contentDisposition = res.headers['content-disposition'] || '';
+      const match = /filename="?([^";]+)"?/i.exec(contentDisposition);
+      const nombreArchivo = match
+        ? match[1]
+        : `Actividades_${new Date().toISOString().slice(0, 10)}.zip`;
+
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/zip' }));
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = nombreArchivo;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+      toast.success(`✅ ZIP descargado con ${ids.length} actividad(es)`);
+      setSeleccion({});
+    } catch (error) {
+      // El error puede venir como Blob JSON (el backend responde JSON antes de abrir el stream)
+      try {
+        if (error.response && error.response.data instanceof Blob) {
+          const texto = await error.response.data.text();
+          const json = JSON.parse(texto);
+          toast.error(json.error || 'Error al generar el ZIP');
+          return;
+        }
+      } catch (e) { /* si no se pudo parsear, se usa el manejo genérico */ }
+      handleApiError(error, 'Error al generar el ZIP de actividades');
+    } finally {
+      setExportando(false);
+    }
+  };
+
   // ========== FUNCIONES PARA MODAL ==========
   const abrirModalActividad = (actividad) => {
     setActividadSeleccionada(actividad);
@@ -564,9 +640,21 @@ const SuperAdminActividades = ({ admin }) => {
   // Componente simplificado para la tarjeta de actividad
   const TarjetaActividadMinimalista = ({ actividad, mostrarEliminar = false }) => {
     const leido = lectura[actividad.id];
+    const marcada = !!seleccion[actividad.id];
     return (
-      <div className={`actividad-minimalista-card ${leido ? 'actividad-leida' : 'actividad-no-leida'}`}>
+      <div className={`actividad-minimalista-card ${leido ? 'actividad-leida' : 'actividad-no-leida'} ${marcada ? 'actividad-marcada' : ''}`}>
         <div className="actividad-minimalista-content">
+          <label
+            className="check-seleccion-actividad"
+            title="Seleccionar para descargar ZIP"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              checked={marcada}
+              onChange={() => toggleSeleccion(actividad.id)}
+            />
+          </label>
           <div className="actividad-minimalista-info">
             <h3>{actividad.titulo}</h3>
             <div className="actividad-minimalista-metadata">
@@ -956,6 +1044,21 @@ const SuperAdminActividades = ({ admin }) => {
                               </div>
                               
                               <div className="periodo-acordeon-controls">
+                                <label
+                                  className="check-seleccion-periodo"
+                                  title="Seleccionar todo el cuatrimestre"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      periodoData.actividades.length > 0 &&
+                                      periodoData.actividades.every(a => seleccion[a.id])
+                                    }
+                                    onChange={() => togglePeriodoSeleccion(periodoData.actividades)}
+                                  />
+                                  <span>Todo el cuatrimestre</span>
+                                </label>
                                 <span className="periodo-count">
                                   {periodoData.actividades.length} actividad(es)
                                 </span>
@@ -1308,6 +1411,32 @@ const SuperAdminActividades = ({ admin }) => {
         </div>
       )}
     </div>
+
+    {/* Barra de exportación ZIP (aparece con selección activa) */}
+    {totalSeleccionadas > 0 && (
+      <div className="barra-export-actividades">
+        <span className="barra-export-count">
+          📋 <strong>{totalSeleccionadas}</strong> actividad(es) seleccionada(s)
+        </span>
+        <div className="barra-export-actions">
+          <button
+            className="btn btn-secondary btn-small"
+            onClick={() => setSeleccion({})}
+            disabled={exportando}
+          >
+            Limpiar
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={exportarSeleccion}
+            disabled={exportando}
+          >
+            {exportando ? '⏳ Generando ZIP...' : '⬇️ Descargar ZIP'}
+          </button>
+        </div>
+      </div>
+    )}
+
     {confirmModal.visible && (
       <div className="confirm-overlay" onClick={cerrarConfirm}>
         <div className="confirm-modal" onClick={e => e.stopPropagation()}>
