@@ -35,6 +35,8 @@ const SuperAdminActividades = ({ admin }) => {
   // ✅ Selección de actividades para exportar ZIP (2 Word por actividad)
   const [seleccion, setSeleccion] = useState({});
   const [exportando, setExportando] = useState(false);
+  const [modalExportAbierto, setModalExportAbierto] = useState(false);
+  const [modoExport, setModoExport] = useState('carpetas'); // 'carpetas' | 'combinado'
 
   // Estado para controlar expansión de años y períodos
   const [expansiones, setExpansiones] = useState({
@@ -434,7 +436,7 @@ const SuperAdminActividades = ({ admin }) => {
     });
   };
 
-  const exportarSeleccion = async () => {
+  const exportarSeleccion = async (modo = modoExport) => {
     const ids = Object.keys(seleccion).map(Number);
     if (ids.length === 0) {
       toast.info('Selecciona al menos una actividad para descargar');
@@ -443,7 +445,7 @@ const SuperAdminActividades = ({ admin }) => {
     try {
       setExportando(true);
       const res = await api.get('/api/university/actividades/export-zip', {
-        params: { ids: ids.join(',') },
+        params: { ids: ids.join(','), modo },
         responseType: 'blob',
         timeout: 180000
       });
@@ -466,6 +468,7 @@ const SuperAdminActividades = ({ admin }) => {
 
       toast.success(`✅ ZIP descargado con ${ids.length} actividad(es)`);
       setSeleccion({});
+      setModalExportAbierto(false);
     } catch (error) {
       // El error puede venir como Blob JSON (el backend responde JSON antes de abrir el stream)
       try {
@@ -1428,11 +1431,85 @@ const SuperAdminActividades = ({ admin }) => {
           </button>
           <button
             className="btn btn-primary"
-            onClick={exportarSeleccion}
+            onClick={() => setModalExportAbierto(true)}
             disabled={exportando}
           >
-            {exportando ? '⏳ Generando ZIP...' : '⬇️ Descargar ZIP'}
+            ⬇️ Descargar ZIP
           </button>
+        </div>
+      </div>
+    )}
+
+    {/* Popup de opciones de descarga */}
+    {modalExportAbierto && (
+      <div
+        className="export-modal-overlay"
+        onClick={() => { if (!exportando) setModalExportAbierto(false); }}
+      >
+        <div className="export-modal" onClick={(e) => e.stopPropagation()}>
+          <button
+            className="export-modal-close"
+            onClick={() => { if (!exportando) setModalExportAbierto(false); }}
+            disabled={exportando}
+            title="Cerrar"
+          >
+            ✕
+          </button>
+
+          <h3 className="export-modal-titulo">⬇️ Descargar actividades</h3>
+          <p className="export-modal-sub">
+            <strong>{totalSeleccionadas}</strong> actividad(es) seleccionada(s) — elige el formato del ZIP
+          </p>
+
+          <label className={`export-opcion ${modoExport === 'carpetas' ? 'activa' : ''}`}>
+            <input
+              type="radio"
+              name="modo-export"
+              checked={modoExport === 'carpetas'}
+              onChange={() => setModoExport('carpetas')}
+              disabled={exportando}
+            />
+            <span className="export-opcion-icono">📁</span>
+            <span className="export-opcion-texto">
+              <strong>Carpeta por actividad</strong>
+              <small>Un ZIP con una carpeta por actividad y 2 Word dentro (texto e imágenes).</small>
+            </span>
+          </label>
+
+          <label className={`export-opcion ${modoExport === 'combinado' ? 'activa' : ''}`}>
+            <input
+              type="radio"
+              name="modo-export"
+              checked={modoExport === 'combinado'}
+              onChange={() => setModoExport('combinado')}
+              disabled={exportando}
+            />
+            <span className="export-opcion-icono">📄</span>
+            <span className="export-opcion-texto">
+              <strong>Archivo único</strong>
+              <small>
+                Un solo ZIP con 2 Word: título + descripción de todas las actividades y
+                título + imágenes de todas (una actividad por página).
+              </small>
+            </span>
+          </label>
+
+          <div className="export-modal-actions">
+            <button
+              className="btn btn-secondary"
+              onClick={() => setModalExportAbierto(false)}
+              disabled={exportando}
+            >
+              Cancelar
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => exportarSeleccion(modoExport)}
+              disabled={exportando}
+            >
+              {exportando ? '⏳ Generando ZIP...' : '⬇️ Descargar'}
+            </button>
+          </div>
         </div>
       </div>
     )}
