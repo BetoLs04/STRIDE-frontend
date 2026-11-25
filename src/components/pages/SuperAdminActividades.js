@@ -11,6 +11,43 @@ import '../../styles/SuperAdminActividades.css';
 import { handleApiError } from '../../utils/errorHandler';
 import { MESSAGES, STATUS, USER_TYPES } from '../../constants/index';
 
+// Íconos para los botones con estilo Uiverse (descarga / cerrar / limpiar)
+const ICONOS_BOTON = {
+  descarga: (
+    <>
+      <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+      <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+      <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+    </>
+  ),
+  cerrar: (
+    <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+  ),
+  limpiar: (
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+  )
+};
+
+const BotonEstiloDescarga = ({ children, onClick, disabled, icono = 'descarga', className = '' }) => (
+  <button
+    className={`btn-descarga ${className}`}
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+  >
+    <span className="btn-descarga__text">{children}</span>
+    <span className="btn-descarga__icon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={icono === 'descarga' ? '0 0 35 35' : '0 0 24 24'}
+        className="btn-descarga__svg"
+      >
+        {ICONOS_BOTON[icono] || ICONOS_BOTON.descarga}
+      </svg>
+    </span>
+  </button>
+);
+
 const SuperAdminActividades = ({ admin }) => {
   const navigate = useNavigate();
   const [actividades, setActividades] = useState([]);
@@ -1423,28 +1460,20 @@ const SuperAdminActividades = ({ admin }) => {
           📋 <strong>{totalSeleccionadas}</strong> actividad(es) seleccionada(s)
         </span>
         <div className="barra-export-actions">
-          <button
-            className="btn btn-secondary btn-small"
+          <BotonEstiloDescarga
+            icono="limpiar"
+            className="btn-descarga--compact"
             onClick={() => setSeleccion({})}
             disabled={exportando}
           >
             Limpiar
-          </button>
-          <button
-            className="btn-descarga"
-            type="button"
+          </BotonEstiloDescarga>
+          <BotonEstiloDescarga
             onClick={() => setModalExportAbierto(true)}
             disabled={exportando}
           >
-            <span className="btn-descarga__text">Descargar ZIP</span>
-            <span className="btn-descarga__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" className="btn-descarga__svg">
-                <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-              </svg>
-            </span>
-          </button>
+            Descargar ZIP
+          </BotonEstiloDescarga>
         </div>
       </div>
     )}
@@ -1465,7 +1494,7 @@ const SuperAdminActividades = ({ admin }) => {
             ✕
           </button>
 
-          <h3 className="export-modal-titulo">⬇️ Descargar actividades</h3>
+          <h3 className="export-modal-titulo">Descargar actividades</h3>
           <p className="export-modal-sub">
             <strong>{totalSeleccionadas}</strong> actividad(es) seleccionada(s) — elige el formato del ZIP
           </p>
@@ -1507,9 +1536,9 @@ const SuperAdminActividades = ({ admin }) => {
             <span className="export-modal-group-label">¿Qué archivos incluir?</span>
             <div className="export-chips">
               {[
-                { valor: 'ambos', etiqueta: 'Ambos', icono: '📄🖼️' },
-                { valor: 'texto', etiqueta: 'Solo texto', icono: '📄' },
-                { valor: 'imagenes', etiqueta: 'Solo imágenes', icono: '🖼️' }
+                { valor: 'ambos', etiqueta: 'Ambos' },
+                { valor: 'texto', etiqueta: 'Solo texto' },
+                { valor: 'imagenes', etiqueta: 'Solo imágenes' }
               ].map(op => (
                 <label
                   key={op.valor}
@@ -1522,37 +1551,27 @@ const SuperAdminActividades = ({ admin }) => {
                     onChange={() => setArchivosExport(op.valor)}
                     disabled={exportando}
                   />
-                  <span>{op.icono} {op.etiqueta}</span>
+                  <span>{op.etiqueta}</span>
                 </label>
               ))}
             </div>
           </div>
 
           <div className="export-modal-actions">
-            <button
-              className="btn btn-secondary"
+            <BotonEstiloDescarga
+              icono="cerrar"
+              className="btn-descarga--compact"
               onClick={() => setModalExportAbierto(false)}
               disabled={exportando}
             >
               Cancelar
-            </button>
-            <button
-              className="btn-descarga"
-              type="button"
+            </BotonEstiloDescarga>
+            <BotonEstiloDescarga
               onClick={() => exportarSeleccion(modoExport)}
               disabled={exportando}
             >
-              <span className="btn-descarga__text">
-                {exportando ? 'Generando...' : 'Descargar'}
-              </span>
-              <span className="btn-descarga__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" className="btn-descarga__svg">
-                  <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                  <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                  <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                </svg>
-              </span>
-            </button>
+              {exportando ? 'Generando...' : 'Descargar'}
+            </BotonEstiloDescarga>
           </div>
         </div>
       </div>

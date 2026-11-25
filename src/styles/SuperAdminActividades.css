@@ -2988,16 +2988,23 @@
   }
 
   .export-modal-actions {
-    flex-direction: column-reverse;
+    flex-wrap: wrap;
+    justify-content: center;
   }
+}
 
-  .export-modal-actions .btn:not(.btn-descarga) {
-    width: 100%;
-  }
+/* Botón compacto del mismo estilo (Limpiar / Cancelar) */
+.btn-descarga--compact {
+  width: 150px;
+}
 
-  .export-modal-actions .btn-descarga {
-    width: 100%;
-  }
+.btn-descarga--compact .btn-descarga__icon {
+  transform: translateX(109px);
+}
+
+.btn-descarga--compact:hover:not(:disabled) .btn-descarga__icon {
+  width: 148px;
+  transform: translateX(0);
 }
 
 /* ========== SUB-OPCIONES: QUÉ ARCHIVOS INCLUIR ========== */
